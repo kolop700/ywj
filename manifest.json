@@ -54,13 +54,15 @@
         "setting" : {
             "urlCheck" : false
         },
-        "usingComponents" : true
+        "usingComponents" : true,
+		"mergeVirtualHostAttributes" : true
     },
     "mp-alipay" : {
         "usingComponents" : true
     },
     "mp-baidu" : {
-        "usingComponents" : true
+        "usingComponents" : true,
+		"mergeVirtualHostAttributes" : true
     },
     "mp-toutiao" : {
         "usingComponents" : true

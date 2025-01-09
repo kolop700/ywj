@@ -30,8 +30,8 @@
       <!-- 底部按钮 -->
       <view class="bottom-btns">
         <view class="custom-btn">
-          <image src="/static/icons/icon_opendoor_bluetooth.png" mode="aspectFit" class="btn-icon"></image>
-          <text class="btn-text">蓝牙开门</text>
+          <image src="/static/icons/icon_opendoor_code.png" mode="aspectFit" class="btn-icon"></image>
+          <text class="btn-text">扫码开门</text>
         </view>
         <view class="custom-btn">
           <image src="/static/icons/icon_opendoor_one.png" mode="aspectFit" class="btn-icon"></image>

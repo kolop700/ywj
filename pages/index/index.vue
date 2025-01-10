@@ -18,7 +18,11 @@
       <!-- 功能按钮网格 -->
       <view class="grid-wrapper">
         <up-grid :border="false" :col="3">
-          <up-grid-item v-for="(item, index) in menuList" :key="index">
+          <up-grid-item 
+            v-for="(item, index) in menuList" 
+            :key="index"
+            @click="handleGridItemClick(item)"
+          >
             <view class="grid-item">
               <image :src="item.icon" mode="aspectFit" class="grid-icon"></image>
               <text class="grid-text">{{ item.name }}</text>
@@ -52,13 +56,22 @@ export default {
   data() {
     return {
       menuList: [
-        { name: '用户登录', icon: '/static/icons/icon_user_login.png' },
+        { name: '用户登录', icon: '/static/icons/icon_user_login.png', url: '/user_package/pages/login/index' },
         { name: '房屋申请', icon: '/static/icons/icon_hous_application.png' },
         { name: '访客密码', icon: '/static/icons/icon_guest_password.png' },
         { name: '开门二维码', icon: '/static/icons/icon_opendoor_password.png' },
         { name: '我的', icon: '/static/icons/icon_my.png' },
         { name: '使用帮助', icon: '/static/icons/icon_help.png' }
       ]
+    }
+  },
+  methods: {
+    handleGridItemClick(item) {
+      if (item.url) {
+        uni.navigateTo({
+          url: item.url
+        })
+      }
     }
   }
 }

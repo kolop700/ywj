@@ -39,42 +39,79 @@
   </view>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      form: {
-        user_account: '',
-        password: ''
-      },
-      msgType: '',
-      messageText: ''
-    }
-  },
-  methods: {
-    handleLogin() {
-      if (!this.form.user_account || !this.form.password) {
-        uni.showToast({
-          title: '账号和密码不能为空',
-          icon: 'none',
-          duration: 2000
-        })
-        return
-      }
-      // 这里添加您的登录逻辑
-      console.log('登录表单：', this.form)
-    },
-    goToRegister() {
-      uni.navigateTo({
-        url: '../register/index'
-      })
-    },
-    goToForgotPassword() {
-      uni.navigateTo({
-        url: '../forgot-password/index'
-      })
-    }
+<script setup>
+import { ref, getCurrentInstance } from 'vue'
+import { onLoad } from "@dcloudio/uni-app"
+onLoad((params) => {
+    console.log(params)
+})
+const { proxy } = getCurrentInstance()
+const form = ref({
+  user_account: '',
+  password: ''
+})
+const msgType = ref('')
+const messageText = ref('')
+const handleLogin = async () => {
+  console.log(form.value)
+  if (!form.value.user_account || !form.value.password) {
+    uni.showToast({
+      title: '账号和密码不能为空',
+      icon: 'none',
+      duration: 2000
+    })
+    return
   }
+  
+  try {
+    const loginData = {
+      app_phone_mac: "0",
+      app_login_type: "2",
+      user_acct: form.value.user_account,
+      user_password: form.value.password
+    }
+    console.log(loginData)
+    const res = await proxy.$api.user.UserLogin(loginData)
+    console.log(res)
+    if (res.code === "0") {
+      // 保存用户信息
+      const userData = res.data[0]
+      uni.setStorageSync('userInfo', userData)
+      uni.setStorageSync('token', userData.user_id)
+      
+      uni.showToast({
+        title: '登录成功',
+        icon: 'success'
+      })
+      // 登录成功后跳转
+      uni.navigateTo({
+        url: '/pages/index/index'
+      })
+    } else {
+      uni.showToast({
+        title: res.msg || '登录失败',
+        icon: 'none'
+      })
+    }
+  } catch (error) {
+    uni.showToast({
+      title: '登录失败，请稍后重试',
+      icon: 'none'
+    })
+    console.error('登录错误:', error)
+  }
+}
+
+const goToRegister = () => {
+  uni.navigateTo({
+    url: '../register/index'
+  })
+}
+
+const goToForgotPassword = () => {
+  uni.navigateTo({
+    url: '../forgot-password/index'
+  })
 }
 </script>
 

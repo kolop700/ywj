@@ -11,4 +11,14 @@ export default defineConfig({
 			imports: ['vue', 'vue-router']
 		})
 	],
+	server: {
+		proxy: {
+			'/yefiot': {
+				target: 'https://xy.yefiot.com',
+				changeOrigin: true,
+				secure: false,
+				rewrite: (path) => path
+			}
+		}
+	}
 })

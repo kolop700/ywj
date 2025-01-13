@@ -274,15 +274,28 @@ const handleSubmit = async () => {
     try {
       const res = await proxy.$api.user.UserRegister(form.value)
       if(res.code === "0") {
-        uni.showToast({ 
-          title: '注册成功', 
-          icon: 'success',
-          duration: 2000
-        })
-        // 延迟返回登录页
-        setTimeout(() => {
-          uni.navigateBack()
-        }, 2000)
+       // 重置成功后执行登录
+       const userStore = proxy.$store.user.useUserStore()
+        try {
+          await userStore.login({
+            user_acct: form.value.phone,
+            user_password: form.value.password
+          })
+          // 登录成功后显示重置成功提示
+          uni.showToast({ 
+            title: '注册成功', 
+            icon: 'success',
+            duration: 2000
+          })
+          // 延迟跳转到主页
+          setTimeout(() => {
+            uni.reLaunch({
+              url: '/pages/index/index'
+            })
+          }, 2000)
+        } catch (error) {
+          console.error('自动登录失败:', error)
+        }
       }
     } catch (error) {
       console.error('注册失败:', error)

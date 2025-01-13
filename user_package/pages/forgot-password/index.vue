@@ -97,9 +97,24 @@ const generateVerifyCode = () => {
   return Math.floor(100000 + Math.random() * 900000).toString()
 }
 
+// 验证手机号
+const validatePhone = () => {
+  if (!form.value.phone) {
+    uni.showToast({ title: '请输入手机号', icon: 'none' })
+    return false
+  }
+  if (!/^1[3-9]\d{9}$/.test(form.value.phone)) {
+    uni.showToast({ title: '手机号格式不正确', icon: 'none' })
+    return false
+  }
+  return true
+}
+
 // 获取验证码
 const getCode = async () => {
   if (counting.value) return
+    // 先验证手机号
+ if (!validatePhone()) return
   
   try {
     // 先生成验证码
@@ -168,15 +183,28 @@ const handleReset = async () => {
     try {
       const res = await proxy.$api.user.resetPassword(form.value)
       if(res.code === "0") {
-        uni.showToast({ 
-          title: '重置密码成功', 
-          icon: 'success',
-          duration: 2000
-        })
-        // 延迟返回登录页
-        setTimeout(() => {
-          uni.navigateBack()
-        }, 2000)
+        // 重置成功后执行登录
+        const userStore = proxy.$store.user.useUserStore()
+        try {
+          await userStore.login({
+            user_acct: form.value.phone,
+            user_password: form.value.newPassword
+          })
+          // 登录成功后显示重置成功提示
+          uni.showToast({ 
+            title: '重置密码成功', 
+            icon: 'success',
+            duration: 2000
+          })
+          // 延迟跳转到主页
+          setTimeout(() => {
+            uni.reLaunch({
+              url: '/pages/index/index'
+            })
+          }, 2000)
+        } catch (error) {
+          console.error('自动登录失败:', error)
+        }
       }
     } catch (error) {
       console.error('重置密码失败:', error)

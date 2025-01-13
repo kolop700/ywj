@@ -36,6 +36,45 @@ export const useUserStore = defineStore('user', () => {
     return userInfo.value.user_id || ''
   })
 
+  // 登录方法
+  async function login(loginData) {
+    try {
+      // 如果没有传入登录数据,使用 userInfo 中的账号密码
+      const loginParams = loginData || {
+        user_acct: userInfo.value.user_acct,
+        user_password: userInfo.value.user_password
+      }
+
+      // 获取平台信息
+      // h5环境使用相对路径，其他环境使用完整URL
+      const baseUrl =  process.env.UNI_PLATFORM === 'h5'
+        ? '/yefiot/v1/UserLogin/'
+        : 'https://xy.yefiot.com/yefiot/v1/UserLogin/'
+
+      const res = await uni.request({
+        url: baseUrl,
+        method: 'POST',
+        data: {
+          app_phone_mac: "0",
+          app_login_type: "2",
+          user_acct: loginParams.user_acct,
+          user_password: loginParams.user_password
+        }
+      })
+      
+      if (res.data.code === "0") {
+        // 登录成功,保存用户信息
+        const userData = res.data.data[0]
+        loginSuccess(userData)
+        return Promise.resolve(res.data)
+      } else {
+        return Promise.reject(res.data)
+      }
+    } catch (error) {
+      return Promise.reject(error)
+    }
+  }
+
   // 检查登录状态，未登录则跳转到登录页
   function checkLogin() {
     if (!isLogin.value) {
@@ -62,6 +101,7 @@ export const useUserStore = defineStore('user', () => {
   return {
     userInfo,
     user_id,
+    login,
     loginSuccess,
     logout,
     avatarUrl,

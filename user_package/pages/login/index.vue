@@ -62,7 +62,6 @@ const handleLogin = async () => {
     })
     return
   }
-  
   try {
     const loginData = {
       app_phone_mac: "0",
@@ -74,19 +73,18 @@ const handleLogin = async () => {
     const res = await proxy.$api.user.UserLogin(loginData)
     console.log(res)
     if (res.code === "0") {
-      // 保存用户信息
+      // 保存用户信息到pinia store
       const userData = res.data[0]
-      uni.setStorageSync('userInfo', userData)
-      uni.setStorageSync('token', userData.user_id)
+      proxy.$store.user.useUserStore().loginSuccess(userData)
       
       uni.showToast({
         title: '登录成功',
         icon: 'success'
       })
-      // 登录成功后跳转
-      uni.navigateTo({
-        url: '/pages/index/index'
-      })
+      // 延迟返回登录页
+      setTimeout(() => {
+        uni.navigateBack()
+      }, 2000)
     } else {
       uni.showToast({
         title: res.msg || '登录失败',

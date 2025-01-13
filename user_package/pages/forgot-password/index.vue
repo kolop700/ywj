@@ -1,110 +1,292 @@
 <template>
-  <view class="forgot-password-container">
-    <view class="form-box">
-      <up-form>
-        <up-form-item>
-          <up-input
-            v-model="form.phone"
-            placeholder="请输入手机号"
-            prefixIcon="phone"
-            clearable
-          ></up-input>
-        </up-form-item>
-        
-        <up-form-item>
-          <up-input
+  <view class="container">
+    <view class="form-container">
+      <!-- 手机号 -->
+      <view class="form-item">
+        <text class="label">手机</text>
+        <input
+          class="input"
+          type="number"
+          v-model="form.phone"
+          placeholder="手机号码"
+          placeholder-style="color: #999999;"
+        />
+      </view>
+
+      <!-- 验证码 -->
+      <view class="form-item">
+        <text class="label">验证码</text>
+        <view class="verify-code-box">
+          <input
+            class="input"
             v-model="form.code"
             placeholder="请输入验证码"
-            prefixIcon="checkbox-mark"
-            clearable
-          >
-            <template #suffix>
-              <up-button size="mini" :disabled="counting" @click="getCode">
-                {{ counting ? `${counter}s后重试` : '获取验证码' }}
-              </up-button>
-            </template>
-          </up-input>
-        </up-form-item>
-        
-        <up-form-item>
-          <up-input
-            v-model="form.newPassword"
-            type="password"
-            placeholder="请输入新密码"
-            prefixIcon="lock"
-            clearable
-          ></up-input>
-        </up-form-item>
-      </up-form>
-      
-      <view class="btn-group">
-        <up-button type="primary" block @click="handleReset">重置密码</up-button>
+            placeholder-style="color: #999999;"
+          />
+          <button 
+            class="code-btn" 
+            :disabled="counting"
+            @tap="getCode"
+          >{{ counting ? `${counter}s` : '发送验证码' }}</button>
+        </view>
       </view>
-      
-      <view class="action-links">
-        <navigator url="../login/index" class="link">返回登录</navigator>
+
+      <!-- 密码 -->
+      <view class="form-item">
+        <text class="label">密码</text>
+        <input
+          class="input"
+          type="password"
+          v-model="form.newPassword"
+          placeholder="请输入密码"
+          placeholder-style="color: #999999;"
+        />
       </view>
+
+      <!-- 确认密码 -->
+      <view class="form-item">
+        <text class="label">确认密码</text>
+        <input
+          class="input"
+          type="password"
+          v-model="form.confirmPassword"
+          placeholder="请再次输入密码"
+          placeholder-style="color: #999999;"
+        />
+      </view>
+    </view>
+
+    <!-- 提交按钮 -->
+    <view class="btn-container">
+      <button 
+        :class="['login-btn', {'btn-disabled': !isFormValid}]" 
+        @click="handleReset"
+      >确定</button>
+      <button class="register-btn" @click="goToLogin">返回登录</button>
     </view>
   </view>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      form: {
-        phone: '',
-        code: '',
-        newPassword: ''
-      },
-      counting: false,
-      counter: 60
-    }
-  },
-  methods: {
-    getCode() {
-      if (this.counting) return
-      // 发送验证码逻辑
-      this.counting = true
-      this.counter = 60
-      const timer = setInterval(() => {
-        if (this.counter > 0) {
-          this.counter--
-        } else {
-          this.counting = false
-          clearInterval(timer)
-        }
-      }, 1000)
-    },
-    handleReset() {
-      // 重置密码逻辑
-      console.log('重置密码表单：', this.form)
+<script setup>
+import { ref, computed, getCurrentInstance } from 'vue'
+import { onLoad } from "@dcloudio/uni-app"
+const { proxy } = getCurrentInstance()
+
+const form = ref({
+  phone: '', // 预设手机号
+  code: '',
+  newPassword: '',
+  confirmPassword: ''
+})
+
+const counting = ref(false)
+const counter = ref(60)
+// 保存验证码和对应的手机号
+const savedVerifyCode = ref('')
+const savedPhone = ref('')
+
+// 计算属性判断表单是否有效
+const isFormValid = computed(() => {
+  return form.value.code && 
+         form.value.newPassword && 
+         form.value.confirmPassword
+})
+
+// 生成6位随机验证码
+const generateVerifyCode = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString()
+}
+
+// 获取验证码
+const getCode = async () => {
+  if (counting.value) return
+  
+  try {
+    // 先生成验证码
+    const verifyCode = generateVerifyCode()
+    
+    const res = await proxy.$api.user.sendSMS(form.value.phone, verifyCode)
+    // 保存验证码和手机号到本地变量
+    savedVerifyCode.value = verifyCode
+    savedPhone.value = form.value.phone
+    
+    uni.showToast({ title: '验证码已发送', icon: 'success' })
+    // 开始倒计时
+    counting.value = true
+    counter.value = 60
+    const timer = setInterval(() => {
+      if (counter.value > 0) {
+        counter.value--
+      } else {
+        counting.value = false
+        clearInterval(timer)
+      }
+    }, 1000)
+  } catch (error) {
+    console.error('发送验证码错误:', error)
+  }
+}
+
+// 表单验证
+const validateForm = () => {
+  if (!form.value.code) {
+    uni.showToast({ title: '请输入验证码', icon: 'none' })
+    return false
+  }
+  
+  // 验证验证码
+  if (!savedVerifyCode.value || !savedPhone.value) {
+    uni.showToast({ title: '请先获取验证码', icon: 'none' })
+    return false
+  }
+  if (savedPhone.value !== form.value.phone) {
+    uni.showToast({ title: '手机号与获取验证码时不一致', icon: 'none' })
+    return false
+  }
+  if (!form.value.newPassword) {
+    uni.showToast({ title: '请输入密码', icon: 'none' })
+    return false
+  }
+  if (form.value.newPassword.length < 6) {
+    uni.showToast({ title: '密码不能少于6位', icon: 'none' })
+    return false
+  }
+  if (form.value.newPassword !== form.value.confirmPassword) {
+    uni.showToast({ title: '两次输入的密码不一致', icon: 'none' })
+    return false
+  }
+  if (form.value.code !== savedVerifyCode.value) {
+    uni.showToast({ title: '验证码错误', icon: 'none' })
+    return false
+  }
+  return true
+}
+
+// 提交表单
+const handleReset = async () => {
+  if (validateForm()) {
+    try {
+      const res = await proxy.$api.user.resetPassword(form.value)
+      if(res.code === "0") {
+        uni.showToast({ 
+          title: '重置密码成功', 
+          icon: 'success',
+          duration: 2000
+        })
+        // 延迟返回登录页
+        setTimeout(() => {
+          uni.navigateBack()
+        }, 2000)
+      }
+    } catch (error) {
+      console.error('重置密码失败:', error)
+      uni.showToast({ 
+        title: error.msg || '重置密码失败', 
+        icon: 'none' 
+      })
     }
   }
+}
+
+// 返回登录页
+const goToLogin = () => {
+  uni.navigateBack()
 }
 </script>
 
 <style lang="scss">
-.forgot-password-container {
+.container {
   min-height: 100vh;
-  padding: 40rpx;
   background-color: #fff;
-  
-  .form-box {
-    margin-top: 40rpx;
+  padding: 20rpx 40rpx;
+}
+
+.form-container {
+  .form-item {
+    display: flex;
+    align-items: center;
+    padding: 25rpx 0;
+    border-bottom: 1px solid #eee;
     
-    .btn-group {
-      margin-top: 60rpx;
+    .label {
+      width: 140rpx;
+      font-size: 30rpx;
+      color: #303030;
+      font-weight: 500;
     }
     
-    .action-links {
-      text-align: center;
-      margin-top: 30rpx;
+    .input {
+      flex: 1;
+      font-size: 30rpx;
+      color: #303030;
+    }
+    
+    .verify-code-box {
+      flex: 1;
+      display: flex;
+      align-items: center;
       
-      .link {
-        color: #2979ff;
-        font-size: 28rpx;
+      .input {
+        flex: 1;
       }
+      
+      .code-btn {
+        margin-left: 20rpx;
+        font-size: 28rpx;
+        color: #FF0036;
+        background: #fff;
+        border: 1px solid #FF0036;
+        border-radius: 4px;
+        padding: 0 20rpx;
+        height: 60rpx;
+        line-height: 60rpx;
+        
+        &[disabled] {
+          color: #999;
+          border-color: #999;
+        }
+      }
+    }
+  }
+}
+
+.btn-container {
+  button {
+    margin-top: 30rpx;
+    width: 100%;
+    height: 110rpx;
+    line-height: 110rpx;
+    font-size: 36rpx;
+    font-weight: 800;
+    border-radius: 12rpx;
+    margin-bottom: 30rpx;
+    
+    &::after {
+      border: none;
+    }
+  }
+  
+  .login-btn {
+    background-color: #FF0036;
+    color: #fff;
+    
+    &:active {
+      opacity: 0.8;
+    }
+    
+    &.btn-disabled {
+      background-color: #A7A7A7;
+      opacity: 1;
+    }
+  }
+  
+  .register-btn {
+    background-color: #fff;
+    color: #333;
+    border: 1rpx solid #FF0036;
+    
+    &:active {
+      background-color: #f5f5f5;
     }
   }
 }

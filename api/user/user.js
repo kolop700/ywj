@@ -42,5 +42,17 @@ export default {
         user_card_b: ""
       }
     })
+  },
+  // 重置密码
+  resetPassword(data) {
+    return request({
+      url: BASE_API + 'changePwd/',
+      method: 'post',
+      data: {
+        user_acct: data.phone,
+        user_id: 0,
+        user_password: data.newPassword
+      }
+    })
   }
 } 

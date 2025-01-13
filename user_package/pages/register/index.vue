@@ -1,296 +1,312 @@
 <template>
   <view class="container">
-    <up-form
-      labelPosition="left"
-      :model="form"
-      :rules="rules"
-      ref="registerForm"
-      labelWidth="70"
-      :labelStyle="{
-        fontWeight: '500',
-        fontSize: '15px',
-        color: '#303030',
-        lineHeight: '18px'
-      }"
-    >
+    <view class="form-container">
       <!-- 手机号 -->
-      <up-form-item
-        label="手机"
-        prop="phone"
-        borderBottom
-      >
-        <up-input
-          v-model="form.phone"
+      <view class="form-item">
+        <text class="label">手机</text>
+        <input
+          class="input"
           type="number"
-          border="none"
+          v-model="form.phone"
           placeholder="请输入手机号码"
-        ></up-input>
-      </up-form-item>
+          placeholder-style="color: #999999;"
+        />
+      </view>
 
       <!-- 验证码 -->
-      <up-form-item
-        label="验证码"
-        prop="code"
-        borderBottom
-      >
+      <view class="form-item">
+        <text class="label">验证码</text>
         <view class="verify-code-box">
-          <up-input
+          <input
+            class="input"
             v-model="form.code"
-            border="none"
             placeholder="请输入验证码"
-          ></up-input>
-          <view class="code-btn">
-            <up-button
-              @tap="getCode"
-              :text="counting ? `${counter}s` : '发送验证码'"
-              type="success"
-              size="mini"
-              :disabled="counting"
-              :customStyle="{
-                width: '83px',
-                height: '31px',
-                borderRadius: '4px',
-                border: '1px solid #FA4E52',
-                color: '#FA4E52',
-                backgroundColor: '#fff'
-              }"
-            ></up-button>
-          </view>
+            placeholder-style="color: #999999;"
+          />
+          <button 
+            class="code-btn" 
+            :disabled="counting"
+            @tap="getCode"
+          >{{ counting ? `${counter}s` : '发送验证码' }}</button>
         </view>
-      </up-form-item>
+      </view>
 
       <!-- 姓名 -->
-      <up-form-item
-        label="姓名"
-        prop="name"
-        borderBottom
-      >
-        <up-input
+      <view class="form-item">
+        <text class="label">姓名</text>
+        <input
+          class="input"
           v-model="form.name"
-          border="none"
           placeholder="请输入姓名"
-        ></up-input>
-      </up-form-item>
+          placeholder-style="color: #999999;"
+        />
+      </view>
 
       <!-- 密码 -->
-      <up-form-item
-        label="密码"
-        prop="password"
-        borderBottom
-      >
-        <up-input
-          v-model="form.password"
+      <view class="form-item">
+        <text class="label">密码</text>
+        <input
+          class="input"
           type="password"
-          border="none"
+          v-model="form.password"
           placeholder="请输入密码"
-        ></up-input>
-      </up-form-item>
+          placeholder-style="color: #999999;"
+        />
+      </view>
 
       <!-- 确认密码 -->
-      <up-form-item
-        label="确认密码"
-        prop="confirmPassword"
-        borderBottom
-      >
-        <up-input
-          v-model="form.confirmPassword"
+      <view class="form-item">
+        <text class="label">确认密码</text>
+        <input
+          class="input"
           type="password"
-          border="none"
+          v-model="form.confirmPassword"
           placeholder="请再次输入密码"
-        ></up-input>
-      </up-form-item>
+          placeholder-style="color: #999999;"
+        />
+      </view>
 
       <!-- 性别 -->
-      <up-form-item
-        label="性别"
-        prop="gender"
-        borderBottom
-        @click="showGenderPicker = true; hideKeyboard()"
-      >
-        <up-input
-          v-model="form.gender"
-          disabled
-          disabledColor="#ffffff"
-          placeholder="请选择性别"
-          border="none"
-        ></up-input>
-        <template #right>
-          <up-icon name="arrow-right"></up-icon>
-        </template>
-      </up-form-item>
-    </up-form>
+      <view class="form-item">
+        <text class="label">性别</text>
+        <picker 
+          @change="onGenderChange" 
+          :value="genderIndex" 
+          :range="genderColumns"
+        >
+          <view class="picker-content">
+            <text :class="['picker-text', form.gender ? 'selected' : '']">
+              {{ form.gender || '请选择性别（必填）' }}
+            </text>
+            <uni-icons type="right" size="16" color="#999999"></uni-icons>
+          </view>
+        </picker>
+      </view>
+    </view>
 
-    <!-- 在提交按钮前添加协议同意选项 -->
+    <!-- 协议同意选项 -->
     <view class="agreement">
-    <up-checkbox
-        name="agree"
-        activeColor="red"
-        usedAlone
-        v-model:checked="checked"></up-checkbox>
+      <checkbox-group @change="onCheckboxChange">
+        <checkbox 
+          :checked="checked" 
+          color="#FF0036"
+          style="transform:scale(0.7)"
+        />
+      </checkbox-group>
       <text class="text-agreement">我已阅读并同意本程序的</text>
       <text class="link" @tap="openUserAgreement">《用户服务协议》</text>
       <text class="normal-text">及</text>
-      <text class="link normal-text" @tap="openPrivacyPolicy">《隐私政策》</text>
+      <text class="link" @tap="openPrivacyPolicy">《隐私政策》</text>
     </view>
 
     <!-- 提交按钮 -->
     <view class="btn-container">
-      <button class="login-btn" @click="handleSubmit">提交</button>
+      <button 
+        :class="['login-btn', {'btn-disabled': !isFormValid}]" 
+        @click="handleSubmit"
+      >提交</button>
+      <button class="register-btn" @click="goToLogin">返回登录</button>
     </view>
-
-    <!-- 性别选择器 -->
-    <up-picker
-      :show="showGenderPicker"
-      :columns="[genderColumns]"
-      title="请选择性别"
-      @cancel="showGenderPicker = false"
-      @confirm="confirmGender"
-      @change="changeGender"
-    ></up-picker>
   </view>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      form: {
-        phone: '',
-        code: '',
-        name: '',
-        password: '',
-        confirmPassword: '',
-        gender: ''
-      },
-      rules: {
-        phone: [{
-          required: true,
-          message: '请输入手机号',
-          trigger: 'blur'
-        }, {
-          validator: (rule, value, callback) => {
-            return uni.$u.test.mobile(value);
-          },
-          message: '手机号格式不正确',
-          trigger: 'blur'
-        }],
-        code: [{
-          required: true,
-          message: '请输入验证码',
-          trigger: 'blur'
-        }],
-        name: [{
-          required: true,
-          message: '请输入姓名',
-          trigger: 'blur'
-        }],
-        password: [{
-          required: true,
-          min: 6,
-          message: '密码不能少于6位',
-          trigger: 'blur'
-        }],
-        confirmPassword: [{
-          required: true,
-          validator: (rule, value, callback) => {
-            return value === this.form.password;
-          },
-          message: '两次输入的密码不一致',
-          trigger: 'blur'
-        }],
-        gender: [{
-          required: true,
-          message: '请选择性别',
-          trigger: 'change'
-        }]
-      },
-      genderColumns: ['男', '女'],
-      showGenderPicker: false,
-      counting: false,
-      counter: 60,
-      isValid: false,
-      checked: false
-    }
-  },
-  methods: {
-    getCode() {
-      if (this.counting || !this.form.phone) {
-        !this.form.phone && uni.$u.toast('请输入手机号')
-        return
-      }
-      
-      if (!uni.$u.test.mobile(this.form.phone)) {
-        uni.$u.toast('请输入正确的手机号')
-        return
-      }
+<script setup>
+import { ref, computed, getCurrentInstance } from 'vue'
+import { onLoad } from "@dcloudio/uni-app"
+const { proxy } = getCurrentInstance()
 
-      this.counting = true
-      this.counter = 60
-      const timer = setInterval(() => {
-        if (this.counter > 0) {
-          this.counter--
-        } else {
-          this.counting = false
-          clearInterval(timer)
-        }
-      }, 1000)
-    },
-    confirmGender(e) {
-      this.form.gender = e.value[0]
-      this.showGenderPicker = false
-      this.$refs.registerForm.validateField('gender')
-    },
-    changeGender(e) {
-      console.log('性别选择变化：', e)
-    },
-    hideKeyboard() {
-      uni.hideKeyboard()
-    },
-    handleSubmit() {
-      if (!this.checked ) {
-        uni.$u.toast('请先同意用户协议和隐私政策')
-        return
-      }
-      
-      this.$refs.registerForm.validate().then(res => {
-        uni.$u.toast('验证通过')
-        console.log('注册表单：', this.form)
-      }).catch(errors => {
-        uni.$u.toast('请检查表单填写')
-      })
-    },
-    validateAllFields() {
-      this.$refs.registerForm.validate().then(() => {
-        this.isValid = this.checked && this.isAgreed
-      }).catch(() => {
-        this.isValid = false
-      })
-    },
-    handleFieldChange() {
-      if (this.form.phone && this.form.code && this.form.name && 
-          this.form.password && this.form.confirmPassword && this.form.gender) {
-        this.validateAllFields()
+onLoad((params) => {
+  console.log(params)
+})
+
+const form = ref({
+  phone: '',
+  code: '',
+  name: '',
+  password: '',
+  confirmPassword: '',
+  gender: ''
+})
+
+const genderColumns = ['男', '女']
+const genderIndex = ref(0)
+const counting = ref(false)
+const counter = ref(60)
+const checked = ref(false)
+// 保存验证码和对应的手机号
+const savedVerifyCode = ref('')
+const savedPhone = ref('')
+
+// 计算属性判断表单是否有效
+const isFormValid = computed(() => {
+  return form.value.phone && 
+         form.value.code && 
+         form.value.name && 
+         form.value.password && 
+         form.value.confirmPassword && 
+         form.value.gender &&
+         checked.value
+})
+
+// 验证手机号
+const validatePhone = () => {
+  if (!form.value.phone) {
+    uni.showToast({ title: '请输入手机号', icon: 'none' })
+    return false
+  }
+  if (!/^1[3-9]\d{9}$/.test(form.value.phone)) {
+    uni.showToast({ title: '手机号格式不正确', icon: 'none' })
+    return false
+  }
+  return true
+}
+
+// 生成6位随机验证码
+const generateVerifyCode = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString()
+}
+
+// 获取验证码
+const getCode = async () => {
+  if (counting.value) return
+  
+  // 先验证手机号
+  if (!validatePhone()) return
+  
+  try {
+    // 先生成验证码
+    const verifyCode = generateVerifyCode()
+    
+    const res = await proxy.$api.user.sendSMS(form.value.phone, verifyCode)
+    // 保存验证码和手机号到本地变量
+    savedVerifyCode.value = verifyCode
+    savedPhone.value = form.value.phone
+    
+    uni.showToast({ title: '验证码已发送', icon: 'success' })
+    // 开始倒计时
+    counting.value = true
+    counter.value = 60
+    const timer = setInterval(() => {
+      if (counter.value > 0) {
+        counter.value--
       } else {
-        this.isValid = false
+        counting.value = false
+        clearInterval(timer)
       }
-    },
-    openUserAgreement() {
-      uni.navigateTo({
-        url: '/pages/agreement/user'
+    }, 1000)
+  } catch (error) {
+    console.error('发送验证码错误:', error)
+  }
+}
+
+// 表单验证
+const validateForm = () => {
+  if (!form.value.phone) {
+    uni.showToast({ title: '请输入手机号', icon: 'none' })
+    return false
+  }
+  if (!/^1[3-9]\d{9}$/.test(form.value.phone)) {
+    uni.showToast({ title: '手机号格式不正确', icon: 'none' })
+    return false
+  }
+  if (!form.value.code) {
+    uni.showToast({ title: '请输入验证码', icon: 'none' })
+    return false
+  }
+  
+  // 验证验证码
+  if (!savedVerifyCode.value || !savedPhone.value) {
+    uni.showToast({ title: '请先获取验证码', icon: 'none' })
+    return false
+  }
+  if (savedPhone.value !== form.value.phone) {
+    uni.showToast({ title: '手机号与获取验证码时不一致', icon: 'none' })
+    return false
+  }
+
+  if (!form.value.name) {
+    uni.showToast({ title: '请输入姓名', icon: 'none' })
+    return false
+  }
+  if (!form.value.password) {
+    uni.showToast({ title: '请输入密码', icon: 'none' })
+    return false
+  }
+  if (form.value.password.length < 6) {
+    uni.showToast({ title: '密码不能少于6位', icon: 'none' })
+    return false
+  }
+  if (form.value.password !== form.value.confirmPassword) {
+    uni.showToast({ title: '两次输入的密码不一致', icon: 'none' })
+    return false
+  }
+  if (!form.value.gender) {
+    uni.showToast({ title: '请选择性别', icon: 'none' })
+    return false
+  }
+  if (form.value.code !== savedVerifyCode.value) {
+    uni.showToast({ title: '验证码错误', icon: 'none' })
+    return false
+  }
+  return true
+}
+
+// 性别选择改变
+const onGenderChange = (e) => {
+  const index = e.detail.value
+  genderIndex.value = index
+  form.value.gender = genderColumns[index]
+}
+
+// 协议勾选改变
+const onCheckboxChange = (e) => {
+  checked.value = e.detail.value.length > 0
+}
+
+// 提交表单
+const handleSubmit = async () => {
+  if (!checked.value) {
+    uni.showToast({ title: '请先同意用户协议和隐私政策', icon: 'none' })
+    return
+  }
+  
+  if (validateForm()) {
+    try {
+      const res = await proxy.$api.user.UserRegister(form.value)
+      if(res.code === "0") {
+        uni.showToast({ 
+          title: '注册成功', 
+          icon: 'success',
+          duration: 2000
+        })
+        // 延迟返回登录页
+        setTimeout(() => {
+          uni.navigateBack()
+        }, 2000)
+      }
+    } catch (error) {
+      console.error('注册失败:', error)
+      uni.showToast({ 
+        title: error.msg || '注册失败', 
+        icon: 'none' 
       })
-    },
-    openPrivacyPolicy() {
-      uni.navigateTo({
-        url: '/pages/agreement/privacy'
-      })
-    }
-  },
-  watch: {
-    form: {
-      handler: 'handleFieldChange',
-      deep: true
     }
   }
+}
+
+// 打开用户协议
+const openUserAgreement = () => {
+  uni.navigateTo({ url: '/user_package/pages/agreement/user' })
+}
+
+// 打开隐私政策
+const openPrivacyPolicy = () => {
+  uni.navigateTo({ url: '/user_package/pages/agreement/privacy' })
+}
+
+// 返回登录页
+const goToLogin = () => {
+  uni.navigateBack()
 }
 </script>
 
@@ -301,61 +317,127 @@ export default {
   padding: 20rpx 40rpx;
 }
 
-.verify-code-box {
-  display: flex;
-  align-items: center;
-  
-  .up-input {
-    flex: 1;
-  }
-  
-  .code-btn {
-    flex-shrink: 0;
+.form-container {
+  .form-item {
+    display: flex;
+    align-items: center;
+    padding: 25rpx 0;
+    border-bottom: 1px solid #eee;
+    
+    .label {
+      width: 140rpx;
+      font-size: 30rpx;
+      color: #303030;
+      font-weight: 500;
+    }
+    
+    .input {
+      flex: 1;
+      font-size: 30rpx;
+      color: #303030;
+    }
+    
+    .verify-code-box {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      
+      .input {
+        flex: 1;
+      }
+      
+      .code-btn {
+        margin-left: 20rpx;
+        font-size: 28rpx;
+        color: #FF0036;
+        background: #fff;
+        border: 1px solid #FF0036;
+        border-radius: 4px;
+        padding: 0 20rpx;
+        height: 60rpx;
+        line-height: 60rpx;
+        
+        &[disabled] {
+          color: #999;
+          border-color: #999;
+        }
+      }
+    }
+    
+    .picker-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-width: 500rpx;
+      
+      .picker-text {
+        font-size: 30rpx;
+        color: #999;
+      }
+    }
+
+    .picker-text.selected {
+      color: #303030;
+    }
   }
 }
 
 .agreement {
   display: flex;
   align-items: center;
-  margin-top: 20rpx;
- flex-wrap: wrap;
+  flex-wrap: wrap;
+  margin-top: 30rpx;
   
-  
-  .text-agreement {
-    font-size: 28rpx;
-    color: #A7A7A7;
-  }
-  
-  .normal-text {
+  .text-agreement, .normal-text {
     font-size: 28rpx;
     color: #A7A7A7;
   }
   
   .link {
-    color: #c21a04;
+    color: #FF0036;
     font-size: 28rpx;
   }
-  
-  .text-privacy {
-    margin-left: 60rpx;
-    margin-top: 5rpx;
-  }
-
-  
 }
 
-// 修改按钮容器样式，减小上边距
 .btn-container {
-  margin-top: 20rpx;
-}
-
-.login-btn {
+  button {
+    margin-top: 30rpx;
+    width: 100%;
+    height: 110rpx;
+    line-height: 110rpx;
+    font-size: 36rpx;
+    font-weight: 800;
+    border-radius: 12rpx;
+    margin-bottom: 30rpx;
+    
+    &::after {
+      border: none;
+    }
+  }
+  
+  .login-btn {
     background-color: #FF0036;
     color: #fff;
     
     &:active {
       opacity: 0.8;
     }
+    
+    &.btn-disabled {
+      background-color: #A7A7A7;
+      opacity: 1;
+    }
   }
   
+  .register-btn {
+    background-color: #fff;
+    color: #333;
+    border: 1rpx solid #FF0036;
+    
+    &:active {
+      background-color: #f5f5f5;
+    }
+  }
+}
 </style> 

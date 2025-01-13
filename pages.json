@@ -38,33 +38,21 @@
 					"style": {
 						"navigationBarTitleText": "忘记密码"
 					}
+				},
+				{
+					"path": "pages/agreement/user",
+					"style": {
+						"navigationBarTitleText": "用户服务协议"
+					}
+				},
+				{
+					"path": "pages/agreement/privacy",
+					"style": {
+						"navigationBarTitleText": "隐私政策"
+					}
 				}
 			]
 		}
-		// ,
-		// {
-		// 	"root": "workbench_package",
-		// 	"pages": [
-		// 		{
-		// 			"path": "pages/dashboard/index",
-		// 			"style": {
-		// 				"navigationBarTitleText": "工作台"
-		// 			}
-		// 		},
-		// 		{
-		// 			"path": "pages/house-manage/index",
-		// 			"style": {
-		// 				"navigationBarTitleText": "房屋管理"
-		// 			}
-		// 		},
-		// 		{
-		// 			"path": "pages/visitor-manage/index",
-		// 			"style": {
-		// 				"navigationBarTitleText": "访客管理"
-		// 			}
-		// 		}
-		// 	]
-		// }
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",

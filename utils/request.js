@@ -33,15 +33,15 @@ const request = ({
             // 收到开发者服务器成功返回的回调函数
             success: (res) => {
                 console.log(res)
-                const { code, msg } = res.data;
+                const { code, Code, msg, Message } = res.data;
                 console.log(res.data)
-                if (code === "0") {
+                if (code === "0" || Code === "OK") {
                     return resolve(res.data);
                 }
                 uni.showToast({
                     icon: 'none',
                     duration: 3000,
-                    title: msg || '请求失败',
+                    title: msg || Message || '请求失败',
                 });
                 return reject(res.data);
             },

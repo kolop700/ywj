@@ -1,8 +1,51 @@
 import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
 
 export const useUserStore = defineStore('user', () => {
   const userInfo = ref({})
   const user_id = ref('')
+  
+  // 基础图片URL
+  const BASE_IMG_URL = 'https://xy.yefiot.com/yefiot/v1/'
+  
+  // 头像完整URL的计算属性
+  const avatarUrl = computed(() => {
+    if (userInfo.value.user_face_url && userInfo.value.user_face_tag) {
+      return `${BASE_IMG_URL}${userInfo.value.user_face_url}?tag=${userInfo.value.user_face_tag}`
+    }
+    return '' // 返回默认头像或空字符串
+  })
+
+  // 判断是否登录
+  const isLogin = computed(() => {
+    return !!user_id.value && !!userInfo.value.user_acct
+  })
+
+  // 获取账号
+  const userAcct = computed(() => {
+    return userInfo.value.user_acct || ''
+  })
+
+  // 获取用户名
+  const userName = computed(() => {
+    return userInfo.value.user_name || ''
+  })
+
+  // 获取用户ID
+  const userId = computed(() => {
+    return userInfo.value.user_id || ''
+  })
+
+  // 检查登录状态，未登录则跳转到登录页
+  function checkLogin() {
+    if (!isLogin.value) {
+      uni.navigateTo({
+        url: '/user_package/pages/login/index'
+      })
+      return false
+    }
+    return true
+  }
 
   // 登录成功
   function loginSuccess(data) {
@@ -20,7 +63,14 @@ export const useUserStore = defineStore('user', () => {
     userInfo,
     user_id,
     loginSuccess,
-    logout
+    logout,
+    avatarUrl,
+    BASE_IMG_URL,
+    isLogin,
+    userName,
+    userAcct,
+    userId,
+    checkLogin
   }
 }) 
 
@@ -36,3 +86,36 @@ export const useUserStore = defineStore('user', () => {
 
 // // 退出登录
 // userStore.logout()
+
+// const { proxy } = getCurrentInstance()
+// const userStore = proxy.$store.user.useUserStore()
+
+// // 获取用户名
+// const userName = userStore.userName
+
+// // 获取用户ID
+// const userId = userStore.userId
+
+// // 在template中使用
+// <text>{{ userStore.userName }}</text>
+// <text>{{ userStore.userId }}</text>
+
+
+// const { proxy } = getCurrentInstance()
+// const userStore = proxy.$store.user.useUserStore()
+
+// // 在需要登录才能访问的页面或方法中
+// function someAction() {
+//   // 检查是否登录，未登录会自动跳转到登录页
+//   if (!userStore.checkLogin()) {
+//     return // 如果未登录，终止后续操作
+//   }
+  
+//   // 已登录，继续执行相关操作
+//   // ...
+// }
+
+// // 或者在页面加载时检查
+// onLoad(() => {
+//   userStore.checkLogin()
+// })

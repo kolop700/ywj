@@ -2,17 +2,20 @@
 import { getCurrentInstance } from 'vue'
 
 export default {
-	onLaunch: async function() {
+	onLaunch: function() {
 		console.log('App Launch')
 		const { proxy } = getCurrentInstance()
 		const userStore = proxy.$store.user.useUserStore()
-		// 只在有完整的登录信息时尝试登录
+		
+		// 将登录请求放在后台执行，不阻塞界面加载
+		setTimeout(async () => {
 			try {
 				await userStore.login()
 				console.log('自动登录成功')
 			} catch (error) {
 				console.log('自动登录失败', error)
 			}
+		}, 0)
 	},
 	onShow: function() {
 		console.log('App Show')

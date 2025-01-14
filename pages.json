@@ -13,7 +13,13 @@
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "星云小卫"
+				"navigationBarTitleText": "首页"
+			}
+		},
+		{
+			"path": "pages/house/apply",
+			"style": {
+				"navigationBarTitleText": "房屋申请"
 			}
 		}
 	],

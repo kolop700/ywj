@@ -154,6 +154,7 @@ const menuList = ref([
   { 
     name: "房屋申请", 
     icon: "/static/icons/icon_hous_application.png",
+    url: "/pages/house/apply",
     needLogin: true
   },
   { 

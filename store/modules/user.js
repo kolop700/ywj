@@ -126,6 +126,20 @@ export const useUserStore = defineStore('user', () => {
     deviceStore.clearDeviceList()
   }
 
+  const getUserRoomList = async () => {
+    try {
+      const res = await userApi.getUserRoomList(user_id.value)
+      return res.data || []
+    } catch (error) {
+      console.error('获取房屋列表失败:', error)
+      return []
+    }
+  }
+
+  const bindUserRoom = async (params) => {
+    return await userApi.bindUserRoom(params)
+  }
+
   return {
     userInfo,
     user_id,
@@ -140,7 +154,9 @@ export const useUserStore = defineStore('user', () => {
     userAcct,
     userId,
     checkLogin,
-    updateRoomList
+    updateRoomList,
+    getUserRoomList,
+    bindUserRoom
   }
 }) 
 

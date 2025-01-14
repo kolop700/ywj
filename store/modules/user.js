@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import request from '@/utils/request'
 
 export const useUserStore = defineStore('user', () => {
   const userInfo = ref({})
@@ -45,15 +46,9 @@ export const useUserStore = defineStore('user', () => {
         user_password: userInfo.value.user_password
       }
 
-      // 获取平台信息
-      // h5环境使用相对路径，其他环境使用完整URL
-      const baseUrl =  process.env.UNI_PLATFORM === 'h5'
-        ? '/yefiot/v1/UserLogin/'
-        : 'https://xy.yefiot.com/yefiot/v1/UserLogin/'
-
-      const res = await uni.request({
-        url: baseUrl,
-        method: 'POST',
+      const res = await request({
+        url: '/yefiot/v1/UserLogin/',
+        method: 'post',
         data: {
           app_phone_mac: "0",
           app_login_type: "2",
@@ -62,14 +57,10 @@ export const useUserStore = defineStore('user', () => {
         }
       })
       
-      if (res.data.code === "0") {
-        // 登录成功,保存用户信息
-        const userData = res.data.data[0]
-        loginSuccess(userData)
-        return Promise.resolve(res.data)
-      } else {
-        return Promise.reject(res.data)
-      }
+      // 登录成功,保存用户信息
+      const userData = res.data[0]
+      loginSuccess(userData)
+      return Promise.resolve(res)
     } catch (error) {
       return Promise.reject(error)
     }

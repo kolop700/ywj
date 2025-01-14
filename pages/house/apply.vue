@@ -127,11 +127,11 @@
     </view>
 </template>
 <script setup>
-import { ref, getCurrentInstance, computed, onMounted } from 'vue'
+import { ref, getCurrentInstance, computed, onMounted, nextTick } from 'vue'
 import { storeToRefs } from 'pinia'
 import { onLoad } from '@dcloudio/uni-app'
 import uniIcons from '@/uni_modules/uni-icons/components/uni-icons/uni-icons.vue'
-import { getPageHeight } from '@/utils/layout'
+import { getPageHeight, calculateScrollViewHeight } from '@/utils/layout'
 import scanUtils from '@/utils/scanUtils'
 
 const { proxy } = getCurrentInstance()
@@ -162,6 +162,22 @@ const cardModel = ref(true)
 // 页面高度
 const windowHeight = ref('100vh')
 
+// 列表高度
+const listHeight = ref(750)
+
+// 计算列表高度
+const updateListHeight = async () => {
+  // #ifdef MP-WEIXIN || APP-PLUS
+  try {
+    const height = await calculateScrollViewHeight()
+    listHeight.value = height
+  } catch (error) {
+    console.error('计算高度失败:', error)
+    listHeight.value = 750 // 默认高度
+  }
+  // #endif
+}
+
 // 格式化日期
 const getDateOnly = (dateString) => {
   if (!dateString) return ''
@@ -191,9 +207,19 @@ const loadHouseList = async () => {
 }
 
 // 页面加载时获取房屋列表和设置高度
-onMounted(() => {
+onMounted(async () => {
   windowHeight.value = getPageHeight()
+  await updateListHeight()
   loadHouseList()
+})
+
+// 监听窗口大小变化
+onLoad(() => {
+  // #ifdef MP-WEIXIN || APP-PLUS
+  uni.onWindowResize(() => {
+    updateListHeight()
+  })
+  // #endif
 })
 
 // 表单是否有效
@@ -209,6 +235,13 @@ const roomPopup = ref(null)
 const inputChange = (e) => {
   const { field } = e.currentTarget.dataset
   formData.value[field] = e.detail.value
+  
+  // 如果是楼宇地址输入变化，清空房间
+  if (field === 'building') {
+    formData.value.room = ''
+    roomList.value = []
+    selectedUnit.value = null
+  }
 }
 
 // 扫描二维码
@@ -275,6 +308,11 @@ const showBuildingSearch = async () => {
     return
   }
   
+  // 清空房间相关数据
+  formData.value.room = ''
+  roomList.value = []
+  selectedUnit.value = null
+  
   try {
     const res = await deviceApi.getUnitList({
       name: searchText
@@ -322,6 +360,11 @@ const hideRoomDialog = () => {
 
 // 选择楼宇
 const selectDialogBuilding = (item) => {
+  // 清空房间相关数据
+  formData.value.room = ''
+  roomList.value = []
+  
+  // 设置新的楼宇信息
   selectedUnit.value = item
   formData.value.building = item.unitname
   hideDialog()
@@ -384,22 +427,34 @@ const submitForm = () => {
 </script>
 
 <style lang="scss" scoped>
+/* #ifdef MP-WEIXIN */
+page {
+  height: 100vh;
+  background-color: #F5F5F5;
+}
+/* #endif */
+
 .container {
-  min-height: v-bind(windowHeight);
-  height: v-bind(windowHeight);
+  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   background: #F5F5F5;
   box-sizing: border-box;
-  padding-bottom: env(safe-area-inset-bottom);
+  overflow: hidden;
+  /* #ifdef MP-WEIXIN || APP-PLUS */
+  padding-top: var(--status-bar-height);
+  /* #endif */
 }
 
 .form-section {
   background: #FFFFFF;
   padding: 15rpx 0;
   flex: none;
+  width: 100%;
 }
 
+/* #ifdef H5 */
 .list-section {
   flex: 1;
   background: #FFFFFF;
@@ -407,17 +462,28 @@ const submitForm = () => {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  min-height: 0;
 }
+/* #endif */
+
+/* #ifdef MP-WEIXIN || APP-PLUS */
+.list-section {
+  background: #FFFFFF;
+  margin: 10rpx 0;
+  height: v-bind(listHeight + 'rpx');
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+/* #endif */
 
 .card {
+  height: 100%;
   margin: 0;
   background: #fff;
   padding: 20rpx;
   display: flex;
   flex-direction: column;
-  min-height: 0;
-  height: 100%;
 }
 
 .header {
@@ -447,19 +513,21 @@ const submitForm = () => {
   flex: none;
   padding: 15rpx 20rpx;
   background: #FFFFFF;
-  height: 150rpx;
+  height: 120rpx;
   box-sizing: border-box;
-  margin-bottom: constant(safe-area-inset-bottom);
-  margin-bottom: env(safe-area-inset-bottom);
+  width: 100%;
 }
 
 .ad-container {
   width: 100%;
-  height: 100rpx;
+  height: 100%;
   background: #F8F8F8;
   border-radius: 12rpx;
   overflow: hidden;
   position: relative;
+  /* #ifdef MP-WEIXIN */
+  margin-bottom: 0;
+  /* #endif */
 }
 
 .ad-image {
@@ -571,6 +639,9 @@ const submitForm = () => {
 
 /* 修改弹出层背景 */
 :deep(.uni-popup) {
+  /* #ifdef MP-WEIXIN || APP-PLUS */
+  z-index: 999;
+  /* #endif */
   background-color: rgba(0, 0, 0, 0.5) !important;
 }
 
@@ -668,4 +739,35 @@ const submitForm = () => {
   color: #e54d42;
   background: rgba(229, 77, 66, 0.1);
 }
+.button-container {
+	display: flex;
+	justify-content: center;
+	padding: 20rpx 40rpx;  /* 减小内边距 */
+	margin-top: 10rpx;  /* 减小上边距 */
+  }
+/* 按钮样式 */
+.login-button {
+	width: 100%;
+	padding: 0 30rpx;
+	font-size: 36rpx;
+	height: 100rpx;
+	text-align: center;
+	font-weight: bold;
+  }
+  
+  .login-button.secondary {
+	background-color: #FCA5A7;
+  }
+
+  .divider {
+	height: 1rpx;
+	background: #eee;
+	margin: 10rpx 0;
+  }
+
+  .divider_10 {
+	height: 10rpx;
+	background: #eee;
+	margin: 10rpx 0;
+  }
 </style> 

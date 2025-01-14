@@ -12,10 +12,15 @@
 export const getPageHeight = (options = {}) => {
   const { hasNav = true, hasTabBar = false } = options
   const sys = uni.getSystemInfoSync()
+  
+  // #ifdef MP-WEIXIN
+  return '100%'  // 微信小程序使用百分比高度
+  // #endif
+  
   let height = sys.windowHeight
   
   // #ifdef H5
-  return `${height}px`
+  return height + 'px'
   // #endif
   
   // #ifdef APP-PLUS || MP
@@ -32,7 +37,7 @@ export const getPageHeight = (options = {}) => {
     height -= 50 // tabBar固定高度
   }
   
-  return `${height}px`
+  return height + 'px'
   // #endif
 }
 
@@ -61,6 +66,43 @@ export const getSafeAreaBottom = () => {
   const sys = uni.getSystemInfoSync()
   return sys.safeAreaInsets?.bottom || 0
 } 
+
+/**
+ * 计算ScrollView可用高度
+ * @returns {Promise<number>} 返回可用高度（单位rpx）
+ */
+export const calculateScrollViewHeight = () => {
+  return new Promise((resolve) => {
+    const sys = uni.getSystemInfoSync()
+    const query = uni.createSelectorQuery()
+    
+    // #ifdef MP-WEIXIN || APP-PLUS
+    // 获取整个容器的高度
+    query.select('.container').boundingClientRect()
+    // 获取表单区域高度
+    query.select('.form-section').boundingClientRect()
+    // 获取广告区域高度
+    query.select('.ad-section').boundingClientRect()
+    
+    query.exec((res) => {
+      const [containerRect, formRect, adRect] = res
+      if (containerRect && formRect && adRect) {
+        // 计算列表可用高度 = 容器高度 - 表单区域 - 广告区域 - 上下边距
+        const availableHeight = containerRect.height - formRect.height - adRect.height - 30
+        // 转换为rpx
+        const rpxHeight = (availableHeight * (750 / sys.windowWidth))
+        resolve(rpxHeight)
+      } else {
+        resolve(750) // 默认高度
+      }
+    })
+    // #endif
+    
+    // #ifdef H5
+    resolve(0) // H5不需要计算
+    // #endif
+  })
+}
 
 
 // 布局样式

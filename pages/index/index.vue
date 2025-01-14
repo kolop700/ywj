@@ -73,6 +73,23 @@
           <text>设备列表</text>
           <text class="close-icon" @click="closePopup">×</text>
         </view>
+
+        <!-- 添加设备统计信息 -->
+        <!-- <view class="device-stats">
+          <view class="stat-item">
+            <text class="stat-label">总设备</text>
+            <text class="stat-value">{{ deviceList.length }}</text>
+          </view>
+          <view class="stat-item">
+            <text class="stat-label">在线</text>
+            <text class="stat-value online">{{ onlineCount }}</text>
+          </view>
+          <view class="stat-item">
+            <text class="stat-label">离线</text>
+            <text class="stat-value offline">{{ offlineCount }}</text>
+          </view>
+        </view> -->
+
         <!-- 添加搜索框 -->
         <view class="search-box">
           <input 
@@ -85,18 +102,27 @@
         <view class="device-list">
           <view 
             class="device-item" 
-            v-for="(item, index) in filteredDeviceList" 
+            v-for="(item, index) in filteredDevices" 
             :key="index"
-            :class="[
-              item.status === '离线' ? 'offline-item' : 'online-item',
-            ]"
+            :class="[item.online !== '1' ? 'state' : '']"
             @click="handleDeviceClick(item)"
           >
-            <view class="device-info">
-              <text class="device-name">{{ item.name }}</text>
-              <text class="device-address" v-if="item.address">地址：{{ item.address }}</text>
+            <view class="item-left">
+              <text class="item-title" :class="{'state': item.online !== '1'}">
+                {{ item.door_name }}
+              </text>
+              <view class="item-address" :class="{'state': item.online !== '1'}">
+                <text>地址：{{ item.comm_name }}{{ item.unit_name }}</text>
+              </view>
             </view>
-            <text class="status-text">{{ item.status }}</text>
+            <view class="item-right">
+              <text 
+                class="status-text"
+                :class="{'state': item.online !== '1'}"
+              >
+                {{ item.online === '1' ? '在线' : '离线' }}
+              </text>
+            </view>
           </view>
         </view>
         <view class="refresh-btn" @click="refreshDeviceList">刷新</view>
@@ -107,10 +133,16 @@
 
 <script setup>
 import { ref, getCurrentInstance, computed } from 'vue'
+import { storeToRefs } from 'pinia'
 import { onLoad } from '@dcloudio/uni-app'
-
+import doorAccessUtils from '@/utils/doorAccessUtils'
 const { proxy } = getCurrentInstance()
 const userStore = proxy.$store.user.useUserStore()
+const deviceStore = proxy.$store.device.useDeviceStore()
+const deviceApi = proxy.$api.device
+
+// 使用 storeToRefs 保持响应性
+const { deviceList} = storeToRefs(deviceStore)
 
 // 菜单列表
 const menuList = ref([
@@ -170,54 +202,7 @@ const handleScanCode = () => {
 
 // 设备列表弹框状态
 const showDeviceList = ref(false)
-
-// 模拟设备列表数据
-const deviceList = ref([
-  {
-    name: '1栋1单元门',
-    address: '省警察学生宿区（建研所）1栋1单元',
-    status: '在线'
-  },
-  {
-    name: '2.8一体机产线测试',
-    address: '盈警盾工业区 某某某某某某设计开发区',
-    status: '离线'
-  },
-  {
-    name: '2组团15栋2单元门',
-    address: '东莞市江南二期园（盈翠市）15栋2单元',
-    status: '在线'
-  }
-  ,
-  {
-    name: '2.8一体机产线测试',
-    address: '盈警盾工业区 某某某某某某设计开发区',
-    status: '离线'
-  },
-  {
-    name: '2组团15栋2单元门',
-    address: '东莞市江南二期园（盈翠市）15栋2单元',
-    status: '在线'
-  },
-  {
-    name: '人行门',
-    address: '',
-    status: '在线'
-  },
-  {
-    name: '2.8一体机产线测试',
-    address: '盈警盾工业区 某某某某某某设计开发区',
-    status: '离线'
-  },
-  {
-    name: '2组团15栋2单元门',
-    address: '东莞市江南二期园（盈翠市）15栋2单元',
-    status: '在线'
-  },
-])
-
 const popup = ref(null)
-
 // 处理远程开门
 const handleRemoteOpen = () => {
   if (!userStore.checkLogin()) return
@@ -235,16 +220,50 @@ const onPopupChange = (e) => {
 }
 
 // 刷新设备列表
-const refreshDeviceList = () => {
-  console.log('刷新设备列表')
-  // TODO: 调用获取设备列表API
+const refreshDeviceList = async () => {
+  console.log('刷新设备列表', userStore.userId)
+  try {
+    // 尝试从服务器获取最新数据
+    const res = await deviceApi.getDoorList(userStore.userId)
+    if (res.data) {
+      // 直接更新 store 中的数据
+      deviceStore.setDeviceList(res.data)
+    }
+  } catch (error) {
+    console.error('获取设备列表失败', error)
+    // 如果请求失败且没有数据，显示错误提示
+    if (!deviceStore.deviceList.length) {
+      uni.showToast({
+        title: '获取设备列表失败',
+        icon: 'none'
+      })
+    }
+  }
 }
 
 // 处理设备点击
-const handleDeviceClick = (device) => {
-  if (device.status === '在线') {
-    // TODO: 处理开门逻辑
-    console.log('开门:', device)
+const handleDeviceClick = async (device) => {
+  // 先检查登录状态
+  if (!userStore.checkLogin()) {
+    return
+  }
+
+  if (device.online === '1') {
+    // 调用开门方法
+    try {
+      const success = await doorAccessUtils.openDoor(device)
+      if (success) {
+        console.log('开门成功:', device)
+      }
+    } catch (error) {
+      console.error('开门操作失败:', error)
+    }
+  } else {
+    uni.showToast({
+      title: '设备离线',
+      icon: 'none',
+      duration: 3000
+    })
   }
 }
 
@@ -252,12 +271,16 @@ const handleDeviceClick = (device) => {
 const searchKey = ref('')
 
 // 过滤后的设备列表
-const filteredDeviceList = computed(() => {
-  if (!searchKey.value) return deviceList.value
-  return deviceList.value.filter(item => 
-    item.name.toLowerCase().includes(searchKey.value.toLowerCase()) ||
-    (item.address && item.address.toLowerCase().includes(searchKey.value.toLowerCase()))
-  )
+const filteredDevices = computed(() => {
+  if (!searchKey.value) return deviceStore.filteredDevices
+  return deviceStore.filteredDevices.filter(item => {
+    const searchText = searchKey.value.toLowerCase()
+    const nameMatch = item.door_name?.toLowerCase().includes(searchText)
+    const addressMatch = `${item.comm_name || ''}${item.unit_name || ''}`
+      .toLowerCase()
+      .includes(searchText)
+    return nameMatch || addressMatch
+  })
 })
 </script>
 
@@ -440,72 +463,77 @@ const filteredDeviceList = computed(() => {
     background: #F8F8F8;
 
     .device-item {
-      margin-bottom: 20rpx;
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
+      padding: 20rpx;
+      margin-bottom: 20rpx;
       background: #FFFFFF;
       border-radius: 12rpx;
-      padding: 20rpx;
-      transition: all 0.5s;
-
-      &.offline-item {
+      transition: all 0.2s;
+      
+      &.state {
         background: #F5F5F5;
-        .device-info {
-          .device-name, .device-address {
-            color: #999;
-          }
-        }
-        .status-text {
-          color: #999;
+        
+        &:active {
+          background: #F5F5F5;
+          opacity: 0.8;
         }
       }
-
-      &.online-item {
-        cursor: pointer;
-        &:active {
-          background: #FF0036;
-          .device-info {
-            .device-name, .device-address {
-              color: #FFFFFF;
-            }
+      
+      &:active {
+        background: #FF0036;
+        
+        .item-left {
+          .item-title {
+            color: #FFFFFF;
           }
+          
+          .item-address {
+            color: rgba(255, 255, 255, 0.8);
+          }
+        }
+        
+        .item-right {
           .status-text {
             color: #FFFFFF;
           }
         }
       }
 
-      &:last-child {
-        margin-bottom: 0;
-      }
-
-      .device-info {
+      .item-left {
         flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 8rpx;
-
-        .device-name {
+        
+        .item-title {
           font-size: 28rpx;
           color: #333;
           font-weight: 500;
+          margin-bottom: 8rpx;
+          
+          &.state {
+            color: #999;
+          }
         }
-
-        .device-address {
+        
+        .item-address {
           font-size: 24rpx;
-          color: #999;
+          color: #666;
           line-height: 1.4;
+          
+          &.state {
+            color: #999;
+          }
         }
       }
-
-      .status-text {
-        font-size: 24rpx;
-        &.online {
+      
+      .item-right {
+        .status-text {
+          font-size: 24rpx;
           color: #FF0036;
-        }
-        &.offline {
-          color: #999;
+          
+          &.state {
+            color: #999;
+          }
         }
       }
     }
@@ -520,6 +548,41 @@ const filteredDeviceList = computed(() => {
     color: #fff;
     font-size: 28rpx;
     border-radius: 12rpx;
+  }
+
+  .device-stats {
+    display: flex;
+    justify-content: space-around;
+    padding: 20rpx;
+    background: #f8f8f8;
+    border-radius: 12rpx;
+    margin: 20rpx;
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      
+      .stat-label {
+        font-size: 24rpx;
+        color: #666;
+        margin-bottom: 8rpx;
+      }
+      
+      .stat-value {
+        font-size: 32rpx;
+        font-weight: bold;
+        color: #333;
+        
+        &.online {
+          color: #FF0036; // 在线设备数量显示红色
+        }
+        
+        &.offline {
+          color: #999; // 离线设备数量显示灰色
+        }
+      }
+    }
   }
 }
 </style>

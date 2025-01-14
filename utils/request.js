@@ -38,11 +38,6 @@ const request = ({
                 if (code === "0" || Code === "OK") {
                     return resolve(res.data);
                 }
-                uni.showToast({
-                    icon: 'none',
-                    duration: 3000,
-                    title: msg || Message || '请求失败',
-                });
                 return reject(res.data);
             },
             // 接口调用失败的回调函数

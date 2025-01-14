@@ -54,5 +54,15 @@ export default {
         user_password: data.newPassword
       }
     })
+  },
+  // 获取用户房间列表
+  getUserRoomList(user_id) {
+    return request({
+      url: BASE_API + 'getUserRoomList/',
+      method: 'post',
+      data: {
+        user_id
+      }
+    })
   }
 } 

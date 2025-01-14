@@ -1,10 +1,13 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import userApi from '@/api/user/user'
+import deviceApi from '@/api/device/device' // 引入设备API
+import { useDeviceStore } from './device'
 
 export const useUserStore = defineStore('user', () => {
   const userInfo = ref({})
   const user_id = ref('')
+  const maxExpireDate = ref('') // 最大过期日期
   
   // 基础图片URL
   const BASE_IMG_URL = 'https://xy.yefiot.com/yefiot/v1/'
@@ -73,22 +76,60 @@ export const useUserStore = defineStore('user', () => {
     return true
   }
 
+  // 获取用户房间列表并更新最大过期日期
+  async function updateRoomList() {
+    try {
+      const res = await userApi.getUserRoomList(user_id.value)
+      if (res.data && res.data.length > 0) {
+        // 找出最大的expire_date
+        const maxDate = res.data.reduce((max, room) => {
+          return room.expire_date > max ? room.expire_date : max
+        }, res.data[0].expire_date)
+        maxExpireDate.value = maxDate
+      }
+      return Promise.resolve(res)
+    } catch (error) {
+      maxExpireDate.value = userInfo.value.expire_date
+      return Promise.reject(error)
+    }
+  }
+
   // 登录成功
-  function loginSuccess(data) {
+  async function loginSuccess(data) {
     userInfo.value = data
     user_id.value = data.user_id
-   
+    
+    // 清空设备列表
+    const deviceStore = useDeviceStore()
+    deviceStore.clearDeviceList()
+    
+    try {
+      // 登录成功后获取房间列表
+      await updateRoomList()
+      
+      // 获取设备列表
+      const res = await deviceApi.getDoorList(data.user_id)
+      if (res.data) {
+        deviceStore.setDeviceList(res.data)
+      }
+    } catch (error) {
+      console.error('初始化数据失败:', error)
+    }
   }
 
   // 退出登录
   function logout() {
     userInfo.value = {}
     user_id.value = ''
+    // 清空设备列表
+    const deviceStore = useDeviceStore()
+    deviceStore.clearDeviceList()
   }
 
   return {
     userInfo,
     user_id,
+    maxExpireDate,
     login,
     loginSuccess,
     logout,
@@ -98,7 +139,8 @@ export const useUserStore = defineStore('user', () => {
     userName,
     userAcct,
     userId,
-    checkLogin
+    checkLogin,
+    updateRoomList
   }
 }) 
 

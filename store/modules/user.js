@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import request from '@/utils/request'
+import userApi from '@/api/user/user'
 
 export const useUserStore = defineStore('user', () => {
   const userInfo = ref({})
@@ -40,22 +40,18 @@ export const useUserStore = defineStore('user', () => {
   // 登录方法
   async function login(loginData) {
     try {
-      // 如果没有传入登录数据,使用 userInfo 中的账号密码
+      // 如果没有传入登录数据且userInfo中没有账号密码，直接返回
+      if (!loginData && (!userInfo.value.user_acct || !userInfo.value.user_password)) {
+        return Promise.reject('无登录数据')
+      }
+      
+      // 使用传入的登录数据或userInfo中的账号密码
       const loginParams = loginData || {
         user_acct: userInfo.value.user_acct,
         user_password: userInfo.value.user_password
       }
 
-      const res = await request({
-        url: '/yefiot/v1/UserLogin/',
-        method: 'post',
-        data: {
-          app_phone_mac: "0",
-          app_login_type: "2",
-          user_acct: loginParams.user_acct,
-          user_password: loginParams.user_password
-        }
-      })
+      const res = await userApi.UserLogin(loginParams)
       
       // 登录成功,保存用户信息
       const userData = res.data[0]
@@ -81,6 +77,7 @@ export const useUserStore = defineStore('user', () => {
   function loginSuccess(data) {
     userInfo.value = data
     user_id.value = data.user_id
+   
   }
 
   // 退出登录

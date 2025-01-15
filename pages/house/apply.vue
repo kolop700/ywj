@@ -435,17 +435,14 @@ page {
 /* #endif */
 
 /* #ifdef H5 */
-page {
-  height: 100vh;
-  overflow: hidden;
-}
-
 .container {
-  height: 100vh;
+  min-height: v-bind(windowHeight);
+  height: v-bind(windowHeight);
   display: flex;
   flex-direction: column;
   background: #F5F5F5;
-  overflow: hidden;
+  box-sizing: border-box;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 /* #endif */
 
@@ -464,19 +461,18 @@ page {
   /* #endif */
   background: #FFFFFF;
   width: 100%;
+  flex: none;  /* 不伸缩，保持自身大小 */
   padding-bottom: 15rpx;
-  flex: none;
 }
 
 /* #ifdef H5 */
 .list-section {
-  flex: 1;
+  flex: 1;     /* 占据剩余空间 */
   background: #FFFFFF;
   padding: 10rpx 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  min-height: 0; /* 关键：允许flex子项收缩 */
 }
 /* #endif */
 
@@ -501,19 +497,19 @@ page {
 }
 
 .house-list {
-  height: 100%;
+  flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding: 0 15rpx;
 }
 
 .ad-section {
+  flex: none;  /* 不伸缩，保持自身大小 */
   background: #FFFFFF;
   padding: 15rpx 20rpx;
-  height: 120rpx;
+  height: 150rpx;
   box-sizing: border-box;
   width: 100%;
-  flex: none;
 }
 
 .header {

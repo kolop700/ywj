@@ -438,7 +438,7 @@ const goToLogin = () => {
     }
     
     &.btn-disabled {
-      background-color: #A7A7A7;
+      background-color: #FCA5A7;
       opacity: 1;
     }
   }

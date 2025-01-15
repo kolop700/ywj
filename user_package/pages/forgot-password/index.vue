@@ -282,8 +282,8 @@ const goToLogin = () => {
   button {
     margin-top: 30rpx;
     width: 100%;
-    height: 110rpx;
-    line-height: 110rpx;
+    height: 100rpx;
+    line-height: 100rpx;
     font-size: 36rpx;
     font-weight: 800;
     border-radius: 12rpx;
@@ -303,7 +303,7 @@ const goToLogin = () => {
     }
     
     &.btn-disabled {
-      background-color: #A7A7A7;
+       background-color: #FCA5A7;
       opacity: 1;
     }
   }

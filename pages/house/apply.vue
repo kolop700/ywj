@@ -465,7 +465,8 @@ page {
 
 .form-section {
   /* #ifdef MP-WEIXIN || APP-PLUS */
-  padding-top: var(--status-bar-height);
+  // padding-top: var(--status-bar-height);
+  padding-top: 15rpx;
   /* #endif */
   background: #FFFFFF;
   width: 100%;
@@ -600,9 +601,18 @@ page {
   border-bottom: 1rpx solid #EEEEEE;
   position: relative;
 }
+.header {
+font-weight: 800;
+font-size: 32rpx;
+color: #303030;
+line-height: 30rpx;
+padding: 20rpx;
+
+
+}
 
 .header-text {
-  font-size: 32rpx;
+  font-size: 35rpx;
   color: #333;
   font-weight: 500;
   flex: 1;

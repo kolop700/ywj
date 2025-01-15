@@ -21,6 +21,12 @@
 			"style": {
 				"navigationBarTitleText": "房屋申请"
 			}
+		},
+		{
+			"path": "pages/door/scan",
+			"style": {
+				"navigationBarTitleText": "扫码开门"
+			}
 		}
 	],
 	"subPackages": [

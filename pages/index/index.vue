@@ -165,6 +165,7 @@ const menuList = ref([
   {
     name: "开门二维码",
     icon: "/static/icons/icon_opendoor_password.png",
+    url: '/pages/door/scan?device_number=XY2405220098',
     needLogin: true
   },
   { 

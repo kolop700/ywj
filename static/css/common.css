@@ -3936,25 +3936,25 @@ scroll-view.cu-steps .cu-item {
 .lines-white {
 	color: var(--white);
 }
-.button-container {
+/* .button-container {
 	display: flex;
 	justify-content: center;
 	padding: 30rpx 40rpx;
 	margin-top: 20rpx;
   }
 /* 按钮样式 */
-.login-button {
+/* .login-button {
 	width: 100%;
 	padding: 0 30rpx;
 	font-size: 36rpx;
 	height: 100rpx;
 	text-align: center;
 	font-weight: bold;
-  }
+  } */
   
-  .login-button.secondary {
+  /* .login-button.secondary {
 	background-color: #FCA5A7;
-  }
+  } */
 
   .divider {
 	height: 1rpx;

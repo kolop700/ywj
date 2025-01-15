@@ -46,34 +46,40 @@
           </view>
         </form>
       </view>
+     
+      <!-- 分割线 -->
+      <view class="divider_10"></view>
 
-      <!-- 列表区域 -->
-      <view class="list-section">
-        <view class="card" v-if="cardModel">
-          <view class="header">我的房屋</view>
-          <view class="divider"></view>
-          <scroll-view class="house-list" scroll-y>
-            <view 
-              v-for="(item, index) in houseList" 
-              :key="item.roomid"
-              class="house-item"
-            >
-              <!-- 房屋信息 -->
-              <view class="house-info">
-                <text class="house-name">{{item.name}}</text>
-                <view class="auth-info">
-                  <text class="auth-date">授权时间：{{item.expire_date}}</text>
-                  <text 
-                    class="auth-status"
-                    :class="{'status-normal': item.authority === '0', 'status-error': item.authority === '1'}"
-                  >
-                    {{item.authority === '0' ? '权限正常' : '权限异常'}}
-                  </text>
+      <!-- 内容区域 -->
+      <view class="content-section">
+        <!-- 列表区域 -->
+        <view class="list-section">
+          <view class="card" v-if="cardModel">
+            <view class="header">我的房屋</view>
+            <view class="divider"></view>
+            <scroll-view class="house-list" scroll-y>
+              <view 
+                v-for="(item, index) in houseList" 
+                :key="item.roomid"
+                class="house-item"
+              >
+                <!-- 房屋信息 -->
+                <view class="house-info">
+                  <text class="house-name">{{item.name}}</text>
+                  <view class="auth-info">
+                    <text class="auth-date">授权时间：{{item.expire_date}}</text>
+                    <text 
+                      class="auth-status"
+                      :class="{'status-normal': item.authority === '0', 'status-error': item.authority === '1'}"
+                    >
+                      {{item.authority === '0' ? '权限正常' : '权限异常'}}
+                    </text>
+                  </view>
                 </view>
+                <view class="divider" v-if="index !== houseList.length - 1"></view>
               </view>
-              <view class="divider" v-if="index !== houseList.length - 1"></view>
-            </view>
-          </scroll-view>
+            </scroll-view>
+          </view>
         </view>
       </view>
 
@@ -81,7 +87,7 @@
       <view class="ad-section">
         <view class="ad-container">
           <image class="ad-image" src="/static/images/ad-placeholder.png" mode="aspectFill"></image>
-          <view class="ad-text"> 广告区域</view>
+          <view class="ad-text">广告区域</view>
         </view>
       </view>
     
@@ -452,6 +458,8 @@ page {
   display: flex;
   flex-direction: column;
   background: #F5F5F5;
+  position: relative;
+  padding-bottom: 150rpx; /* 为广告区域预留空间 */
 }
 /* #endif */
 
@@ -461,20 +469,15 @@ page {
   /* #endif */
   background: #FFFFFF;
   width: 100%;
-  flex: none;  /* 不伸缩，保持自身大小 */
-  padding-bottom: 15rpx;
+  flex: none;
 }
 
-/* #ifdef H5 */
-.list-section {
-  flex: 1;     /* 占据剩余空间 */
-  background: #FFFFFF;
-  padding: 10rpx 0;
+.content-section {
+  flex: 1;
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
-/* #endif */
 
 /* #ifdef MP-WEIXIN || APP-PLUS */
 .list-section {
@@ -487,6 +490,21 @@ page {
   width: 100%;
 }
 /* #endif */
+
+.ad-section {
+  /* #ifdef MP-WEIXIN || APP-PLUS */
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  /* #endif */
+  background: #FFFFFF;
+  padding: 15rpx 20rpx;
+  height: 150rpx;
+  box-sizing: border-box;
+  width: 100%;
+  z-index: 99;
+}
 
 .card {
   height: 100%;
@@ -501,31 +519,6 @@ page {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding: 0 15rpx;
-}
-
-.ad-section {
-  flex: none;  /* 不伸缩，保持自身大小 */
-  background: #FFFFFF;
-  padding: 15rpx 20rpx;
-  height: 150rpx;
-  box-sizing: border-box;
-  width: 100%;
-}
-
-.header {
-  font-size: 32rpx;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 20rpx;
-  flex: none;
-}
-
-.house-item {
-  padding: 15rpx 0;
-}
-
-.house-info {
-  margin-bottom: 10rpx;
 }
 
 .ad-container {
@@ -712,7 +705,9 @@ page {
 }
 
 .divider_10 {
-  display: none;
+  height: 10rpx;
+  background: #EEEEEE;
+  width: 100%;
 }
 
 .house-name {
@@ -775,9 +770,5 @@ page {
 	margin: 10rpx 0;
   }
 
-  .divider_10 {
-	height: 10rpx;
-	background: #eee;
-	margin: 10rpx 0;
-  }
+
 </style> 

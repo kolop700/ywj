@@ -75,20 +75,21 @@ export const calculateScrollViewHeight = () => {
   return new Promise((resolve) => {
     const sys = uni.getSystemInfoSync()
     const query = uni.createSelectorQuery()
+    const windowHeight = sys.windowHeight
     
     // #ifdef MP-WEIXIN || APP-PLUS
-    // 获取整个容器的高度
-    query.select('.container').boundingClientRect()
-    // 获取表单区域高度
+    const statusBarHeight = sys.statusBarHeight || 0
+    const navBarHeight = 44 // 导航栏高度
+    
+    // 获取表单和广告区域高度
     query.select('.form-section').boundingClientRect()
-    // 获取广告区域高度
     query.select('.ad-section').boundingClientRect()
     
     query.exec((res) => {
-      const [containerRect, formRect, adRect] = res
-      if (containerRect && formRect && adRect) {
-        // 计算列表可用高度 = 容器高度 - 表单区域 - 广告区域 - 上下边距
-        const availableHeight = containerRect.height - formRect.height - adRect.height - 30
+      const [formRect, adRect] = res
+      if (formRect && adRect) {
+        // 计算列表可用高度 = 窗口高度 - 状态栏 - 导航栏 - 表单高度 - 广告高度
+        const availableHeight = windowHeight - statusBarHeight - navBarHeight - formRect.height - adRect.height
         // 转换为rpx
         const rpxHeight = (availableHeight * (750 / sys.windowWidth))
         resolve(rpxHeight)
@@ -99,7 +100,8 @@ export const calculateScrollViewHeight = () => {
     // #endif
     
     // #ifdef H5
-    resolve(0) // H5不需要计算
+    // H5端不需要计算高度，使用flex布局
+    resolve(0)
     // #endif
   })
 }

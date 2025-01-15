@@ -81,7 +81,7 @@
       <view class="ad-section">
         <view class="ad-container">
           <image class="ad-image" src="/static/images/ad-placeholder.png" mode="aspectFill"></image>
-          <view class="ad-text"></view>
+          <view class="ad-text"> 广告区域</view>
         </view>
       </view>
     
@@ -434,41 +434,56 @@ page {
 }
 /* #endif */
 
+/* #ifdef H5 */
+page {
+  height: 100vh;
+  overflow: hidden;
+}
+
 .container {
-  min-height: 100vh;
   height: 100vh;
   display: flex;
   flex-direction: column;
   background: #F5F5F5;
-  box-sizing: border-box;
   overflow: hidden;
+}
+/* #endif */
+
+/* #ifdef MP-WEIXIN || APP-PLUS */
+.container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #F5F5F5;
+}
+/* #endif */
+
+.form-section {
   /* #ifdef MP-WEIXIN || APP-PLUS */
   padding-top: var(--status-bar-height);
   /* #endif */
-}
-
-.form-section {
   background: #FFFFFF;
-  padding: 15rpx 0;
-  flex: none;
   width: 100%;
+  padding-bottom: 15rpx;
+  flex: none;
 }
 
 /* #ifdef H5 */
 .list-section {
   flex: 1;
   background: #FFFFFF;
-  margin: 10rpx 0;
+  padding: 10rpx 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  min-height: 0; /* 关键：允许flex子项收缩 */
 }
 /* #endif */
 
 /* #ifdef MP-WEIXIN || APP-PLUS */
 .list-section {
   background: #FFFFFF;
-  margin: 10rpx 0;
+  padding: 10rpx 0;
   height: v-bind(listHeight + 'rpx');
   overflow: hidden;
   display: flex;
@@ -479,11 +494,26 @@ page {
 
 .card {
   height: 100%;
-  margin: 0;
   background: #fff;
   padding: 20rpx;
   display: flex;
   flex-direction: column;
+}
+
+.house-list {
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 15rpx;
+}
+
+.ad-section {
+  background: #FFFFFF;
+  padding: 15rpx 20rpx;
+  height: 120rpx;
+  box-sizing: border-box;
+  width: 100%;
+  flex: none;
 }
 
 .header {
@@ -494,28 +524,12 @@ page {
   flex: none;
 }
 
-.house-list {
-  flex: 1;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding: 0 15rpx;
-}
-
 .house-item {
   padding: 15rpx 0;
 }
 
 .house-info {
   margin-bottom: 10rpx;
-}
-
-.ad-section {
-  flex: none;
-  padding: 15rpx 20rpx;
-  background: #FFFFFF;
-  height: 120rpx;
-  box-sizing: border-box;
-  width: 100%;
 }
 
 .ad-container {

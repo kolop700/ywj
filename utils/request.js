@@ -9,13 +9,16 @@ const request = ({
     params, // get请求提交参数
     data, // post/put请求提交参数
     headers, // 请求头
+    showLoading = true, // 新增参数，默认为true保持原有行为
 }) => {
     return new Promise((resolve, reject) => {
-        // 显示加载框
-        uni.showLoading({
-            title: '加载中',
-            mask: true
-        });
+        // 仅在 showLoading 为 true 时显示加载框
+        if (showLoading) {
+            uni.showLoading({
+                title: '加载中',
+                mask: true
+            });
+        }
 
         if (!headers) {
             const token = uni.getStorageSync('token');
@@ -52,8 +55,10 @@ const request = ({
             },
             // 接口调用结束的回调函数（调用成功、失败都会执行）
             complete() {
-                // 隐藏加载框
-                uni.hideLoading();
+                // 仅在 showLoading 为 true 时隐藏加载框
+                if (showLoading) {
+                    uni.hideLoading();
+                }
             },
         });
     });

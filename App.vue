@@ -10,7 +10,7 @@ export default {
 		// 将登录请求放在后台执行，不阻塞界面加载
 		setTimeout(async () => {
 			try {
-				await userStore.login()
+				await userStore.login({ showLoading: false })
 				console.log('自动登录成功')
 			} catch (error) {
 				console.log('自动登录失败', error)

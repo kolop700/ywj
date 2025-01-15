@@ -41,8 +41,18 @@ export const useUserStore = defineStore('user', () => {
   })
 
   // 登录方法
-  async function login(loginData) {
+  async function login(loginDataOrOptions = null, options = {}) {
     try {
+      let loginData = null;
+      let requestOptions = options;
+
+      // 如果第一个参数是对象，且包含 showLoading，则它是 options
+      if (loginDataOrOptions && 'showLoading' in loginDataOrOptions) {
+        requestOptions = loginDataOrOptions;
+      } else {
+        loginData = loginDataOrOptions;
+      }
+
       // 如果没有传入登录数据且userInfo中没有账号密码，直接返回
       if (!loginData && (!userInfo.value.user_acct || !userInfo.value.user_password)) {
         return Promise.reject('无登录数据')
@@ -54,11 +64,11 @@ export const useUserStore = defineStore('user', () => {
         user_password: userInfo.value.user_password
       }
 
-      const res = await userApi.UserLogin(loginParams)
+      const res = await userApi.UserLogin(loginParams, requestOptions)
       
       // 登录成功,保存用户信息
       const userData = res.data[0]
-      loginSuccess(userData)
+      loginSuccess(userData, requestOptions)
       return Promise.resolve(res)
     } catch (error) {
       return Promise.reject(error)
@@ -77,9 +87,9 @@ export const useUserStore = defineStore('user', () => {
   }
 
   // 获取用户房间列表并更新最大过期日期
-  async function updateRoomList() {
+  async function updateRoomList(options = {}) {
     try {
-      const res = await userApi.getUserRoomList(user_id.value)
+      const res = await userApi.getUserRoomList(user_id.value, options)
       if (res.data && res.data.length > 0) {
         // 找出最大的expire_date
         const maxDate = res.data.reduce((max, room) => {
@@ -95,7 +105,7 @@ export const useUserStore = defineStore('user', () => {
   }
 
   // 登录成功
-  async function loginSuccess(data) {
+  async function loginSuccess(data, options = {}) {
     userInfo.value = data
     user_id.value = data.user_id
     
@@ -105,10 +115,10 @@ export const useUserStore = defineStore('user', () => {
     
     try {
       // 登录成功后获取房间列表
-      await updateRoomList()
+      await updateRoomList(options)
       
       // 获取设备列表
-      const res = await deviceApi.getDoorList(data.user_id)
+      const res = await deviceApi.getDoorList(data.user_id, options)
       if (res.data) {
         deviceStore.setDeviceList(res.data)
       }

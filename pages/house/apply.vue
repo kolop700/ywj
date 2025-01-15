@@ -65,14 +65,14 @@
               >
                 <!-- 房屋信息 -->
                 <view class="house-info">
-                  <text class="house-name">{{item.name}}</text>
+                  <text class="house-name">申请房屋：{{item.name}}</text>
                   <view class="auth-info">
                     <text class="auth-date">授权时间：{{item.expire_date}}</text>
                     <text 
                       class="auth-status"
-                      :class="{'status-normal': item.authority === '0', 'status-error': item.authority === '1'}"
+                      :class="{'status-normal': item.authority === '1', 'status-error': item.authority === '0'}"
                     >
-                      {{item.authority === '0' ? '权限正常' : '权限异常'}}
+                    {{item.authority === '1' ? '权限正常' : '权限异常'}}
                     </text>
                   </view>
                 </view>

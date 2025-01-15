@@ -79,5 +79,19 @@ export default {
       ...defaultOptions,
       ...options
     })
+  },
+  // 绑定用户房间
+  bindUserRoom(data, options = {}) {
+    return request({
+      url: BASE_API + 'bindUserRoom/',
+      method: 'post',
+      data: {
+        room_id: data.room_id,
+        user_id: data.user_id,
+        auto_author: data.auto_author || "0"
+      },
+      ...defaultOptions,
+      ...options
+    })
   }
 } 

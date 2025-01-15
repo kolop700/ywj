@@ -42,6 +42,8 @@
             <button 
               class="cu-btn bg-red login-button"
               :class="{'secondary': !isFormValid}"
+              @click="submitForm"
+              type="submit"
             >提交申请</button>
           </view>
         </form>
@@ -306,9 +308,9 @@ const showBuildingSearch = async () => {
     return
   }
 
-  if (searchText.length < 3) {
+  if (searchText.length < 2) {
     uni.showToast({
-      title: '请至少输入3个字符',
+      title: '请至少输入2个字符',
       icon: 'none'
     })
     return
@@ -419,7 +421,7 @@ const loadRoomList = async () => {
 }
 
 // 提交表单
-const submitForm = () => {
+const submitForm = async () => {
   if (!isFormValid.value) {
     uni.showToast({
       title: '请填写完整信息',
@@ -427,8 +429,55 @@ const submitForm = () => {
     })
     return
   }
-  
-  console.log('提交数据：', formData.value)
+  if (!selectedUnit.value?.unit_id) {
+    uni.showToast({
+      title: '请选择有效的楼宇',
+      icon: 'none'
+    })
+    return
+  }
+  // 获取当前选中的房间ID
+  const selectedRoom = roomList.value.find(room => 
+    `${room.floor_name}${room.room_name}` === formData.value.room
+  )
+  if (!selectedRoom) {
+    uni.showToast({
+      title: '请选择有效的房间',
+      icon: 'none'
+    })
+    return
+  }
+  try {
+    const result = await proxy.$api.user.bindUserRoom({
+      room_id: selectedRoom.id,
+      user_id: userStore.userInfo.user_id,
+      auto_author: "0"
+    })
+    if (result.code === "0") {
+      uni.showToast({
+        title: '申请成功',
+        icon: 'success'
+      })
+      // 重新加载房屋列表
+      await loadHouseList()
+      // 清空表单
+      formData.value.building = ''
+      formData.value.room = ''
+      selectedUnit.value = null
+      roomList.value = []
+    } else {
+      uni.showToast({
+        title: result.msg || '申请失败',
+        icon: 'none'
+      })
+    }
+  } catch (error) {
+    console.error('申请失败:', error)
+    uni.showToast({
+      title: '申请失败，请重试',
+      icon: 'none'
+    })
+  }
 }
 </script>
 

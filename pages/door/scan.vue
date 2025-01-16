@@ -32,10 +32,13 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, getCurrentInstance, computed } from 'vue'
+import { storeToRefs } from 'pinia'
+const { proxy } = getCurrentInstance()
 import { onLoad } from '@dcloudio/uni-app'
 import doorAccessUtils from '@/utils/doorAccessUtils'
-
+const deviceStore = proxy.$store.device.useDeviceStore()
+const { deviceList } = storeToRefs(deviceStore)
 const deviceNumber = ref('')
 const visitorPassword = ref('')
 
@@ -49,6 +52,7 @@ onLoad((options) => {
   if (options.device_number) {
     deviceNumber.value = options.device_number
   }
+  console.log('设备列表:', deviceList.value)
 })
 
 // 直接开门
@@ -62,7 +66,16 @@ const openDoor = async () => {
   }
 
   try {
-    await doorAccessUtils.openDoor(deviceNumber.value)
+    // 查找匹配的设备
+    const matchedDevice = deviceList.value.find(device => device.door_qr_code === deviceNumber.value)
+    if (!matchedDevice) {
+      uni.showToast({
+        title: '未找到匹配的设备',
+        icon: 'none'
+      })
+      return
+    }
+    await doorAccessUtils.openDoor(matchedDevice)
     uni.showToast({
       title: '开门成功',
       icon: 'success'

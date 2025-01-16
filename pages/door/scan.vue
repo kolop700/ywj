@@ -14,16 +14,16 @@
     <view class="visitor-section">
       <text class="section-title">访客密钥</text>
       <input 
-        type="text" 
+        type="number" 
         v-model="visitorPassword"
         placeholder="请输入访客密码"
         class="custom-input"
       />
       <view class="button-container">
             <button 
-              class="cu-btn bg-red login-button"
+              class="cu-btn login-button bg-red"
               :class="{'secondary': !isFormValid}"
-              @click="submitForm"
+              @click="openDoorWithPassword"
               type="submit"
             >提交申请</button>
           </view>
@@ -32,12 +32,17 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import doorAccessUtils from '@/utils/doorAccessUtils'
 
 const deviceNumber = ref('')
 const visitorPassword = ref('')
+
+// 判断表单是否有效的计算属性
+const isFormValid = computed(() => {
+  return visitorPassword.value.length >= 6 && /^\d+$/.test(visitorPassword.value)
+})
 
 // 页面加载时获取设备号
 onLoad((options) => {

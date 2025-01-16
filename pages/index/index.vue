@@ -7,6 +7,9 @@
         <up-icon v-else name="account" size="24"></up-icon>
       </view>
       <text>{{ userStore.userName || '未登录' }}</text>
+      <view class="refresh-icon" :class="{ 'rotating': isRotating }" @click="handleRefresh">
+        <image src="/static/icons/icon_refresh.png" mode="aspectFit"></image>
+      </view>
     </view>
 
     <!-- 内容区域 - 自适应高度 -->
@@ -284,6 +287,23 @@ const filteredDevices = computed(() => {
     return nameMatch || addressMatch
   })
 })
+
+// 添加刷新相关的状态
+const isRotating = ref(false)
+
+// 处理刷新点击
+const handleRefresh = () => {
+  if (isRotating.value) return
+  isRotating.value = true
+  
+  // 刷新数据
+  userStore.login()
+  
+  // 1秒后停止旋转
+  setTimeout(() => {
+    isRotating.value = false
+  }, 1000)
+}
 </script>
 
 <style lang="scss">
@@ -302,7 +322,8 @@ const filteredDevices = computed(() => {
   flex: none;
   display: flex;
   align-items: center;
-  padding: 10rpx;
+  padding-left: 20rpx;
+  position: relative;
 
   .avatar {
     width: 5vh;
@@ -314,7 +335,7 @@ const filteredDevices = computed(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 15rpx;
+    margin-right: 20rpx;
     overflow: hidden;
 
     .avatar-img {
@@ -326,6 +347,34 @@ const filteredDevices = computed(() => {
 
   text {
     font-size: calc(12px + 0.5vh);
+  }
+
+  .refresh-icon {
+    position: absolute;
+    right: 20rpx;
+    width: 80rpx;
+    height: 80rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    image {
+      width: 100%;
+      height: 100%;
+    }
+    
+    &.rotating {
+      animation: rotate 1s linear;
+    }
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 

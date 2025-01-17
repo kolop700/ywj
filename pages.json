@@ -77,19 +77,9 @@
 				{
 					"path": "pages/qrcode/index",
 					"style": {
-						"navigationBarTitleText": "二维码界面"
-					}
-				},
-				{
-					"path": "pages/face-upload/index",
-					"style": {
-						"navigationBarTitleText": "人脸上传"
-					}
-				},
-				{
-					"path": "pages/my/index",
-					"style": {
-						"navigationBarTitleText": "我的"
+						"navigationBarTitleText": "二维码界面",
+						"statusBarBackgroundColor": "#FCDEDE"
+						}
 					}
 				}
 			]

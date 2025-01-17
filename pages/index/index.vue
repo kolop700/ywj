@@ -164,12 +164,14 @@ const menuList = ref([
   { 
     name: "访客密码", 
     icon: "/static/icons/icon_guest_password.png",
+	url: '/workbench_package/pages/visitor-password/index',
+	
     needLogin: true
   },
   {
     name: "开门二维码",
     icon: "/static/icons/icon_opendoor_password.png",
-    url: '/pages/door/scan?device_number=YN11373',
+    url: '/workbench_package/pages/qrcode/index',
     needLogin: true
   },
   { 

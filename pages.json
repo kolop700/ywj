@@ -64,6 +64,35 @@
 					}
 				}
 			]
+		},
+		{
+			"root": "workbench_package",
+			"pages": [
+				{
+					"path": "pages/visitor-password/index",
+					"style": {
+						"navigationBarTitleText": "临时访客密码"
+					}
+				},
+				{
+					"path": "pages/qrcode/index",
+					"style": {
+						"navigationBarTitleText": "二维码界面"
+					}
+				},
+				{
+					"path": "pages/face-upload/index",
+					"style": {
+						"navigationBarTitleText": "人脸上传"
+					}
+				},
+				{
+					"path": "pages/my/index",
+					"style": {
+						"navigationBarTitleText": "我的"
+					}
+				}
+			]
 		}
 	],
 	"globalStyle": {

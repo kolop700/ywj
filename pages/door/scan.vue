@@ -158,12 +158,10 @@ const openDoorWithPassword = async () => {
   text-align: center; 
   cursor: pointer; 
   transition: all 0.2s ease;
-  box-shadow: 0 6rpx 16rpx rgba(0, 122, 255, 0.3);
   transform: scale(1);
   
   &:active {
     transform: scale(0.85);
-    box-shadow: 0 2rpx 8rpx rgba(0, 122, 255, 0.2);
   }
   
   text {

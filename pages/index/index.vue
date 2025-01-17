@@ -143,6 +143,7 @@ const { proxy } = getCurrentInstance()
 const userStore = proxy.$store.user.useUserStore()
 const deviceStore = proxy.$store.device.useDeviceStore()
 const deviceApi = proxy.$api.device
+import scanUtils from '@/utils/scanUtils'
 
 // 使用 storeToRefs 保持响应性
 const { deviceList} = storeToRefs(deviceStore)
@@ -200,9 +201,20 @@ const handleGridItemClick = (item) => {
 }
 
 // 处理扫码开门
-const handleScanCode = () => {
+const handleScanCode = async () => {
   if (!userStore.checkLogin()) return
-  // 扫码开门的逻辑
+  const result = await scanUtils.scanQRCode()
+  if (result) {
+    uni.navigateTo({
+      url: `/pages/door/scan?device_number=${result}`
+    })
+  } else {
+    uni.showToast({
+      title: '扫码失败，请重试',
+      icon: 'none',
+      duration: 2000
+    })
+  }
 }
 
 // 设备列表弹框状态

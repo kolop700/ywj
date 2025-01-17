@@ -1,6 +1,12 @@
 <template>
   <!-- 使用 up-navbar 组件 -->
   <view>
+    <!-- 用于分享的隐藏canvas -->
+    <canvas
+      canvas-id="shareCanvas"
+      style="width: 250px; height: 250px; position: fixed; left: -9999px;"
+    ></canvas>
+
     <!-- 二维码区域 -->
     <div class="header">
 
@@ -26,13 +32,22 @@
       </div>
       <div class="divider"></div>
       <div class="info-item">
-        <text class="label">有效次数:</text>
-        <text class="value">{{validTimes}}</text>
+        <picker mode="selector" :range="validTimesColumns" :value="gender" @change="picktimes">
+          <view class="picker">
+            <text class="label">有效次数:</text>
+            <text class="value">{{ validTimesColumns[gender] }}</text>
+            <text class="endlabel">(无限表示不限次数)</text>
+          </view>
+        </picker>
       </div>
       <div class="divider"></div>
       <div class="info-item">
-        <text class="label">有效分钟:</text>
-        <text class="value">5</text>
+        <picker mode="selector" :range="validMinutesColumns" :value="min" @change="pickmin">
+          <view class="picker">
+            <text class="label">有效分钟:</text>
+            <text class="value">{{ validMinutesColumns[min] }}</text>
+          </view>
+        </picker>
       </div>
       <div class="divider"></div>
     </div>
@@ -40,91 +55,136 @@
     <div class="padding flex flex-direction">
       <button form-type="submit" class="cu-btn bg-red login-button" @tap="shareToFriend">分享好友</button>
     </div>
-
+<!-- 
     <div class="footer">
       <navigator url="/pages/qrRodeManage/qrRodeManage" class="footer-link">管理员二维码</navigator>
-    </div>
+    </div> -->
   </view>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
+import DoorQRCodeUtils from '@/utils/doorQRCodeUtils'
+import ShareUtils from '@/utils/shareUtils'
 
 const qrcodeRef = ref(null)
 const imgUrl = ref('/static')
 const doorPassword = ref('')
-const validTimes = ref(0)
-const qrCodeValue = ref('initial-qr-code-data')
+const qrCodeValue = ref('')
 const navBgColor = ref('linear-gradient(#FCD3D3, #FCDEDE)')
 const statusBarHeight = ref(0)
+
+// 有效次数选项
+const validTimesColumns = ['无限', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+const validMinutesColumns = Array.from({ length: 30 }, (_, i) => String(i + 1))
+
+// 在 script setup 中定义数据
+const gender = ref(0)  // 有效次数索引
+const min = ref(4)        // 有效分钟索引
+
+// 生成二维码和密码
+const generateQRCode = () => {
+  // 获取选择的值
+  const validTimes = validTimesColumns[gender.value] === '无限' ? 0 : parseInt(validTimesColumns[gender.value])
+  const validMinutes = parseInt(validMinutesColumns[min.value])
+
+  // 调用 DoorQRCodeUtils 生成二维码和密码
+  const result = DoorQRCodeUtils.generateDoorQRCode({
+    validTimes,
+    validMinutes
+  })
+
+  // 更新显示
+  qrCodeValue.value = result.qrcode
+  doorPassword.value = result.tempPassword
+}
+
+// 处理有效次数变化
+const picktimes = (e) => {
+  gender.value = e.detail.value
+  generateQRCode()
+}
+
+// 处理有效分钟变化
+const pickmin = (e) => {
+  min.value = e.detail.value
+  generateQRCode()
+}
+
+// 刷新二维码
+const refreshQRCode = () => {
+  // 强制重新生成二维码
+  qrCodeValue.value = ''  // 先清空二维码值
+  nextTick(() => {
+    generateQRCode()  // 在下一个tick重新生成
+  })
+}
 
 // 二维码生成成功回调
 const onQRCodeGenerated = (res) => {
   console.log('二维码生成成功:', res)
 }
 
-// 刷新二维码
-const refreshQRCode = () => {
-  // 这里可以调用后端接口获取新的二维码数据
-  qrCodeValue.value = 'new-qr-code-data' // 替换为实际的二维码数据
-}
-
 // 复制密码
-const copyPassword = () => {
-  uni.setClipboardData({
-    data: doorPassword.value,
-    success: () => {
-      uni.showToast({
-        title: '密码已复制',
-        icon: 'success',
-        duration: 2000
-      })
-    }
-  })
+const copyPassword = async () => {
+  try {
+    await ShareUtils.copyToClipboard(doorPassword.value)
+  } catch (error) {
+    console.error('复制失败:', error)
+  }
 }
 
 // 保存二维码
-const save = () => {
-  uni.showModal({
-    title: '保存二维码',
-    content: '是否保存二维码到相册？',
-    success: (res) => {
-      if (res.confirm) {
-        uni.saveImageToPhotosAlbum({
-          filePath: qrcodeRef.value.result,
-          success: () => {
-            uni.showToast({
-              title: '保存成功',
-              icon: 'success'
-            })
-          },
-          fail: () => {
-            uni.showToast({
-              title: '保存失败',
-              icon: 'error'
-            })
-          }
-        })
-      }
+const save = async () => {
+  try {
+    const res = await uni.showModal({
+      title: '保存二维码',
+      content: '是否保存二维码到相册？'
+    })
+    
+    if (res.confirm) {
+      await ShareUtils.saveImageToAlbum(qrcodeRef.value.result)
     }
-  })
+  } catch (error) {
+    console.error('保存失败:', error)
+  }
 }
 
 // 分享给好友
-const shareToFriend = () => {
-  uni.share({
-    provider: "weixin",
-    scene: "WXSceneSession",
-    type: 0,
-    title: "门禁二维码",
-    success: (res) => {
-      console.log("分享成功:", res)
-    },
-    fail: (err) => {
-      console.error("分享失败:", err)
-    }
-  })
+const shareToFriend = async () => {
+  try {
+    // 获取二维码图片
+    const imageUrl = await ShareUtils.captureImage(qrcodeRef.value)
+    
+    // 分享到微信
+    await ShareUtils.shareToWeChat({
+      imageUrl,
+      title: '门禁二维码',
+      summary: `有效次数: ${validTimesColumns[gender.value]}, 有效分钟: ${validMinutesColumns[min.value]}`
+    })
+  } catch (error) {
+    console.error('分享失败:', error)
+  }
 }
+
+// 微信小程序分享配置
+// #ifdef MP-WEIXIN
+const onShareAppMessage = () => {
+  return {
+    title: '门禁二维码',
+    path: '/pages/qrcode/index',
+    imageUrl: qrcodeRef.value.result
+  }
+}
+
+const onShareTimeline = () => {
+  return {
+    title: '门禁二维码',
+    query: '',
+    imageUrl: qrcodeRef.value.result
+  }
+}
+// #endif
 
 // 返回上一页
 const goBack = () => {
@@ -132,8 +192,9 @@ const goBack = () => {
 }
 
 onMounted(() => {
-  // 初始化时可以调用接口获取二维码数据
-  // qrCodeValue.value = await getQRCodeData()
+  // 初始化时生成二维码
+  generateQRCode()
+
   // 获取状态栏高度
   const systemInfo = uni.getSystemInfoSync()
   statusBarHeight.value = systemInfo.statusBarHeight
@@ -403,6 +464,28 @@ onMounted(() => {
   100% {
     transform: scale(1);
   }
+}
+
+.picker {
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.label {
+  color: #888;
+  min-width: 150rpx;
+}
+
+.endlabel {
+  margin-left: 20rpx;
+  color: #888;
+  font-size: 24rpx;
+}
+
+.value {
+  margin-left: 50rpx;
+  color: #303030;
 }
 </style>
 

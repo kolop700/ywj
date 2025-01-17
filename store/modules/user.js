@@ -20,6 +20,16 @@ export const useUserStore = defineStore('user', () => {
     return '' // 返回默认头像或空字符串
   })
 
+  // 获取用户卡号A
+  const userCardA = computed(() => {
+    return userInfo.value.user_card_a || '00000000'
+  })
+
+  // 获取用户卡号B
+  const userCardB = computed(() => {
+    return userInfo.value.user_card_b || '00000000'
+  })
+
   // 判断是否登录
   const isLogin = computed(() => {
     return !!user_id.value && !!userInfo.value.user_acct
@@ -166,7 +176,9 @@ export const useUserStore = defineStore('user', () => {
     checkLogin,
     updateRoomList,
     getUserRoomList,
-    bindUserRoom
+    bindUserRoom,
+    userCardA,
+    userCardB
   }
 }) 
 

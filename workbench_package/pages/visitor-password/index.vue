@@ -71,153 +71,200 @@
   </view>
 </template>
 
-<script>
-import { ref, onMounted } from 'vue';
-import { onReady } from '@dcloudio/uni-app';
+<script setup>
+import { ref, getCurrentInstance, computed, onMounted } from 'vue'
+import { onReady } from '@dcloudio/uni-app'
 
-export default {
-  data() {
-    const now = new Date();
-    const end = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24小时后
-    return {
-      deviceList: [
-        { id: 1, name: '南大门', selected: false },
-        { id: 2, name: '1楼消防门', selected: false },
-        { id: 3, name: '-1楼消防门', selected: false },
-        { id: 4, name: '北门', selected: false }
-      ],
-      startDateTime: now.getTime(),
-      endDateTime: end.getTime(),
-      showStartPicker: false,
-      showEndPicker: false,
-      validTimesRange: ['0', '1', '2', '3', '4', '5'],
-      validTimes: 0,
-      doorPassword: this.generateRandomPassword()
-    };
-  },
-  computed: {
-    currentTime() {
-      return Date.now();
-    },
-    maxEndTime() {
-      // 开始时间后的3天
-      return this.startDateTime + (3 * 24 * 60 * 60 * 1000);
+const { proxy } = getCurrentInstance()
+const userStore = proxy.$store.user.useUserStore()
+const deviceApi = proxy.$api.device
+
+// 数据定义
+const now = new Date()
+const end = new Date(now.getTime() + 24 * 60 * 60 * 1000)
+
+const deviceList = ref([])
+const startDateTime = ref(now.getTime())
+const endDateTime = ref(end.getTime())
+const showStartPicker = ref(false)
+const showEndPicker = ref(false)
+const validTimesRange = ref(['0', '1', '2', '3', '4', '5'])
+const validTimes = ref(0)
+const doorPassword = ref(generateRandomPassword())
+const startPickerRef = ref(null)
+const endPickerRef = ref(null)
+
+// 计算属性
+const currentTime = computed(() => Date.now())
+const maxEndTime = computed(() => startDateTime.value + (3 * 24 * 60 * 60 * 1000))
+
+// 方法定义
+const getDeviceList = async () => {
+  try {
+    const response = await deviceApi.getRemoteOpenDoorList(userStore.userId)
+    if (response.data && Array.isArray(response.data)) {
+      deviceList.value = response.data.map(item => ({
+        id: item.door_id,
+        name: item.door_name,
+        selected: false
+      }))
     }
-  },
-  methods: {
-    toggleSelection(id) {
-      // 找到当前设备
-      const index = this.deviceList.findIndex(item => item.id === id);
-      if (index !== -1) {
-        // 直接切换当前设备的选中状态
-        this.deviceList[index].selected = !this.deviceList[index].selected;
-        // 强制更新视图
-        this.deviceList = [...this.deviceList];
-      }
-    },
-    // 获取已选中的设备
-    getSelectedDevices() {
-      return this.deviceList.filter(item => item.selected);
-    },
-    bindValidTimesChange(e) {
-      this.validTimes = this.validTimesRange[e.detail.value];
-    },
-    formatDateTime(timestamp) {
-      if (!timestamp) return '';
-      const date = new Date(timestamp);
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      const hours = String(date.getHours()).padStart(2, '0');
-      const minutes = String(date.getMinutes()).padStart(2, '0');
-      const seconds = String(date.getSeconds()).padStart(2, '0');
-      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-    },
-    formatter(type, value) {
-      if (type === 'year') {
-        return `${value}年`;
-      }
-      if (type === 'month') {
-        return `${value}月`;
-      }
-      if (type === 'day') {
-        return `${value}日`;
-      }
-      if (type === 'hour') {
-        return `${value}时`;
-      }
-      if (type === 'minute') {
-        return `${value}分`;
-      }
-      if (type === 'second') {
-        return `${value}秒`;
-      }
-      return value;
-    },
-    generateRandomPassword() {
-      return String(Math.floor(100000 + Math.random() * 900000));
-    },
-    refresh() {
-      // 只更新开门密码
-      this.doorPassword = this.generateRandomPassword();
-    },
-    onStartTimeConfirm(e) {
-      this.startDateTime = e.value;
-      this.showStartPicker = false;
-      
-      // 如果结束时间小于开始时间，将结束时间设置为开始时间后24小时
-      if (this.endDateTime < this.startDateTime) {
-        this.endDateTime = this.startDateTime + (24 * 60 * 60 * 1000);
-      }
-      // 如果结束时间超过了最大允许时间，将其设置为最大允许时间
-      if (this.endDateTime > this.maxEndTime) {
-        this.endDateTime = this.maxEndTime;
-      }
-    },
-    onEndTimeConfirm(e) {
-      this.endDateTime = e.value;
-      this.showEndPicker = false;
-    },
-    shareKeys() {
-      // 验证时间
-      if (this.startDateTime < this.currentTime) {
-        uni.showToast({
-          title: '开始时间不能小于当前时间',
-          icon: 'none'
-        });
-        return;
-      }
-      if (this.endDateTime > this.maxEndTime) {
-        uni.showToast({
-          title: '结束时间不能超过开始时间后3天',
-          icon: 'none'
-        });
-        return;
-      }
-      
-      // 获取选中的设备
-      const selectedDevices = this.getSelectedDevices();
-      if (selectedDevices.length === 0) {
-        uni.showToast({
-          title: '请选择至少一个设备',
-          icon: 'none'
-        });
-        return;
-      }
-      // 分享钥匙逻辑
-      console.log('选中的设备：', selectedDevices);
-      console.log('开始时间：', this.formatDateTime(this.startDateTime));
-      console.log('结束时间：', this.formatDateTime(this.endDateTime));
-      console.log('有效次数：', this.validTimes);
-      console.log('开门密码：', this.doorPassword);
-    }
-  },
-  onReady() {
-    // 微信小程序需要在onReady中设置formatter
-    this.$refs.startPickerRef?.setFormatter?.(this.formatter);
-    this.$refs.endPickerRef?.setFormatter?.(this.formatter);
+  } catch (error) {
+    console.error('获取设备列表失败:', error)
+    uni.showToast({
+      title: '获取设备列表失败',
+      icon: 'none'
+    })
   }
-};
+}
+
+const toggleSelection = (id) => {
+  const index = deviceList.value.findIndex(item => item.id === id)
+  if (index !== -1) {
+    deviceList.value[index].selected = !deviceList.value[index].selected
+    deviceList.value = [...deviceList.value]
+  }
+}
+
+const getSelectedDevices = () => {
+  return deviceList.value.filter(item => item.selected)
+}
+
+const bindValidTimesChange = (e) => {
+  validTimes.value = validTimesRange.value[e.detail.value]
+}
+
+const formatDateTime = (timestamp) => {
+  if (!timestamp) return ''
+  const date = new Date(timestamp)
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  const seconds = String(date.getSeconds()).padStart(2, '0')
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+}
+
+const formatter = (type, value) => {
+  if (type === 'year') return `${value}年`
+  if (type === 'month') return `${value}月`
+  if (type === 'day') return `${value}日`
+  if (type === 'hour') return `${value}时`
+  if (type === 'minute') return `${value}分`
+  if (type === 'second') return `${value}秒`
+  return value
+}
+
+function generateRandomPassword() {
+  return String(Math.floor(100000 + Math.random() * 900000))
+}
+
+const refresh = () => {
+  doorPassword.value = generateRandomPassword()
+}
+
+const onStartTimeConfirm = (e) => {
+  startDateTime.value = e.value
+  showStartPicker.value = false
+  
+  if (endDateTime.value < startDateTime.value) {
+    endDateTime.value = startDateTime.value + (24 * 60 * 60 * 1000)
+  }
+  if (endDateTime.value > maxEndTime.value) {
+    endDateTime.value = maxEndTime.value
+  }
+}
+
+const onEndTimeConfirm = (e) => {
+  endDateTime.value = e.value
+  showEndPicker.value = false
+}
+
+const shareKeys = async () => {
+  if (endDateTime.value > maxEndTime.value) {
+    uni.showToast({
+      title: '结束时间不能超过开始时间后3天',
+      icon: 'none'
+    })
+    return
+  }
+  
+  const selectedDevices = getSelectedDevices()
+  if (selectedDevices.length === 0) {
+    uni.showToast({
+      title: '请选择至少一个设备',
+      icon: 'none'
+    })
+    return
+  }
+
+  try {
+    // 处理设备ID列表
+    const doorPhoneId = selectedDevices.map(device => device.id).join(',') + ','
+    
+    // 处理时间格式
+    const startTime = formatDateTime(startDateTime.value)
+    const endTime = formatDateTime(endDateTime.value)
+    
+    // 处理次数转换：0 转为 -1，其他数字保持不变
+    const times = validTimes.value === '0' ? -1 : parseInt(validTimes.value)
+    
+    const params = {
+      doorPhoneId,
+      userId: userStore.userId,
+      startTime,
+      endTime,
+      times,
+      tempkey: parseInt(doorPassword.value)
+    }
+    const response = await deviceApi.saveTempKey(params)
+    if (response.code === '0') {
+      // 构建提示消息
+      const message = `临时访客密码\n尊敬的访客朋友您好! 请您在规定的时间内,使用app扫描设备上的二维码并输入临时访问密钥,开启相应的通行权限。时间为${startTime}至${endTime}, 您的临时开门密码为:${doorPassword.value}`
+      // 显示模态框
+      uni.showModal({
+        title: '临时访客密码',
+        content: message,
+        showCancel: true,
+        cancelText: '关闭',
+        confirmText: '复制内容',
+        success: function (res) {
+          if (res.confirm) {
+            uni.setClipboardData({
+              data: message,
+              success: function () {
+                uni.showToast({
+                  title: '复制成功',
+                  icon: 'success'
+                })
+              }
+            })
+          }
+        }
+      })
+      refresh() // 刷新密码
+    } else {
+      throw new Error('保存失败')
+    }
+  } catch (error) {
+    console.error('保存访客密码失败:', error)
+    uni.showToast({
+      title: '设置失败，请重试',
+      icon: 'none'
+    })
+  }
+}
+
+// 生命周期钩子
+onMounted(() => {
+  getDeviceList()
+})
+
+onReady(() => {
+  startPickerRef.value?.setFormatter?.(formatter)
+  endPickerRef.value?.setFormatter?.(formatter)
+})
 </script>
 
 <style scoped>
@@ -255,7 +302,7 @@ export default {
 }
 
 .scroll-container {
-  max-height: 400rpx;
+  max-height: 380rpx;
   background-color: white;
   padding: 20rpx 40rpx;
 }

@@ -68,5 +68,29 @@ export default {
       ...defaultOptions,
       ...options
     })
+  },
+
+  // 获取远程开门设备列表
+  getRemoteOpenDoorList(userId, options = {}) {
+    return request({
+      url: BASE_API + 'openSQL/',
+      method: 'post',
+      data: {
+        sql: `CALL get_remote_open_door_list('''',${userId})`
+      },
+      ...defaultOptions,
+      ...options
+    })
+  },
+
+  // 保存临时密钥
+  saveTempKey(params, options = {}) {
+    return request({
+      url: BASE_API + 'uptempkey/',
+      method: 'post',
+      data: params,
+      ...defaultOptions,
+      ...options
+    })
   }
 } 

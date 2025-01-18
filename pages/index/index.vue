@@ -210,6 +210,8 @@ const handleGridItemClick = (item) => {
 const handleScanCode = async () => {
   if (!userStore.checkLogin()) return
   const result = await scanUtils.scanQRCode()
+  console.log('扫码结果', result)
+  // http://localhost:5173/#/pages/door/scan?device_number=YN11373
   if (result) {
     uni.navigateTo({
       url: `/pages/door/scan?device_number=${result}`

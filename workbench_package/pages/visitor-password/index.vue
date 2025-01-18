@@ -207,8 +207,8 @@ const shareKeys = async () => {
     const startTime = formatDateTime(startDateTime.value)
     const endTime = formatDateTime(endDateTime.value)
     
-    // 处理次数转换：0 转为 -1，其他数字保持不变
-    const times = validTimes.value === '0' ? -1 : parseInt(validTimes.value)
+    // 处理次数转换：0 或 '0' 转为 -1，其他数字保持不变
+    const times = validTimes.value === 0 || validTimes.value === '0' ? -1 : parseInt(validTimes.value)
     
     const params = {
       doorPhoneId,

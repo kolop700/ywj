@@ -92,5 +92,20 @@ export default {
       ...defaultOptions,
       ...options
     })
+  },
+
+  // 验证访客密码
+  checkTempPassword(params, options = {}) {
+    return request({
+      url: BASE_API + 'checkTempPsw/',
+      method: 'post',
+      data: {
+        OpenPassword: params.password,
+        qrcode: params.deviceNumber,
+        sn: params.sn
+      },
+      ...defaultOptions,
+      ...options
+    })
   }
 } 

@@ -38,6 +38,7 @@ const { proxy } = getCurrentInstance()
 import { onLoad } from '@dcloudio/uni-app'
 import doorAccessUtils from '@/utils/doorAccessUtils'
 const deviceStore = proxy.$store.device.useDeviceStore()
+const deviceApi = proxy.$api.device
 const { deviceList } = storeToRefs(deviceStore)
 const deviceNumber = ref('')
 const visitorPassword = ref('')
@@ -107,14 +108,34 @@ const openDoorWithPassword = async () => {
   }
 
   try {
-    await doorAccessUtils.openDoorWithPassword(deviceNumber.value, visitorPassword.value)
-    uni.showToast({
-      title: '开门成功',
-      icon: 'success'
+    // 获取新的序列号
+    const sn = deviceStore.getSerialNo()
+    
+    // 处理密码值：如果是0或'0'，转换为-1
+    const password = visitorPassword.value === '0' || visitorPassword.value === 0 ? -1 : parseInt(visitorPassword.value)
+    
+    // 调用访客密码验证接口
+    const res = await deviceApi.checkTempPassword({
+      password: password,
+      deviceNumber: deviceNumber.value,
+      sn: sn
     })
+    
+    if (res.code === 0 || res.code === '0') {
+      uni.showToast({
+        title: '开门成功',
+        icon: 'success'
+      })
+    } else {
+      uni.showToast({
+        title: res.msg || '密码错误或已过期',
+        icon: 'none'
+      })
+    }
   } catch (error) {
+    console.error('访客密码验证失败:', error)
     uni.showToast({
-      title: '密码错误或已过期',
+      title: '验证失败，请重试',
       icon: 'none'
     })
   }

@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 
 export const useDeviceStore = defineStore('device', () => {
   const deviceList = ref([])
+  const serialNo = ref(10000)  // 添加序列号状态
 
   // 过滤后的设备列表作为 getter
   const filteredDevices = computed(() => {
@@ -32,12 +33,24 @@ export const useDeviceStore = defineStore('device', () => {
     return deviceList.value.filter(device => device.online === "0").length
   })
 
+  // 获取序列号
+  function getSerialNo() {
+    if (serialNo.value > 999999) {
+      serialNo.value = 10000
+    } else {
+      serialNo.value += 1
+    }
+    return serialNo.value
+  }
+
   return {
     deviceList,
     filteredDevices,
     setDeviceList,
     clearDeviceList,
     onlineDeviceCount,
-    offlineDeviceCount
+    offlineDeviceCount,
+    serialNo,
+    getSerialNo
   }
 }) 

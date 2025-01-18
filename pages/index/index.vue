@@ -181,7 +181,10 @@ const menuList = ref([
   },
   { 
     name: "使用帮助", 
-    icon: "/static/icons/icon_help.png" 
+    icon: "/static/icons/icon_help.png",
+    url: '/workbench_package/pages/face-upload/index',
+    needLogin: true
+ 
   },
 ])
 

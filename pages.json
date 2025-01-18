@@ -80,7 +80,13 @@
 						"navigationBarTitleText": "二维码界面",
 						"statusBarBackgroundColor": "#FCDEDE"
 					}
-				}
+				},
+				{
+					"path": "pages/face-upload/index",
+					"style": {
+						"navigationBarTitleText": "人脸上传"
+					}
+				}				
 			]
 		}
 	],

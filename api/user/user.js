@@ -54,6 +54,23 @@ export default {
       ...options
     })
   },
+   // 修改
+   updateUserInfo(data, options = {}) {
+    return request({
+      url: BASE_API + 'UserRegister/',
+      method: 'post',
+      data: {
+        user_acct: data.phone,
+        user_password: data.password,
+        user_name: data.name,
+        user_sex: data.gender === '男' ? '1' : '2',
+        user_identity_card: "",
+        user_card_b: ""
+      },
+      ...defaultOptions,
+      ...options
+    })
+  },
   // 重置密码
   resetPassword(data, options = {}) {
     return request({

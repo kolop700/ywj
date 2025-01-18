@@ -165,8 +165,7 @@ const menuList = ref([
   { 
     name: "访客密码", 
     icon: "/static/icons/icon_guest_password.png",
-	url: '/workbench_package/pages/visitor-password/index',
-	
+   	url: '/workbench_package/pages/visitor-password/index',
     needLogin: true
   },
   {
@@ -178,6 +177,7 @@ const menuList = ref([
   { 
     name: "我的", 
     icon: "/static/icons/icon_my.png",
+    url: '/workbench_package/pages/my/index',
     needLogin: true
   },
   { 

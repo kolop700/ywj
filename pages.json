@@ -40,6 +40,12 @@
 					}
 				},
 				{
+					"path": "pages/profile/index",
+					"style": {
+						"navigationBarTitleText": "修改用户资料"
+					}
+				},
+				{
 					"path": "pages/register/index",
 					"style": {
 						"navigationBarTitleText": "用户注册"
@@ -79,6 +85,12 @@
 					"style": {
 						"navigationBarTitleText": "二维码界面",
 						"statusBarBackgroundColor": "#FCDEDE"
+					}
+				},
+				{
+					"path": "pages/my/index",
+					"style": {
+						"navigationBarTitleText": "我的"
 					}
 				},
 				{

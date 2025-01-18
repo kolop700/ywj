@@ -2,7 +2,7 @@
   <view class="page-container">
     <!-- 顶部用户信息 - 固定高度 -->
     <view class="user-header">
-      <view class="avatar">
+      <view class="avatar" @click="previewAvatar">
         <image v-if="userStore.avatarUrl" :src="userStore.avatarUrl" mode="aspectFill" class="avatar-img"></image>
         <up-icon v-else name="account" size="24"></up-icon>
       </view>
@@ -145,8 +145,9 @@ const deviceStore = proxy.$store.device.useDeviceStore()
 const deviceApi = proxy.$api.device
 import scanUtils from '@/utils/scanUtils'
 
-// 使用 storeToRefs 保持响应性
-const { deviceList} = storeToRefs(deviceStore)
+// 使用 storeToRefs 获取需要的状态
+const { avatarUrl, userName, userId } = storeToRefs(userStore)
+const { deviceList } = storeToRefs(deviceStore)
 
 // 菜单列表
 const menuList = ref([
@@ -180,7 +181,7 @@ const menuList = ref([
     needLogin: true
   },
   { 
-    name: "使用帮助", 
+    name: "人脸上传", 
     icon: "/static/icons/icon_help.png",
     url: '/workbench_package/pages/face-upload/index',
     needLogin: true
@@ -320,6 +321,16 @@ const handleRefresh = () => {
   setTimeout(() => {
     isRotating.value = false
   }, 1000)
+}
+
+// 添加预览头像的方法
+const previewAvatar = () => {
+  if (userStore.avatarUrl) {
+    uni.previewImage({
+      urls: [userStore.avatarUrl],
+      current: 0
+    })
+  }
 }
 </script>
 

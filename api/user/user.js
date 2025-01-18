@@ -93,5 +93,28 @@ export default {
       ...defaultOptions,
       ...options
     })
+  },
+  // 上传用户人脸图片
+  uploadUserFacePic(filePath, userAcct, options = {}) {
+    return new Promise((resolve, reject) => {
+      uni.uploadFile({
+        url: process.env.NODE_ENV === 'development' && process.env.UNI_PLATFORM === 'h5' 
+          ? '/yefiot/v1/uploadUserFacePic/'  // 开发环境使用代理
+          : 'https://xy.yefiot.com/yefiot/v1/uploadUserFacePic/', // 生产环境使用完整URL
+        filePath: filePath,
+        name: 'file',
+        formData: {
+          user: userAcct
+        },
+        success: (res) => {
+          // uploadFile 返回的数据是字符串，需要手动转换成对象
+          const data = JSON.parse(res.data)
+          resolve(data)
+        },
+        fail: (err) => {
+          reject(err)
+        }
+      })
+    })
   }
 } 

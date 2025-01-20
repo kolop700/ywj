@@ -59,12 +59,47 @@ export default {
     return this.addChecksum(pkg)
   },
 
+  // 门禁类型映射表
+  doorTypes: {
+    "1": "yfn01",
+    "2": "yfn02",
+    "3": "yfn03",
+    "4": "yfn04",
+    "5": "yfb01",
+    "11": "yff01",
+    "12": "yff02",
+    "13": "yff03",
+    "41": "yfv01",
+    "42": "yfv02",
+    "43": "bxv02",
+    "44": "yfv04",
+    "45": "bxv05",
+    "46": "yfv06",
+    "47": "yfv07",
+    "48": "yfv08",
+    "49": "yfv09",
+    "51": "yfl01",
+    "91": "yfd01",
+    "92": "yfd02"
+  },
+
   // 门类型转换为 16 进制表示，并补足 4 位
   formatDoorType(doorType) {
-    if (parseInt(doorType) > 100) {
-      return (Array(4).join(0) + parseInt(doorType).toString(16).toUpperCase()).slice(-4)
+    const type = doorType.toString()
+    console.log('门类型:', type)
+    // 如果在映射表中存在，直接返回
+    if (this.doorTypes[type]) {
+      return this.doorTypes[type]
     }
-    return doorType // 如果需要其他转换逻辑，可以在这里添加
+    
+    // 如果大于100，转换为16进制并补足4位
+    if (parseInt(type) > 100) {
+      const hexType = parseInt(type).toString(16).toUpperCase()
+      return (Array(4).join('0') + hexType).slice(-4)
+    }
+    
+    // 默认返回 yfn03
+    return 'yfn03'
   },
 
   // 开门方法
@@ -93,8 +128,19 @@ export default {
       const liftstr = door.liftstr || '0'.repeat(16)
       const timegroup = door.timegroup || '00'
 
+      // 获取门类型
+      const type = this.formatDoorType(door.door_type)
+
       console.log("开门参数:", {
-        card, tag, datestr, liftstr, user_id, pswd, timegroup
+        card,
+        tag,
+        datestr,
+        liftstr,
+        user_id,
+        pswd,
+        timegroup,
+        door_type: door.door_type,
+        formatted_type: type
       })
 
       // 生成开门数据包
@@ -107,9 +153,6 @@ export default {
         title: '开门中...',
         mask: true
       })
-
-      // 获取门类型
-      const type = this.formatDoorType(door.door_type)
 
       // 使用原生请求
       return new Promise((resolve, reject) => {

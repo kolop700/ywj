@@ -5,6 +5,8 @@ import store from '@/store';
 import mixin from '@/utils/mixin.js';
 import { createPinia } from 'pinia';
 import { createPersistedState } from 'pinia-plugin-persistedstate';
+import BleUtils from '@/utils/bleUtils'
+import DoorBleUtils from '@/utils/doorBleUtils'
 
 // #ifndef VUE3
 import Vue from 'vue'
@@ -44,6 +46,12 @@ export function createApp() {
   app.use(pinia);
   app.config.globalProperties.$store = store;
   app.mixin(mixin);
+  // 初始化实例
+  const bleUtils = new BleUtils()
+  const doorBleUtils = new DoorBleUtils(bleUtils)
+  // 注册为全局属性
+  uni.$bleUtils = bleUtils
+  uni.$doorBleUtils = doorBleUtils
   return {
     app
   }

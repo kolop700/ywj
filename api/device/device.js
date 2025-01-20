@@ -107,5 +107,20 @@ export default {
       ...defaultOptions,
       ...options
     })
+  },
+
+  // 访客密码开门
+  tempPasswordOpen(params, options = {}) {
+    return request({
+      url: BASE_API + 'temppswOpen/',
+      method: 'post',
+      data: {
+        openid: "0",
+        qrcode: params.deviceNumber,
+        sn: params.sn
+      },
+      ...defaultOptions,
+      ...options
+    })
   }
 } 

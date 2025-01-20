@@ -37,23 +37,41 @@ import { storeToRefs } from 'pinia'
 const { proxy } = getCurrentInstance()
 import { onLoad } from '@dcloudio/uni-app'
 import doorAccessUtils from '@/utils/doorAccessUtils'
+import visitorPasswordUtils from '@/utils/visitorPasswordUtils'
+import doorBleUtils from '@/utils/doorBleUtils'
 const deviceStore = proxy.$store.device.useDeviceStore()
 const deviceApi = proxy.$api.device
 const { deviceList } = storeToRefs(deviceStore)
 const deviceNumber = ref('')
 const visitorPassword = ref('')
+const matchedDevice = ref(null)
+
+// 添加 userStore
+const userStore = proxy.$store.user.useUserStore()
 
 // 判断表单是否有效的计算属性
 const isFormValid = computed(() => {
   return visitorPassword.value.length >= 6 && /^\d+$/.test(visitorPassword.value)
 })
 
-// 页面加载时获取设备号
+// 页面加载时获取设备号和查找设备
 onLoad((options) => {
   if (options.device_number) {
     deviceNumber.value = options.device_number
+    console.log('设备号:', deviceNumber.value)
+    // 查找匹配的设备并保存
+    const device = deviceList.value.find(device => device.door_qr_code === deviceNumber.value)
+    if (device) {
+      matchedDevice.value = device
+    } else {
+      uni.showToast({
+        title: '未找到匹配的设备',
+        icon: 'none'
+      })
+    }
   }
   console.log('设备列表:', deviceList.value)
+  console.log('匹配的设备:', matchedDevice.value)
 })
 
 // 直接开门
@@ -68,20 +86,34 @@ const openDoor = async () => {
 
   try {
     // 查找匹配的设备
-    const matchedDevice = deviceList.value.find(device => device.door_qr_code === deviceNumber.value)
-    if (!matchedDevice) {
+    if (!matchedDevice.value) {
+      const device = deviceList.value.find(device => device.door_qr_code === deviceNumber.value)
+      if (device) {
+        matchedDevice.value = device
+      }
+    }
+
+    if (!matchedDevice.value) {
       uni.showToast({
         title: '未找到匹配的设备',
         icon: 'none'
       })
       return
     }
-    await doorAccessUtils.openDoor(matchedDevice)
-    uni.showToast({
-      title: '开门成功',
-      icon: 'success'
-    })
+
+    // 尝试蓝牙开门
+    try {
+      if (!uni.$doorBleUtils) {
+        throw new Error('蓝牙模块未初始化')
+      }
+      await uni.$doorBleUtils.openDoorWithBle(matchedDevice.value, userStore.userId)
+    } catch (bleError) {
+      console.error('蓝牙开门失败:', bleError)
+      console.log('尝试网络开门')
+      await doorAccessUtils.openDoor(matchedDevice.value)
+    }
   } catch (error) {
+    console.error('开门失败:', error)
     uni.showToast({
       title: '开门失败',
       icon: 'none'
@@ -89,14 +121,14 @@ const openDoor = async () => {
   }
 }
 
-// 使用访客密码开门
-const openDoorWithPassword = async () => {
+// 验证访客密码
+const verifyVisitorPassword = async () => {
   if (!deviceNumber.value) {
     uni.showToast({
       title: '设备号不能为空',
       icon: 'none'
     })
-    return
+    return false
   }
 
   if (!visitorPassword.value) {
@@ -104,41 +136,33 @@ const openDoorWithPassword = async () => {
       title: '请输入访客密码',
       icon: 'none'
     })
-    return
+    return false
   }
 
-  try {
-    // 获取新的序列号
-    const sn = deviceStore.getSerialNo()
-    
-    // 处理密码值：如果是0或'0'，转换为-1
-    const password = visitorPassword.value === '0' || visitorPassword.value === 0 ? -1 : parseInt(visitorPassword.value)
-    
-    // 调用访客密码验证接口
-    const res = await deviceApi.checkTempPassword({
-      password: password,
-      deviceNumber: deviceNumber.value,
-      sn: sn
-    })
-    
-    if (res.code === 0 || res.code === '0') {
-      uni.showToast({
-        title: '开门成功',
-        icon: 'success'
-      })
-    } else {
-      uni.showToast({
-        title: res.msg || '密码错误或已过期',
-        icon: 'none'
-      })
-    }
-  } catch (error) {
-    console.error('访客密码验证失败:', error)
-    uni.showToast({
-      title: '验证失败，请重试',
-      icon: 'none'
-    })
-  }
+  // 获取新的序列号
+  const sn = deviceStore.getSerialNo()
+  
+  // 处理密码值：如果是0或'0'，转换为-1
+  const password = visitorPassword.value === '0' || visitorPassword.value === 0 ? -1 : parseInt(visitorPassword.value)
+  
+  // 调用访客密码验证接口
+  return await visitorPasswordUtils.verifyPassword({
+    password: password,
+    deviceNumber: deviceNumber.value,
+    sn: sn
+  })
+}
+
+// 使用访客密码开门
+const openDoorWithPassword = async () => {
+  const verifyResult = await verifyVisitorPassword()
+  if (!verifyResult.success) return
+  
+  // 验证成功后，调用开门接口
+  await visitorPasswordUtils.openDoor({
+    deviceNumber: deviceNumber.value,
+    sn: verifyResult.sn
+  })
 }
 </script>
 

@@ -27,6 +27,18 @@
 			"style": {
 				"navigationBarTitleText": "扫码开门"
 			}
+		},
+		{
+			"path": "pages/lq-upgrade/upgrade",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom",
+				"app-plus": {
+					"bounce": "none",
+					"animationType": "none", //取消窗口动画
+					"background": "transparent" // 设置背景透明
+				}
+			}
 		}
 	],
 	"subPackages": [
@@ -104,9 +116,12 @@
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "uni-app",
+		"navigationBarTitleText": "云小卫",
 		"navigationBarBackgroundColor": "#F8F8F8",
-		"backgroundColor": "#F8F8F8"
+		"backgroundColor": "#F8F8F8",
+		"app-plus": {
+            "bounce": "none" 
+        }
 	},
 	"uniIdRouter": {
 		"loginPage": "user_package/pages/login/index",

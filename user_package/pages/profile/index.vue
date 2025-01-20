@@ -104,7 +104,7 @@
         const params = {
           phone: form.value.phone,
           name: form.value.name,
-          gender: form.value.gender === '男' ? '1' : '2',
+          gender: form.value.gender === '男' ? 1 : 2,
           password: userInfo.user_password
         }
         const res = await proxy.$api.user.updateUserInfo(params)

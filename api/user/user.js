@@ -63,7 +63,7 @@ export default {
         user_acct: data.phone,
         user_password: data.password,
         user_name: data.name,
-        user_sex: data.gender === '男' ? '1' : '2',
+        user_sex: data.gender,
         user_identity_card: "",
         user_card_b: ""
       },
@@ -132,6 +132,18 @@ export default {
           reject(err)
         }
       })
+    })
+  },
+  // 获取应用版本信息
+  getAppVersion(options = {}) {
+    return request({
+      url: BASE_API + 'getAppVer/',
+      method: 'post',
+      data: {
+        app_no: '1'  // 固定传入 app_no: 1
+      },
+      ...defaultOptions,
+      ...options
     })
   }
 } 

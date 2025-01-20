@@ -144,6 +144,7 @@ const userStore = proxy.$store.user.useUserStore()
 const deviceStore = proxy.$store.device.useDeviceStore()
 const deviceApi = proxy.$api.device
 import scanUtils from '@/utils/scanUtils'
+import checkVersion from '@/pages/lq-upgrade/checkVersion.js'
 
 // 使用 storeToRefs 获取需要的状态
 const { avatarUrl, userName, userId } = storeToRefs(userStore)
@@ -189,9 +190,33 @@ const menuList = ref([
   },
 ])
 
-// 页面加载时检查登录状态
+// 检查版本更新
+const checkAppUpdate = () => {
+  console.log('检查版本更新')
+  const userApi = proxy.$api.user
+  userApi.getAppVersion().then(res => {
+    console.log('版本信息', res)
+    if (res.code === '0' && res.data && res.data.length > 0) {
+      const versionInfo = res.data[0]
+      console.log('版本信息', versionInfo)
+      // 检查是否需要更新
+      checkVersion({
+        name: versionInfo.ver_name,         // 版本名称
+        code: parseInt(versionInfo.ver_no), // 版本号
+        content: versionInfo.ver_des,       // 更新内容
+        url: versionInfo.ver_link,          // 下载链接
+        forceUpdate: versionInfo.ver_forced_update === '1'  // 是否强制更新
+      })
+    }
+  }).catch(err => {
+    console.error('获取版本信息失败:', err)
+  })
+}
+
+// 页面加载时检查登录状态和版本更新
 onLoad(() => {
   userStore.checkLogin()
+  checkAppUpdate() // 检查版本更新
 })
 
 // 处理网格项点击

@@ -2,8 +2,8 @@
     "name" : "星云小卫",
     "appid" : "__UNI__F8D1DD9",
     "description" : "",
-    "versionName" : "1.0.0",
-    "versionCode" : "100",
+    "versionName" : "1.0.1",
+    "versionCode" : 101,
     "transformPx" : false,
     /* 5+App特有相关 */
     "app-plus" : {
@@ -51,7 +51,12 @@
             },
             /* SDK配置 */
             "sdkConfigs" : {
-                "share" : {}
+                "share" : {
+                    "weixin" : {
+                        "appid" : "wx6a5561be592cc61d",
+                        "UniversalLinks" : ""
+                    }
+                }
             },
             "icons" : {
                 "android" : {

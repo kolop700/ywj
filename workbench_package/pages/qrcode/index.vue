@@ -53,7 +53,7 @@
     </div>
 
     <div class="padding flex flex-direction">
-      <button form-type="submit" class="cu-btn bg-red login-button" @tap="shareToFriend">分享好友</button>
+      <button form-type="submit" class="cu-btn bg-red login-button" @tap="shareToFriend">保存到本地相册</button>
     </div>
 <!-- 
     <div class="footer">
@@ -152,19 +152,20 @@ const save = async () => {
 
 // 分享给好友
 const shareToFriend = async () => {
-  try {
-    // 获取二维码图片
-    const imageUrl = await ShareUtils.captureImage(qrcodeRef.value)
+	save();
+  // try {
+  //   // 获取二维码图片
+  //   const imageUrl = await ShareUtils.captureImage(qrcodeRef.value)
     
-    // 分享到微信
-    await ShareUtils.shareToWeChat({
-      imageUrl,
-      title: '门禁二维码',
-      summary: `有效次数: ${validTimesColumns[gender.value]}, 有效分钟: ${validMinutesColumns[min.value]}`
-    })
-  } catch (error) {
-    console.error('分享失败:', error)
-  }
+  //   // 分享到微信
+  //   await ShareUtils.shareToWeChat({
+  //     imageUrl,
+  //     title: '门禁二维码',
+  //     summary: `有效次数: ${validTimesColumns[gender.value]}, 有效分钟: ${validMinutesColumns[min.value]}`
+  //   })
+  // } catch (error) {
+  //   console.error('分享失败:', error)
+  // }
 }
 
 // 微信小程序分享配置

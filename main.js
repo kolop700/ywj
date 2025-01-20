@@ -46,12 +46,13 @@ export function createApp() {
   app.use(pinia);
   app.config.globalProperties.$store = store;
   app.mixin(mixin);
-  // 初始化实例
+  
+  // 初始化蓝牙实例并提供给组件
   const bleUtils = new BleUtils()
   const doorBleUtils = new DoorBleUtils(bleUtils)
-  // 注册为全局属性
-  uni.$bleUtils = bleUtils
-  uni.$doorBleUtils = doorBleUtils
+  app.provide('bleUtils', bleUtils)
+  app.provide('doorBleUtils', doorBleUtils)
+  
   return {
     app
   }

@@ -13,7 +13,7 @@ class DoorBleUtils {
    * @returns {Promise}
    */
   async openDoorWithBle(device, userId) {
-    // 显示加载框
+    // 显示开门中的提示
     uni.showLoading({
       title: '正在开门...',
       mask: true
@@ -42,6 +42,7 @@ class DoorBleUtils {
       // 清理资源
       this.bleUtils.stopBluetoothDevicesDiscovery()
       this.bleUtils.closeBluetoothAdapter()
+      // 隐藏开门中的提示
       uni.hideLoading()
     }
   }
@@ -52,8 +53,6 @@ class DoorBleUtils {
    * @returns {Promise<Object>} 目标设备信息
    */
   async findAndConnectDevice(doorMac) {
-    uni.showLoading({ title: '搜索设备中...' })
-    
     try {
       // 开始搜索设备
       await this.bleUtils.startBluetoothDevicesDiscovery()
@@ -62,7 +61,6 @@ class DoorBleUtils {
       const targetDevice = await this.waitForDevice(doorMac)
       
       // 连接设备
-      uni.showLoading({ title: '连接设备中...' })
       await this.bleUtils.connectBleDevice(targetDevice.deviceId)
       
       return targetDevice
@@ -101,8 +99,6 @@ class DoorBleUtils {
    * @param {string} userId 用户ID
    */
   async sendOpenCommand(device, userId) {
-    uni.showLoading({ title: '发送开门指令...' })
-    
     try {
       // 获取服务
       const services = await this.bleUtils.getBleDeviceServices(device.deviceId)
@@ -141,11 +137,6 @@ class DoorBleUtils {
       throw error
     }
   }
-}
-
-// 导出前检查全局变量是否存在
-if (!uni.$bleUtils) {
-  console.error('警告: bleUtils 未在全局注册，蓝牙功能可能无法正常工作')
 }
 
 export default DoorBleUtils 

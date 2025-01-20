@@ -179,7 +179,7 @@ export default {
                       icon: 'none',
                       duration: 1000
                     })
-                    resolve(true)
+                    reject(true)
                     break
 
                   case 'HD3AA79W':
@@ -188,7 +188,7 @@ export default {
                       icon: 'none',
                       duration: 3000
                     })
-                    resolve(false)
+                    reject(false)
                     break
 
                   case 'HD2AA78W':
@@ -197,7 +197,7 @@ export default {
                       icon: 'none',
                       duration: 3000
                     })
-                    resolve(false)
+                    reject(false)
                     break
 
                   default:
@@ -215,7 +215,7 @@ export default {
                   icon: 'error',
                   duration: 3000
                 })
-                resolve(false)
+                reject(false)
               }
             } else {
               reject(new Error('请求失败'))

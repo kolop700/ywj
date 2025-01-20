@@ -32,13 +32,16 @@
 </template>
 
 <script setup>
-import { ref, getCurrentInstance, computed } from 'vue'
+import { ref, getCurrentInstance, computed, inject } from 'vue'
 import { storeToRefs } from 'pinia'
 const { proxy } = getCurrentInstance()
 import { onLoad } from '@dcloudio/uni-app'
 import doorAccessUtils from '@/utils/doorAccessUtils'
 import visitorPasswordUtils from '@/utils/visitorPasswordUtils'
-import doorBleUtils from '@/utils/doorBleUtils'
+
+// 注入蓝牙实例
+const doorBleUtils = inject('doorBleUtils')
+
 const deviceStore = proxy.$store.device.useDeviceStore()
 const deviceApi = proxy.$api.device
 const { deviceList } = storeToRefs(deviceStore)
@@ -101,22 +104,36 @@ const openDoor = async () => {
       return
     }
 
-    // 尝试蓝牙开门
+    // 优先尝试网络开门
     try {
-      if (!uni.$doorBleUtils) {
+      console.log('尝试网络开门')
+      uni.showLoading({
+        title: '正在开门...',
+        mask: true
+      })
+      await doorAccessUtils.openDoor(matchedDevice.value)
+      uni.hideLoading()
+      uni.showToast({
+        title: '开门成功',
+        icon: 'success'
+      })
+    } catch (networkError) {
+      uni.hideLoading()
+      console.error('网络开门失败:', networkError)
+      console.log('尝试蓝牙开门')
+      // 网络开门失败后尝试蓝牙开门
+      if (!doorBleUtils) {
         throw new Error('蓝牙模块未初始化')
       }
-      await uni.$doorBleUtils.openDoorWithBle(matchedDevice.value, userStore.userId)
-    } catch (bleError) {
-      console.error('蓝牙开门失败:', bleError)
-      console.log('尝试网络开门')
-      await doorAccessUtils.openDoor(matchedDevice.value)
+      await doorBleUtils.openDoorWithBle(matchedDevice.value, userStore.userId)
     }
   } catch (error) {
+    uni.hideLoading()
     console.error('开门失败:', error)
     uni.showToast({
-      title: '开门失败',
-      icon: 'none'
+      title: '开门失败，请重试',
+      icon: 'none',
+      duration: 2000
     })
   }
 }

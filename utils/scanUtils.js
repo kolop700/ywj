@@ -12,13 +12,110 @@ const QR_REGEX = {
 
 const scanUtils = {
   /**
+   * 检查并申请权限
+   * @returns {Promise<boolean>} 是否获得所有权限
+   */
+  async checkAndRequestPermissions() {
+    // #ifdef APP-PLUS
+    const permissionNames = {
+      'android.permission.CAMERA': '相机',
+      'android.permission.READ_EXTERNAL_STORAGE': '存储',
+      'android.permission.BLUETOOTH': '蓝牙',
+      'android.permission.ACCESS_FINE_LOCATION': '位置'
+    };
+
+    // 检查权限状态
+    const checkPermission = (permission) => {
+      return new Promise((resolve) => {
+        plus.android.requestPermissions(
+          [permission],
+          function(resultObj) {
+            resolve(resultObj.granted.length > 0);
+          },
+          function(error) {
+            console.error('权限检查失败:', error);
+            resolve(false);
+          }
+        );
+      });
+    };
+
+    // 引导用户去设置页面
+    const goToAppSetting = () => {
+      return new Promise((resolve) => {
+        uni.showModal({
+          title: '权限申请',
+          content: '请在设置中开启相关权限，以正常使用应用功能',
+          confirmText: '去设置',
+          cancelText: '取消',
+          success: (res) => {
+            if (res.confirm) {
+              // 跳转到应用设置界面
+              const Intent = plus.android.importClass('android.content.Intent');
+              const Settings = plus.android.importClass('android.provider.Settings');
+              const Uri = plus.android.importClass('android.net.Uri');
+              const mainActivity = plus.android.runtimeMainActivity();
+              const intent = new Intent();
+              intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+              const uri = Uri.fromParts('package', mainActivity.getPackageName(), null);
+              intent.setData(uri);
+              mainActivity.startActivity(intent);
+              resolve(true);
+            } else {
+              resolve(false);
+            }
+          }
+        });
+      });
+    };
+
+    // 检查所有权限
+    for (let permission in permissionNames) {
+      const hasPermission = await checkPermission(permission);
+      if (!hasPermission) {
+        // 显示权限说明
+        uni.showModal({
+          title: '需要' + permissionNames[permission] + '权限',
+          content: '为了更好的使用体验，请授予' + permissionNames[permission] + '权限',
+          success: async (res) => {
+            if (res.confirm) {
+              const granted = await checkPermission(permission);
+              if (!granted) {
+                // 如果用户拒绝了权限，引导去设置页面
+                await goToAppSetting();
+              }
+            }
+          }
+        });
+        return false;
+      }
+    }
+    return true;
+    // #endif
+
+    // #ifdef H5 || MP
+    return true;
+    // #endif
+  },
+
+  /**
    * 扫描二维码
    * @param {Object} options 配置项
    * @param {Boolean} options.onlyFromCamera 是否只使用相机扫码，默认true
    * @param {Array} options.scanType 扫码类型，默认['qrCode']
    * @returns {Promise<string>} 返回扫码结果，失败返回空字符串
    */
-  scanQRCode(options = {}) {
+  async scanQRCode(options = {}) {
+    // 先检查权限
+    const hasPermissions = await this.checkAndRequestPermissions();
+    if (!hasPermissions) {
+      uni.showToast({
+        title: '缺少必要权限',
+        icon: 'none'
+      });
+      return '';
+    }
+
     const { 
       onlyFromCamera = true, 
       scanType = ['qrCode']

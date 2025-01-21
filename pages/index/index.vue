@@ -62,11 +62,11 @@
 
     <!-- 底部广告区域 - 固定高度 -->
     <view class="ad-section">
-      <up-image
+<!--      <up-image
         src="/static/img/img_ad.png"
         width="100%"
         height="160rpx"
-        shape="round"></up-image>
+        shape="round"></up-image> -->
     </view>
 
     <!-- 远程开门弹框 -->

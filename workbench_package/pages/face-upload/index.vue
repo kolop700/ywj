@@ -5,12 +5,30 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import QfImageCropper from '@/uni_modules/qf-image-cropper/components/qf-image-cropper/qf-image-cropper.vue'
 import userApi from '@/api/user/user.js'
 import { useUserStore } from '@/store/modules/user'
+import scanUtils from '@/utils/scanUtils.js'
 
 const userStore = useUserStore()
+
+// 页面加载时检查权限
+onMounted(async () => {
+	const permissionNames = {
+		'android.permission.CAMERA': '相机',
+		'android.permission.READ_EXTERNAL_STORAGE': '存储'
+	}
+	
+	const hasPermissions = await scanUtils.checkAndRequestPermissions(permissionNames)
+	if (!hasPermissions) {
+		uni.showToast({
+			title: '请授予相机和相册权限以使用此功能',
+			icon: 'none',
+			duration: 2000
+		})
+	}
+})
 
 const handleCrop = async (e) => {
 	try {

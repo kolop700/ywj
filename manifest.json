@@ -20,8 +20,7 @@
         "modules" : {
             "Barcode" : {},
             "Bluetooth" : {},
-            "Camera" : {},
-            "Share" : {}
+            "Camera" : {}
         },
         /* 应用发布信息 */
         "distribute" : {

@@ -89,7 +89,7 @@
       <view class="ad-section">
         <view class="ad-container">
           <image class="ad-image" src="/static/images/ad-placeholder.png" mode="aspectFill"></image>
-          <view class="ad-text">广告区域</view>
+          <view class="ad-text"></view>
         </view>
       </view>
     

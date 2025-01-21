@@ -53,14 +53,22 @@
             /* ios打包配置 */
             "ios" : {
                 "dSYMs" : false,
+                "devices": "iphone",
+                "infoPlist": {
+                    "UIRequiresFullScreen": true
+                },
                 "privacyDescription" : {
                     "NSCameraUsageDescription" : "需要使用相机进行扫码和拍照",
                     "NSPhotoLibraryUsageDescription" : "需要访问相册以选择或保存图片",
                     "NSBluetoothAlwaysUsageDescription" : "需要使用蓝牙功能进行设备连接和开门",
                     "NSBluetoothPeripheralUsageDescription" : "需要使用蓝牙功能进行设备连接和开门",
                     "NSLocationWhenInUseUsageDescription" : "需要使用位置服务以便更好地连接蓝牙设备",
-                    "NSPhotoLibraryAddUsageDescription" : "",
                     "NSLocalNetworkUsageDescription" : "需要访问网络来进行通讯"
+                },
+                "capabilities": {
+                    "entitlements": {
+                        "com.apple.developer.networking.HotspotConfiguration": false
+                    }
                 }
             },
             /* SDK配置 */
@@ -81,17 +89,6 @@
                 },
                 "ios" : {
                     "appstore" : "unpackage/res/icons/1024x1024.png",
-                    "ipad" : {
-                        "app" : "unpackage/res/icons/76x76.png",
-                        "app@2x" : "unpackage/res/icons/152x152.png",
-                        "notification" : "unpackage/res/icons/20x20.png",
-                        "notification@2x" : "unpackage/res/icons/40x40.png",
-                        "proapp@2x" : "unpackage/res/icons/167x167.png",
-                        "settings" : "unpackage/res/icons/29x29.png",
-                        "settings@2x" : "unpackage/res/icons/58x58.png",
-                        "spotlight" : "unpackage/res/icons/40x40.png",
-                        "spotlight@2x" : "unpackage/res/icons/80x80.png"
-                    },
                     "iphone" : {
                         "app@2x" : "unpackage/res/icons/120x120.png",
                         "app@3x" : "unpackage/res/icons/180x180.png",

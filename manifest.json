@@ -2,8 +2,8 @@
     "name" : "星云小卫",
     "appid" : "__UNI__F8D1DD9",
     "description" : "",
-    "versionName" : "1.0.2",
-    "versionCode" : 102,
+    "versionName" : "1.0.3",
+    "versionCode" : 103,
     "transformPx" : false,
     /* 5+App特有相关 */
     "app-plus" : {
@@ -45,6 +45,9 @@
                     "<uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\"/>",
                     "<uses-permission android:name=\"android.permission.BLUETOOTH\"/>",
                     "<uses-permission android:name=\"android.permission.BLUETOOTH_ADMIN\"/>",
+                    "<uses-permission android:name=\"android.permission.BLUETOOTH_SCAN\"/>",
+                    "<uses-permission android:name=\"android.permission.BLUETOOTH_ADVERTISE\"/>",
+                    "<uses-permission android:name=\"android.permission.BLUETOOTH_CONNECT\"/>",
                     "<uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\"/>",
                     "<uses-permission android:name=\"android.permission.ACCESS_COARSE_LOCATION\"/>"
                 ],
@@ -53,9 +56,9 @@
             /* ios打包配置 */
             "ios" : {
                 "dSYMs" : false,
-                "devices": "iphone",
-                "infoPlist": {
-                    "UIRequiresFullScreen": true
+                "devices" : "iphone",
+                "infoPlist" : {
+                    "UIRequiresFullScreen" : true
                 },
                 "privacyDescription" : {
                     "NSCameraUsageDescription" : "需要使用相机进行扫码和拍照",
@@ -65,10 +68,8 @@
                     "NSLocationWhenInUseUsageDescription" : "需要使用位置服务以便更好地连接蓝牙设备",
                     "NSLocalNetworkUsageDescription" : "需要访问网络来进行通讯"
                 },
-                "capabilities": {
-                    "entitlements": {
-                        "com.apple.developer.networking.HotspotConfiguration": false
-                    }
+                "capabilities" : {
+                    "entitlements" : {}
                 }
             },
             /* SDK配置 */
@@ -98,6 +99,17 @@
                         "settings@3x" : "unpackage/res/icons/87x87.png",
                         "spotlight@2x" : "unpackage/res/icons/80x80.png",
                         "spotlight@3x" : "unpackage/res/icons/120x120.png"
+                    },
+                    "ipad" : {
+                        "app" : "unpackage/res/icons/76x76.png",
+                        "app@2x" : "unpackage/res/icons/152x152.png",
+                        "notification" : "unpackage/res/icons/20x20.png",
+                        "notification@2x" : "unpackage/res/icons/40x40.png",
+                        "proapp@2x" : "unpackage/res/icons/167x167.png",
+                        "settings" : "unpackage/res/icons/29x29.png",
+                        "settings@2x" : "unpackage/res/icons/58x58.png",
+                        "spotlight" : "unpackage/res/icons/40x40.png",
+                        "spotlight@2x" : "unpackage/res/icons/80x80.png"
                     }
                 }
             }

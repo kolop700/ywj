@@ -17,6 +17,53 @@ const scanUtils = {
    */
   async checkAndRequestPermissions() {
     // #ifdef APP-PLUS
+    // iOS权限检查
+    if (uni.getSystemInfoSync().platform === 'ios') {
+      return new Promise((resolve) => {
+        try {
+          const AVCaptureDeviceClass = plus.ios.importClass("AVCaptureDevice");
+          const status = AVCaptureDeviceClass.authorizationStatusForMediaType('vide');
+          
+          if (status === 0) {
+            // 首次使用，请求权限
+            plus.ios.importClass("AVCaptureDevice");
+            const result = plus.ios.invoke('AVCaptureDevice', 'requestAccessForMediaType:completionHandler:', 'vide', function(granted) {
+              resolve(granted);
+            });
+          } else if (status === 3) {
+            // 已授权
+            resolve(true);
+          } else {
+            // 未授权或已拒绝
+            uni.showModal({
+              title: '提示',
+              content: '请在系统设置中开启相机权限',
+              confirmText: '去设置',
+              cancelText: '取消',
+              success: function(res) {
+                if (res.confirm) {
+                  try {
+                    const UIApplicationClass = plus.ios.importClass("UIApplication");
+                    const NSURLClass = plus.ios.importClass("NSURL");
+                    const settingsUrl = NSURLClass.URLWithString('app-settings:');
+                    const application = UIApplicationClass.sharedApplication();
+                    application.openURL(settingsUrl);
+                  } catch (e) {
+                    console.error('打开设置页面失败:', e);
+                  }
+                }
+              }
+            });
+            resolve(false);
+          }
+        } catch (e) {
+          console.error('iOS权限检查失败:', e);
+          resolve(false);
+        }
+      });
+    }
+
+    // Android权限检查
     const permissionNames = {
       'android.permission.CAMERA': '相机',
       'android.permission.READ_EXTERNAL_STORAGE': '存储',

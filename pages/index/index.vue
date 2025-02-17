@@ -691,4 +691,18 @@ const previewAvatar = () => {
     }
   }
 }
+
+@media (min-width: 768px) {
+  .content-wrapper {
+    height: calc(94vh - 200rpx - 20rpx);
+    
+    .grid-wrapper {
+      height: 100%;
+    }
+    
+    .bottom-btns {
+      height: 25%;
+    }
+  }
+}
 </style>

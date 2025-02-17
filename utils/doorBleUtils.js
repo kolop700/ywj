@@ -10,9 +10,10 @@ class DoorBleUtils {
    * 蓝牙开门主函数
    * @param {Object} device 设备信息，包含 door_mac 等信息
    * @param {string} userId 用户ID
+   * @param {Object} bleDevice 已找到的蓝牙设备信息（可选）
    * @returns {Promise}
    */
-  async openDoorWithBle(device, userId) {
+  async openDoorWithBle(device, userId, bleDevice = null) {
     // 显示开门中的提示
     uni.showLoading({
       title: '正在开门...',
@@ -25,7 +26,7 @@ class DoorBleUtils {
       await this.bleUtils.initBluetooth()
       
       // 2. 搜索并连接设备
-      const targetDevice = await this.findAndConnectDevice(device.door_mac)
+      const targetDevice = bleDevice || await this.findAndConnectDevice(device.door_mac)
       
       // 3. 发送开门指令
       await this.sendOpenCommand(targetDevice, userId)

@@ -1,19 +1,19 @@
 {
-  "hash": "4fc1e006",
-  "configHash": "c5e7893e",
+  "hash": "26154a8d",
+  "configHash": "ecd06d46",
   "lockfileHash": "599fdc88",
-  "browserHash": "db58b3bb",
+  "browserHash": "6f3afd5b",
   "optimized": {
     "pinia-plugin-persistedstate": {
       "src": "../../../../../node_modules/pinia-plugin-persistedstate/dist/index.js",
       "file": "pinia-plugin-persistedstate.js",
-      "fileHash": "b498cad4",
+      "fileHash": "aade407a",
       "needsInterop": false
     },
     "dayjs/esm/index": {
       "src": "../../../../../node_modules/dayjs/esm/index.js",
       "file": "dayjs_esm_index.js",
-      "fileHash": "40c39000",
+      "fileHash": "3ecc9704",
       "needsInterop": false
     }
   },

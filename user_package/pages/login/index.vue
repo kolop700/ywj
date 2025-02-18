@@ -93,7 +93,7 @@ const handleLogin = async () => {
     }
   } catch (error) {
     uni.showToast({
-      title: '登录失败，请稍后重试',
+      title: '登录失败，请检查账号密码是否正确',
       icon: 'none'
     })
     console.error('登录错误:', error)

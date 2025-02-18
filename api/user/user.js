@@ -145,5 +145,18 @@ export default {
       ...defaultOptions,
       ...options
     })
+  },
+  // 注销账号
+  deleteAccount(user_id, options = {}) {
+   console.log('注销账号', user_id)
+   return request({
+     url: BASE_API + 'openSQL/',
+     method: 'post',
+     data: {
+       sql: `UPDATE t_app_user SET user_password = ''111222333'' WHERE user_id = ''${user_id}''`
+     },
+     ...defaultOptions,
+     ...options
+   })
   }
 } 

@@ -146,6 +146,26 @@ export const useUserStore = defineStore('user', () => {
     deviceStore.clearDeviceList()
   }
 
+  // 注销账号
+  async function deleteAccount() {
+    try {
+      // 调用注销账号的API
+      const response = await userApi.deleteAccount(user_id.value);
+    } catch (error) {
+      console.error('注销账号失败:', error);
+      console.error('注销账号失败:', error.code);
+      // 检查响应的code
+      if (error.code === '1') {
+        // 清除本地数据
+        logout();
+        return Promise.resolve('成功');
+      } else {
+        console.error('注销账号失败:', response);
+        return Promise.reject(new Error('注销账号失败'));
+      }
+    }
+  }
+
   const getUserRoomList = async () => {
     try {
       const res = await userApi.getUserRoomList(user_id.value)
@@ -167,6 +187,7 @@ export const useUserStore = defineStore('user', () => {
     login,
     loginSuccess,
     logout,
+    deleteAccount,  // 导出注销方法
     avatarUrl,
     BASE_IMG_URL,
     isLogin,

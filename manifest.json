@@ -2,8 +2,8 @@
     "name" : "星云小卫",
     "appid" : "__UNI__F8D1DD9",
     "description" : "",
-    "versionName" : "1.0.7",
-    "versionCode" : 107,
+    "versionName" : "1.0.8",
+    "versionCode" : 108,
     "transformPx" : false,
     /* 5+App特有相关 */
     "app-plus" : {
@@ -62,6 +62,7 @@
                     "UIRequiresFullScreen" : true
                 },
                 "privacyDescription" : {
+                    "NSMicrophoneUsageDescription" : "需要使用麦克风功能",
                     "NSCameraUsageDescription" : "需要使用相机进行扫描门禁二维码、拍摄头像和人脸认证，以便您能使用开门和身份验证功能",
                     "NSPhotoLibraryUsageDescription" : "需要访问相册以选择头像照片、保存分享的二维码图片，以及上传人脸认证照片",
                     "NSBluetoothAlwaysUsageDescription" : "需要使用蓝牙功能进行设备连接和开门",
@@ -70,9 +71,7 @@
                     "NSLocalNetworkUsageDescription" : "需要访问网络来进行通讯"
                 },
                 "capabilities" : {
-                    "entitlements" : {
-                        "com.apple.developer.networking.HotspotConfiguration" : true
-                    }
+                    "entitlements" : {}
                 }
             },
             "sdkConfigs" : {

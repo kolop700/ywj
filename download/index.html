@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>云小卫 - 智慧门禁系统</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 引入头部组件 -->
+        <div id="header"></div>
+        
+        <!-- 引入下载区域组件 -->
+        <div id="download"></div>
+        
+        <!-- 引入特性区域组件 -->
+        <div id="features"></div>
+        
+        <!-- 引入截图区域组件 -->
+        <div id="screenshots"></div>
+    </div>
+
+    <script src="js/platform.js"></script>
+    <script>
+        // 加载组件
+        async function loadComponents() {
+            const components = ['header', 'download', 'features', 'screenshots'];
+            
+            for (const component of components) {
+                const response = await fetch(`components/${component}.html`);
+                const html = await response.text();
+                document.getElementById(component).innerHTML = html;
+            }
+        }
+        
+        // 页面加载完成后加载组件
+        document.addEventListener('DOMContentLoaded', loadComponents);
+    </script>
+</body>
+</html> 

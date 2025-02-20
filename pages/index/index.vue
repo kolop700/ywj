@@ -131,17 +131,30 @@
         <view class="refresh-btn" @click="refreshDeviceList">刷新</view>
       </view>
     </uni-popup>
+
+    <!-- 服务协议和隐私政策弹框 -->
+    <uni-popup ref="agreementPopup" type="center" :mask-click="false">
+      <view class="agreement-popup">
+        <view class="agreement-title">服务协议和隐私政策</view>
+        <view class="agreement-content">欢迎使用 APP。我们非常重视您的个人信息和隐私保护。在您使用"服务"之前，请务必仔细阅读<text class="link" @click="agreementStore.openUserAgreement()">《用户协议》</text><text>和</text><text class="link" @click="agreementStore.openPrivacyPolicy()">《隐私政策》</text>，并充分理解所有关于您的个人信息和隐私的内容。我们将严格按照您同意的各项条款使用您的个人信息，以便更好的为您提供服务。</view>
+        <view class="agreement-buttons">
+          <button class="btn-disagree register-btn" @click="handleDisagree">不同意</button>
+          <button class="btn-agree login-btn" @click="handleAgree">同意并继续</button>
+        </view>
+      </view>
+    </uni-popup>
   </view>
 </template>
 
 <script setup>
-import { ref, getCurrentInstance, computed } from 'vue'
+import { ref, getCurrentInstance, computed, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { onLoad } from '@dcloudio/uni-app'
 import doorAccessUtils from '@/utils/doorAccessUtils'
 const { proxy } = getCurrentInstance()
 const userStore = proxy.$store.user.useUserStore()
 const deviceStore = proxy.$store.device.useDeviceStore()
+const agreementStore = proxy.$store.agreement.useAgreementStore()
 const deviceApi = proxy.$api.device
 import scanUtils from '@/utils/scanUtils'
 import checkVersion from '@/pages/lq-upgrade/checkVersion.js'
@@ -215,18 +228,44 @@ const checkAppUpdate = () => {
 
 // 页面加载时检查登录状态和版本更新
 onLoad(() => {
-  userStore.checkLogin()
+  // userStore.checkLogin()
   checkAppUpdate() // 检查版本更新
+})
+
+// 在组件挂载后检查首次打开状态
+onMounted(() => {
+  checkFirstOpen() // 检查是否首次打开
 })
 
 // 处理网格项点击
 const handleGridItemClick = (item) => {
+  // 检查是否同意了协议
+  if (!agreementStore.checkAgreement()) {
+    agreementPopup.value.open()
+    return
+  }
+  
+  // 检查是否需要登录
   if (item.needLogin && !userStore.checkLogin()) {
     return
   }
+  
   if (item.url) {
     uni.navigateTo({
       url: item.url
+    })
+  }
+}
+
+// 处理登录按钮点击
+const handleLoginClick = () => {
+  if (!agreementStore.checkAgreement()) {
+    // 如果没有同意协议，显示协议弹框
+    agreementPopup.value.open()
+  } else {
+    // 如果已经同意协议，直接跳转到登录页面
+    uni.navigateTo({
+      url: '/user_package/pages/login/index'
     })
   }
 }
@@ -358,6 +397,47 @@ const previewAvatar = () => {
       current: 0
     })
   }
+}
+
+// 服务协议弹框相关
+const agreementPopup = ref(null)
+
+// 检查是否首次打开应用
+const checkFirstOpen = () => {
+  if (!agreementStore.checkAgreement()) {
+    agreementPopup.value.open()
+  }
+}
+
+// 处理同意
+const handleAgree = () => {
+  agreementStore.setAgreement(true)
+  agreementPopup.value.close()
+  // 同意后直接跳转到登录页面
+  // uni.navigateTo({
+  //   url: '/user_package/pages/login/index'
+  // })
+}
+
+// 处理不同意
+const handleDisagree = () => {
+  uni.showModal({
+    title: '提示',
+    content: '您需要同意服务协议和隐私政策才能使用本应用',
+    showCancel: false,
+    confirmText: '我知道了',
+    success: () => {
+      // 如果用户是第一次打开应用，点击不同意后退出应用
+      if (!agreementStore.checkAgreement()) {
+        // #ifdef APP-PLUS
+        plus.runtime.quit()
+        // #endif
+        // #ifdef H5
+        window.location.reload()
+        // #endif
+      }
+    }
+  })
 }
 </script>
 
@@ -702,6 +782,101 @@ const previewAvatar = () => {
     
     .bottom-btns {
       height: 25%;
+    }
+  }
+}
+
+.agreement-popup {
+  width: 600rpx;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 40rpx;
+  box-sizing: border-box;
+
+  .agreement-title {
+    font-size: 32rpx;
+    font-weight: 500;
+    color: #333;
+    text-align: center;
+    margin-bottom: 30rpx;
+  }
+
+  .agreement-content {
+    font-size: 28rpx;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 40rpx;
+
+    .link {
+      color: #007AFF;
+      padding: 0 4rpx;
+    }
+  }
+
+  .agreement-buttons {
+    display: flex;
+    gap: 20rpx;
+
+    button {
+      flex: 1;
+      height: 80rpx;
+      line-height: 80rpx;
+      text-align: center;
+      border-radius: 40rpx;
+      font-size: 28rpx;
+      border: none;
+
+      &.btn-disagree {
+        background: #F5F5F5;
+        color: #666;
+      }
+
+      &.btn-agree {
+        background: #FF0036;
+        color: #FFFFFF;
+      }
+    }
+  }
+}
+
+.agreement-buttons {
+  .btn-disagree,
+  .btn-agree {
+    margin-top: 30rpx;
+    width: 100%;
+    height: 110rpx;
+    line-height: 110rpx;
+    font-size: 36rpx;
+    font-weight: 800;
+    border-radius: 12rpx;
+    margin-bottom: 30rpx;
+    
+    &::after {
+      border: none;
+    }
+  }
+  
+  .btn-agree {
+    background-color: #FF0036;
+    color: #fff;
+    
+    &:active {
+      opacity: 0.8;
+    }
+    
+    &.btn-disabled {
+      background-color: #FCA5A7;
+      opacity: 1;
+    }
+  }
+  
+  .btn-disagree {
+    background-color: #fff;
+    color: #333;
+    border: 1rpx solid #FF0036;
+    
+    &:active {
+      background-color: #f5f5f5;
     }
   }
 }

@@ -47,7 +47,12 @@
         </view>
       </view>
       
-      <view class="menu-item" @tap="handleAccountDelete">
+      <!-- 注销账号选项，仅在 iOS 平台显示 -->
+      <view 
+        class="menu-item" 
+        @tap="handleAccountDelete"
+        v-if="platform === 'ios'"
+      >
         <view class="content">
           <text class="delete-text">注销账号</text>
         </view>
@@ -110,6 +115,9 @@ const bannerAdId = ref('') // 初始化为空字符串
 // 获取应用版本号
 const appVersion = ref('')
 
+// 平台判断
+const platform = ref('')
+
 // 初始化版本号
 const initVersion = () => {
   // #ifdef APP-PLUS
@@ -140,6 +148,9 @@ const initAd = () => {
 onMounted(() => {
   initAd()
   initVersion() // 初始化版本号
+  // 获取平台信息
+  const systemInfo = uni.getSystemInfoSync()
+  platform.value = systemInfo.platform.toLowerCase()
 })
 
 // 广告相关的事件处理函数

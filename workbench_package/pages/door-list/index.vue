@@ -74,6 +74,7 @@ import { ref, computed, getCurrentInstance, onMounted } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import doorAccessUtils from '@/utils/doorAccessUtils'
 import { getPageHeight, calculateScrollViewHeight } from '@/utils/layout'
+import { adManager } from '@/utils/adUtils'
 
 const { proxy } = getCurrentInstance()
 const userStore = proxy.$store.user.useUserStore()
@@ -103,14 +104,21 @@ const updateListHeight = async () => {
   // #endif
 }
 
+// 初始化广告管理器
+const initAdManager = () => {
+  adManager.initStore(adStore)
+  adManager.init()
+}
+
 // 页面加载时设置高度和广告
 onMounted(async () => {
   windowHeight.value = getPageHeight()
   await updateListHeight()
   
-  // 初始化广告ID
+  // 初始化广告ID和广告管理器
   try {
     bannerAdId.value = adStore.getBannerAdId()
+    initAdManager()
     console.log('广告ID:', bannerAdId.value)
   } catch (error) {
     console.error('获取广告ID失败:', error)
@@ -207,6 +215,16 @@ const handleDeviceClick = async (device) => {
       const success = await doorAccessUtils.openDoor(device)
       if (success) {
         console.log('开门成功:', device)
+        // 开门成功后展示广告
+        try {
+          // 先尝试展示激励广告
+          const adResult = await adManager.showAd()
+          if (!adResult) {
+            console.log('广告展示受限：可能达到每日限制或间隔时间不足')
+          }
+        } catch (error) {
+          console.error('广告展示失败:', error)
+        }
       }
     } catch (error) {
       console.error('开门操作失败:', error)

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { useAdControlStore, AD_CONTROL_TYPES } from './adControl' // 引入广告控制模块
 
 // 定义广告 ID
 // 【安卓】
@@ -34,6 +35,7 @@ const AD_IDS = {
 // 创建广告状态管理
 export const useAdStore = defineStore('ad', () => {
   const isTestMode = ref(true) // 默认关闭测试模式
+  const adControlStore = useAdControlStore() // 使用广告控制 store
 
   // 获取当前平台
   const getPlatform = () => {
@@ -43,6 +45,10 @@ export const useAdStore = defineStore('ad', () => {
 
   // 获取广告ID
   const getAdId = (type) => {
+    // 检查广告控制类型
+    if (adControlStore.adType === AD_CONTROL_TYPES.NONE) {
+      return '11111'
+    }
     const platform = isTestMode.value ? 'test' : getPlatform()
     return AD_IDS[platform]?.[type] || ''
   }

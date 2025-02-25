@@ -152,6 +152,12 @@ class AdManager {
 
       this.rewardedVideoAd.onError((err) => {
         console.log('激励广告加载失败', err)
+        // 先检查限制，避免不必要的广告加载
+        if (this.canShowAd('interstitial')) {
+            this.showInterstitialAd();
+        } else {
+            console.log('插屏广告展示间隔不足，无法展示插屏广告')
+        }
       })
 
       this.rewardedVideoAd.onClose((res) => {
@@ -177,6 +183,7 @@ class AdManager {
 
       this.interstitialAd.onClose(() => {
         console.log('插屏广告关闭')
+
         this.updateAdCount('interstitial')
       })
     }
@@ -339,10 +346,10 @@ class AdManager {
         return true
       } catch (err) {
         console.error('插屏广告重新加载失败，详细错误:', err)
-        uni.showToast({
-          title: '广告加载失败',
-          icon: 'none'
-        })
+        // uni.showToast({
+        //   title: '广告加载失败',
+        //   icon: 'none'
+        // })
         return false
       }
     }

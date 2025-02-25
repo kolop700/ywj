@@ -11,7 +11,7 @@ export const AD_CONTROL_TYPES = {
 
 export const useAdControlStore = defineStore('adControl', () => {
   // 广告控制类型
-  const adType = ref(AD_CONTROL_TYPES.INTERSTITIAL) // 默认显示 banner + 插屏
+  const adType = ref(AD_CONTROL_TYPES.REWARDED) // 默认显示 banner + 插屏
 
   // 从本地存储初始化
   try {

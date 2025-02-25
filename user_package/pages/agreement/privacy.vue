@@ -93,6 +93,202 @@
         <view class="section-content">
           <view>为确保流畅的浏览体验，您可能会收到来自星云小卫及其合作伙伴外部的第三方（下文简称"第三方"）提供的内容或网络链接。星云小卫对此类第三方无控制权。您可选择是否访问第三方提供的链接、内容、产品和服务。</view>
           <view>星云小卫无法控制第三方的隐私和数据保护政策，此类第三方不受到本政策的约束。在向第三方提交个人信息之前，请自行参见这些第三方的隐私保护政策。</view>
+          
+          <view class="third-party-sdk">
+            <view class="sdk-title">本应用使用的第三方SDK信息如下：</view>
+            
+            <view class="sdk-table">
+              <view class="table-header">
+                <view class="th">SDK名称</view>
+                <view class="th">SDK包名</view>
+                <view class="th">SDK用途</view>
+                <view class="th">可能获取的个人信息类型</view>
+                <view class="th">调用的设备权限</view>
+                <view class="th">信息用途</view>
+                <view class="th">隐私政策链接</view>
+              </view>
+
+              <view class="table-row">
+                <view class="td">阿里weexSDK</view>
+                <view class="td">com.taobao</view>
+                <view class="td">基础功能</view>
+                <view class="td">存储的个人文件</view>
+                <view class="td">android.permission.WRITE_EXTERNAL_STORAGE、android.permission.READ_EXTERNAL_STORAGE</view>
+                <view class="td">uni-app基础模块默认集成，用于渲染uniapp的nvue页面引擎</view>
+                <view class="td"><a href="https://weexapp.com/zh/">weex官网</a></view>
+              </view>
+
+              <view class="table-row">
+                <view class="td">Fresco图库</view>
+                <view class="td">com.facebook.fresco</view>
+                <view class="td">基础功能</view>
+                <view class="td">存储的个人文件</view>
+                <view class="td">android.permission.WRITE_EXTERNAL_STORAGE、android.permission.READ_EXTERNAL_STORAGE</view>
+                <view class="td">用于nvue页面加载图片使用</view>
+                <view class="td"><a href="https://www.fresco-cn.org/">Fresco官网</a></view>
+              </view>
+
+              <view class="table-row">
+                <view class="td">glide图库</view>
+                <view class="td">com.bumptech.glide</view>
+                <view class="td">基础功能</view>
+                <view class="td">存储的个人文件</view>
+                <view class="td">android.permission.WRITE_EXTERNAL_STORAGE、android.permission.READ_EXTERNAL_STORAGE</view>
+                <view class="td">用于图片预览使用</view>
+                <view class="td"><a href="http://bumptech.github.io/glide/">Glide官网</a></view>
+              </view>
+
+              <view class="table-row">
+                <view class="td">gif-drawable</view>
+                <view class="td">pl.droidsonroids.gif</view>
+                <view class="td">基础功能</view>
+                <view class="td">存储文件</view>
+                <view class="td">android.permission.WRITE_EXTERNAL_STORAGE、android.permission.READ_EXTERNAL_STORAGE</view>
+                <view class="td">加载gif图</view>
+                <view class="td"><a href="https://github.com/koral--/android-gif-drawable">gif-drawable官网</a></view>
+              </view>
+
+              <view class="table-row">
+                <view class="td">fastjson</view>
+                <view class="td">com.alibaba.fastjson</view>
+                <view class="td">基础功能</view>
+                <view class="td">无</view>
+                <view class="td">无</view>
+                <view class="td">JSON解析</view>
+                <view class="td"><a href="https://github.com/alibaba/fastjson">fastjson官网</a></view>
+              </view>
+
+              <view class="table-row">
+                <view class="td">移动安全联盟OAID</view>
+                <view class="td">com.bun.miitmdid、com.zui.opendeviceidlibrary、com.netease.nis、com.samsung.android、com.huawei.hms</view>
+                <view class="td">基础功能</view>
+                <view class="td">设备制造商、设备型号、设备品牌、设备网络运营商名称、APP包名</view>
+                <view class="td">无</view>
+                <view class="td">获取oaid，用于本地判断，不会进行任何网络传输。其中设备信息用于判断终端调用接口，运营商名称用于判断虚拟机环境，APP包名用于校验签名</view>
+                <view class="td"><a href="http://www.msa-alliance.cn/col.jsp?id=122">移动安全联盟官网</a></view>
+              </view>
+
+              <view class="table-row">
+                <view class="td">uni-ad</view>
+                <view class="td">-</view>
+                <view class="td">基础广告</view>
+                <view class="td">设备品牌、型号、操作系统版本、OAID、分辨率、IMEI、android ID、SIM卡IMSI信息、应用名称、应用包名、应用版本号、网络信息、应用安装列表、位置信息</view>
+                <view class="td">android.permission.ACCESS_NETWORK_STATE、android.permission.READ_PHONE_STATE、android.permission.ACCESS_COARSE_LOCATION</view>
+                <view class="td">广告投放合作，广告归因、反作弊、安全</view>
+                <view class="td"><a href="https://doc.dcloud.net.cn/markdown-share-docs/1d821cdd3cdf2681045ec4be94bc8404/">隐私协议</a></view>
+              </view>
+
+              <view class="table-row">
+                <view class="td">推啊</view>
+                <view class="td">engine.tuifish.com</view>
+                <view class="td">基础广告</view>
+                <view class="td">设备品牌、型号、操作系统版本、OAID、分辨率、IMEI、android ID、SIM卡IMSI信息、应用名称、应用包名、应用版本号、网络信息、应用安装列表、位置信息</view>
+                <view class="td">android.permission.ACCESS_NETWORK_STATE、android.permission.READ_PHONE_STATE、android.permission.ACCESS_COARSE_LOCATION</view>
+                <view class="td">识别广告、活动作弊行为；改善SDK崩溃率、推送个性化广告；广告投放</view>
+                <view class="td"><a href="https://yun.tuia.cn/tuia/sdk/agreement/index.html">推啊隐私协议</a></view>
+              </view>
+
+              <view class="table-row">
+                <view class="td">快手</view>
+                <view class="td">com.kwad.sdk</view>
+                <view class="td">增强广告</view>
+                <view class="td">基础信息：设备品牌、设备型号、软件系统版本、存储信息、运营商信息、设备时区、设备语言、网络信息等基础信息；设备标识：IMEIs、MEID、OAID、AndroidID、IMSIs、ICCID；位置信息：IP地址、MAC地址、GPS位置信息、基站信息、WIFI信息；应用信息：应用安装列表；其他信息：传感器信息、sim卡激活信息</view>
+                <view class="td">android.permission.ACCESS_NETWORK_STATE、android.permission.INTERNET、android.permission.READ_PHONE_STATE、android.permission.ACCESS_WIFI_STATE、android.permission.REQUEST_INSTALL_PACKAGES、android.permission.VIBRATE</view>
+                <view class="td">广告投放、广告归因、反作弊、安全</view>
+                <view class="td"><a href="https://www.kuaishou.com/about/policy">快手内容联盟隐私协议</a>和<a href="https://u.kuaishou.com/home/detail/1220">SDK使用规范</a></view>
+              </view>
+
+              <view class="table-row">
+                <view class="td">优量汇</view>
+                <view class="td">com.qq.e</view>
+                <view class="td">增强广告</view>
+                <view class="td">基站、附近的WIFI、连接的WIFI、位置信息、设备制造商、设备型号、操作系统版本、屏幕分辨率、屏幕方向、屏幕DPI、IP地址、加速度传感器、磁场传感器、OAID、IMEI/MEID（Device ID）、Android_ID、包名、版本号、进程名称、运行状态、可疑行为、应用安装信息</view>
+                <view class="td">android.permission.INTERNET、android.permission.ACCESS_NETWORK_STATE、android.permission.ACCESS_WIFI_STATE、android.permission.REQUEST_INSTALL_PACKAGES、android.permission.CHANGE_NETWORK_STATE、android.permission.QUERY_ALL_PACKAGES、android.permission.REORDER_TASKS、android.permission.VIBRATE、android.permission.ACCESS_COARSE_LOCATION</view>
+                <view class="td">广告投放与监测归因、广告主统计投放结果、减少App崩溃、确保服务器正常运行、提升可扩展性和性能</view>
+                <view class="td"><a href="https://e.qq.com/dev/help_detail.html?cid=2005&pid=5983">优量汇隐私协议</a></view>
+              </view>
+
+              <view class="table-row">
+                <view class="td">穿山甲</view>
+                <view class="td">com.bytedance.sdk.openadsdk</view>
+                <view class="td">增强广告</view>
+                <view class="td">设备品牌、型号、软件系统版本、屏幕密度、屏幕分辨率、设备语言、设备时区、sim卡信息（mcc&mnc）、CPU信息、可用存储空间大小、MAC地址、设备标识符（如IMEI、IMSI、ICCID、GAID（仅GMS服务）、MEID、硬件序列号build_serial、AndroidID、OAID、运营商信息、Wi-Fi状态、网络信号强度、IP地址、应用包名、运行中的进程信息、版本号、应用前后台状态、软件列表信息、线性加速度传感器、磁场传感器、旋转矢量传感器、精确位置信息、粗略位置信息（WiFi列表、WLAN接入点（如SSID，BSSID）、基站）</view>
+                <view class="td">android.permission.ACCESS_NETWORK_STATE、android.permission.READ_PHONE_STATE、android.permission.WRITE_EXTERNAL_STORAGE</view>
+                <view class="td">广告投放合作、广告归因、反作弊</view>
+                <view class="td"><a href="https://www.pangle.cn/privacy/partner">穿山甲隐私协议</a></view>
+              </view>
+
+              <view class="table-row">
+                <view class="td">Sigmob</view>
+                <view class="td">com.sigmob.windad</view>
+                <view class="td">增强广告</view>
+                <view class="td">设备信息：设备品牌、型号、操作系统版本、OAID、分辨率等基础设备信息；应用信息：应用名称、应用包名、应用版本号等；其他：运营商信息、时区</view>
+                <view class="td">android.permission.ACCESS_NETWORK_STATE、android.permission.INTERNET、android.permission.ACCESS_WIFI_STATE、android.permission.CHANGE_WIFI_STATE、android.permission.READ_PHONE_STATE、android.permission.REQUEST_INSTALL_PACKAGES、android.permission.QUERY_ALL_PACKAGES</view>
+                <view class="td">广告投放、广告主归因、反作弊</view>
+                <view class="td"><a href="https://doc.sigmob.com/Sigmob%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/%E5%90%88%E8%A7%84%E6%9D%A1%E6%AC%BE/%E9%9A%90%E7%A7%81%E6%94%BF%E7%AD%96/">Sigmob隐私协议</a></view>
+              </view>
+
+              <view class="table-row">
+                <view class="td">百度百青藤</view>
+                <view class="td">com.baidu.mobads.proxy</view>
+                <view class="td">增强广告</view>
+                <view class="td">设备信息：设备品牌、型号、软件系统版本、分辨率、网络信号强度、传感器信息，磁盘总空间、系统总内存空间、手机重启信息、手机系统更新时间等基础信息、OAID、AndroidID、屏幕宽高，屏幕像素密度，系统版本号，设备厂商，设备型号，手机运营商，手机网络状态，设备剩余存储空间，手机重启时间和更新时间；开发者应用信息：应用包名、应用前后台状态；设备信息：IMEI、IMSI、MEID；位置信息</view>
+                <view class="td">android.permission.INTERNET、android.permission.ACCESS_NETWORK_STATE、android.permission.ACCESS_WIFI_STATE、android.permission.READ_PHONE_STATE、android.permission.ACCESS_COARSE_LOCATION、android.permission.WRITE_EXTERNAL_STORAGE</view>
+                <view class="td">为最终用户提供安全保障、改善我们的产品和服务，开展内部审计、数据分析和研究</view>
+                <view class="td"><a href="https://union.baidu.com/bqt/#/legal/policies">百度百青藤隐私协议</a></view>
+              </view>
+
+              <view class="table-row">
+                <view class="td">HUAWEI Ads</view>
+                <view class="td">com.huawei.hms.ads.lite</view>
+                <view class="td">增强广告</view>
+                <view class="td">设备信息、网络信息、位置信息、应用信息、应用使用信息、上下文信息</view>
+                <view class="td">android.permission.INTERNET、android.permission.ACCESS_NETWORK_STATE、android.permission.ACCESS_WIFI_STATE</view>
+                <view class="td">单次请求的广告定向投放、程序化广告投放、广告监测归因与反作弊</view>
+                <view class="td"><a href="https://developer.huawei.com/consumer/cn/doc/HMSCore-Guides/whale-hong-kinetic-energy-sdk-privacy-statement-0000001658283582">HUAWEI Ads隐私声明</a>和<a href="https://developer.huawei.com/consumer/cn/doc/HMSCore-Guides/whale-hong-kinetic-sdk-compliance-user-guide-0000001658442922">HUAWEI Ads SDK隐私安全说明</a></view>
+              </view>
+
+              <view class="table-row">
+                <view class="td">章鱼广告</view>
+                <view class="td">com.octopus.ad</view>
+                <view class="td">增强广告</view>
+                <view class="td">设备品牌、设备型号、设备时区、设备语言、系统版本、开发者应用名、应用版本号、应用包名、网络类型、UserAgent信息、网络状态、崩溃信息、性能数据、屏幕高宽、屏幕方向、屏幕DPI信息、系统更新时间、开机时间、磁盘空间、物理内存、设备ID（OAID、GAID）、IMEI用户授权才收集、USB调试模式、cpu、运行状态、运营商、传感器信息、掠过手势内容</view>
+                <view class="td">android.permission.INTERNET、android.permission.ACCESS_NETWORK_STATE、android.permission.ACCESS_WIFI_STATE、android.permission.WRITE_EXTERNAL_STORAGE、android.permission.READ_EXTERNAL_STORAGE</view>
+                <view class="td">基于用户设备信息调整广告投放、统计分析、反作弊、实现广告正常显示与交互功能，通过崩溃信息优化代码缺陷，最大程度减少App崩溃。通过收集SDK运行过程中性能数据，以优化SDK的性能。统计广告数据，以用于广告主统计投放结果</view>
+                <view class="td"><a href="https://doc.adintl.cn/#/zh-cn/guide/UsePrivacy">章鱼广告SDK隐私政策</a></view>
+              </view>
+
+              <view class="table-row">
+                <view class="td">倍孜广告</view>
+                <view class="td">com.beizi.ad</view>
+                <view class="td">增强广告</view>
+                <view class="td">设备品牌、设备型号、设备时区、设备语言、系统版本、网络类型、UserAgent信息、屏幕高宽、屏幕方向、屏幕DPI信息、系统更新时间、开机时间、磁盘空间、物理内存、运营商、sim卡状态、传感器信息、掠过手势内容、cpu、设备ID(国内用户OAID、海外用户GAID)、开发者应用名、应用版本号、应用包名、运行状态、使用数据、诊断数据</view>
+                <view class="td">android.permission.INTERNET、android.permission.ACCESS_NETWORK_STATE、android.permission.ACCESS_WIFI_STATE、android.permission.WRITE_EXTERNAL_STORAGE、android.permission.READ_EXTERNAL_STORAGE</view>
+                <view class="td">广告投放策略、统计分析服务、反作弊分析、广告正常显示与交互功能的实现、广告归因、最大程度减少App崩溃、确保服务器正常运行、提升可扩展性和性能</view>
+                <view class="td"><a href="https://sdkdoc.beizi.biz/#/zh-cn/guide/UsePrivacy">BeiZi SDK隐私保护声明</a></view>
+              </view>
+
+              <view class="table-row">
+                <view class="td">泛连</view>
+                <view class="td">com.fl.saas.s2s</view>
+                <view class="td">增强广告</view>
+                <view class="td">设备品牌、型号、软件系统版本、屏幕密度、屏幕分辨率、设备语言、设备时区、IMEI、IMSI、ICCID、GAID、MEID、IDFA、IDFV、AndroidID、OAID、手机系统重启时间、设备的MAC地址、User Agent、IP地址、运营商信息、Wi-Fi状态、网络信号强度、应用版本、应用包名、应用名称、应用前后台状态、应用列表信息、加速度传感器、陀螺仪传感器、广告的展示、点击及转化等交互数据、系统崩溃数据、性能数据</view>
+                <view class="td">android.permission.INTERNET、android.permission.ACCESS_NETWORK_STATE、android.permission.ACCESS_WIFI_STATE、android.permission.VIBRATE、android.permission.REQUEST_INSTALL_PACKAGES、android.permission.READ_PHONE_STATE</view>
+                <view class="td">广告投放及广告监测归因、反作弊、摇一摇广告投放、广告投放统计分析、提升SDK的稳定性，减少APP的崩溃</view>
+                <view class="td"><a href="https://www.adfunlink.com/doc/privacy.html">Funlink隐私保护声明</a></view>
+              </view>
+
+              <view class="table-row">
+                <view class="td">聚力阅盟</view>
+                <view class="td">com.dcloudym</view>
+                <view class="td">增强广告</view>
+                <view class="td">设备型号、操作系统版本、唯一设备标识符、设备环境等软硬件特征信息；GPS位置以及WLAN接入点、蓝牙和基站等传感器信息</view>
+                <view class="td">android.permission.INTERNET、android.permission.ACCESS_NETWORK_STATE、android.permission.ACCESS_WIFI_STATE、android.permission.VIBRATE、android.permission.REQUEST_INSTALL_PACKAGES、android.permission.READ_PHONE_STATE、android.permission.WRITE_EXTERNAL_STORAGE、android.permission.ACCESS_COARSE_LOCATION、android.permission.ACCESS_FINE_LOCATION</view>
+                <view class="td">广告投放及广告监测归因、反作弊、摇一摇广告投放</view>
+                <view class="td"><a href="https://idbj.juliyuemeng.com/privacy">聚力阅盟隐私保护声明</a></view>
+              </view>
+            </view>
+          </view>
         </view>
       </view>
 
@@ -157,6 +353,14 @@
           <view>本协议的成立、生效、履行和解释，均适用中华人民共和国法律。</view>
         </view>
       </view>
+
+      <view class="section">
+        <view class="section-title">更新日期</view>
+        <view class="section-content">
+          <view>更新日期：2024年3月19日</view>
+          <view>生效日期：2024年3月19日</view>
+        </view>
+      </view>
     </view>
   </view>
 </template>
@@ -204,6 +408,63 @@ onLoad(() => {
         
         view {
           margin-bottom: 20rpx;
+        }
+
+        a {
+          color: #007AFF;
+          text-decoration: none;
+          
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+  }
+
+  .third-party-sdk {
+    margin-top: 30rpx;
+    
+    .sdk-title {
+      font-weight: bold;
+      margin-bottom: 20rpx;
+    }
+    
+    .sdk-table {
+      border: 1px solid #eee;
+      border-radius: 8rpx;
+      
+      .table-header {
+        display: flex;
+        background: #f8f8f8;
+        font-weight: bold;
+        
+        .th {
+          flex: 1;
+          padding: 20rpx;
+          border-right: 1px solid #eee;
+          font-size: 24rpx;
+          
+          &:last-child {
+            border-right: none;
+          }
+        }
+      }
+      
+      .table-row {
+        display: flex;
+        border-top: 1px solid #eee;
+        
+        .td {
+          flex: 1;
+          padding: 20rpx;
+          border-right: 1px solid #eee;
+          font-size: 24rpx;
+          word-break: break-all;
+          
+          &:last-child {
+            border-right: none;
+          }
         }
       }
     }

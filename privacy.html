@@ -27,9 +27,11 @@
         p {
             margin-bottom: 15px;
             text-align: justify;
+            color: #666;
         }
         ul, ol {
             padding-left: 20px;
+            color: #666;
         }
         li {
             margin-bottom: 10px;
@@ -37,6 +39,44 @@
         .footer {
             margin-top: 40px;
             color: #666;
+        }
+        
+        /* 新增第三方SDK表格样式 */
+        .third-party-sdk {
+            margin-top: 30px;
+        }
+        .sdk-title {
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .sdk-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .sdk-table th {
+            background: #f8f8f8;
+            font-weight: bold;
+            padding: 15px;
+            border: 1px solid #eee;
+            font-size: 14px;
+            text-align: left;
+        }
+        .sdk-table td {
+            padding: 15px;
+            border: 1px solid #eee;
+            font-size: 14px;
+            word-break: break-all;
+            color: #666;
+        }
+        .sdk-table a {
+            color: #007AFF;
+            text-decoration: none;
+        }
+        .sdk-table a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -108,6 +148,313 @@
     <h2>第三方提供商及其服务</h2>
     <p>为确保流畅的浏览体验，您可能会收到来自星云小卫及其合作伙伴外部的第三方（下文简称"第三方"）提供的内容或网络链接。星云小卫对此类第三方无控制权。您可选择是否访问第三方提供的链接、内容、产品和服务。</p>
     <p>星云小卫无法控制第三方的隐私和数据保护政策，此类第三方不受到本政策的约束。在向第三方提交个人信息之前，请自行参见这些第三方的隐私保护政策。</p>
+    
+    <div class="third-party-sdk">
+        <div class="sdk-title">本应用使用的第三方SDK信息如下：</div>
+        <table class="sdk-table">
+            <thead>
+                <tr>
+                    <th>SDK名称</th>
+                    <th>SDK包名</th>
+                    <th>SDK用途</th>
+                    <th>可能获取的个人信息类型</th>
+                    <th>调用的设备权限</th>
+                    <th>信息用途</th>
+                    <th>隐私政策链接</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>  
+                    <td>阿里weexSDK</td>  
+                    <td>com.taobao</td>  
+                    <td>uni-app基础模块默认集成，用于渲染uniapp的nvue页面引擎</td>  
+                    <td style="font-size:12px">  
+                        android.permission.WRITE_EXTERNAL_STORAGE<br>  
+                        android.permission.READ_EXTERNAL_STORAG  
+                    </td>  
+                    <td>存储的个人文件</td>  
+                    <td><a href="https://weexapp.com/zh/" target="_blank">https://weexapp.com/zh/</a></td>  
+                  </tr>  
+                  <tr>  
+                    <td>Fresco图库</td>  
+                    <td>com.facebook.fresco</td>  
+                    <td>用于nvue页面加载图片使用</td>  
+                    <td style="font-size:12px">  
+                        android.permission.WRITE_EXTERNAL_STORAGE<br>  
+                        android.permission.READ_EXTERNAL_STORAG  
+                    </td>  
+                    <td>存储的个人文件</td>  
+                    <td><a href="https://www.fresco-cn.org/" target="_blank">https://www.fresco-cn.org/</a></td>  
+                  </tr>  
+                  <tr>  
+                    <td>glide图库</td>  
+                    <td>com.bumptech.glide</td>  
+                    <td>用于图片预览使用</td>  
+                    <td style="font-size:12px">  
+                        android.permission.WRITE_EXTERNAL_STORAGE<br>  
+                        android.permission.READ_EXTERNAL_STORAG  
+                    </td>  
+                    <td>存储的个人文件</td>  
+                    <td><a href="http://bumptech.github.io/glide/" target="_blank">http://bumptech.github.io/glide/</a></td>  
+                  </tr>  
+                <tr>  
+                    <td>gif-drawable</td>  
+                    <td>pl.droidsonroids.gif</td>  
+                    <td>加载gif图</td>  
+                    <td style="font-size:12px">  
+                        android.permission.WRITE_EXTERNAL_STORAGE<br>  
+                        android.permission.READ_EXTERNAL_STORAG  
+                    </td>  
+                    <td>存储文件</td>  
+                    <td><a href="https://github.com/alibaba/fastjson" target="_blank">https://github.com/koral--/android-gif-drawable</a></td>  
+                  </tr>  
+                  <tr>  
+                    <td>fastjson</td>  
+                    <td>com.alibaba.fastjson</td>  
+                    <td>JSON解析</td>  
+                    <td style="font-size:12px">  
+                    无  
+                    </td>  
+                    <td>无</td>  
+                    <td><a href="https://github.com/alibaba/fastjson" target="_blank">https://github.com/alibaba/fastjson</a></td>  
+                  </tr>  
+                  <tr>  
+                    <td>移动安全联盟 OAID</td>  
+                    <td>com.bun.miitmdid、com.zui.opendeviceidlibrary、com.netease.nis、com.samsung.android、com.huawei.hms</td>  
+                    <td>获取oaid</td>  
+                    <td style="font-size:12px">  
+                        无  
+                    </td>  
+                    <td>设备信息</td>  
+                    <td><a href="http://www.msa-alliance.cn/col.jsp?id=122" target="_blank">http://www.msa-alliance.cn/col.jsp?id=122</a></td>  
+                  </tr>  
+                  <tr>  
+                    <td>uni-ad</td>  
+                    <td></td>  
+                    <td>基础广告 </td>  
+                    <td style="font-size:12px">设备品牌、型号、操作系统版本、OAID、分辨率、IMEI、android ID、SIM 卡 IMSI 信息、应用名称、应用包名、应用版本号、网络信息、应用安装列表、位置信息 </td>  
+                    <td style="font-size:12px">  
+                    android.permission.ACCESS_NETWORK_STATE <br>  
+                    android.permission.READ_PHONE_STATE <br>  
+                    android.permission.ACCESS_COARSE_LOCATION   
+                    </td>  
+                    <td>广告投放合作，广告归因、反作弊、安全 </td>  
+                    <td><a href="https://doc.dcloud.net.cn/markdown-share-docs/1d821cdd3cdf2681045ec4be94bc8404/" target="_blank">隐私协议</a></td>  
+                  </tr>  
+                  <tr>  
+                    <td>推啊 </td>  
+                    <td> engine.tuifish.com </td>  
+                    <td>基础广告 </td>  
+                    <td style="font-size:12px">设备品牌、型号、操作系统版本、OAID、分辨率、IMEI、android ID、SIM 卡 IMSI 信息、应用名称、应用包名、应用版本号、网络信息、应用安装列表、位置信息 </td>  
+                    <td style="font-size:12px">  
+                    android.permission.ACCESS_NETWORK_STATE <br>  
+                    android.permission.READ_PHONE_STATE <br>  
+                    android.permission.ACCESS_COARSE_LOCATION   
+                    </td>  
+                    <td style="font-size:12px">识别广告、活动作弊行为；改善 SDK 崩溃率、推送个性化广告；广告投放。 </td>  
+                    <td><a href="https://yun.tuia.cn/tuia/sdk/agreement/index.html" target="_blank">推啊隐私协议</a></td>  
+                  </tr>  
+                  <tr>  
+                    <td>快手 </td>  
+                    <td>com.kwad.sdk </td>  
+                    <td>增强广告 </td>  
+                    <td>基础信息：设备品牌、设备型号、软件系统版本、存储信息、运营商信息、设备时区、设备语言、网络信息等基础信息  
+                设备标识：IMEIs、MEID、OAID、AndroidID、IMSIs、ICCID  
+                位置信息：IP地址、MAC地址、GPS位置信息、基站信息、WIFI信息  
+                应用信息：应用安装列表  
+                其他信息：传感器信息、sim卡激活信息</td>  
+                    <td style="font-size:12px">  
+                    android.permission.ACCESS_NETWORK_STATE <br>  
+                    android.permission.INTERNET <br>  
+                    android.permission.READ_PHONE_STATE <br>  
+                    android.permission.ACCESS_WIFI_STATE <br>  
+                    android.permission.REQUEST_INSTALL_PACKAGES <br>  
+                    android.permission.VIBRATE   
+                    </td>  
+                    <td>广告投放、广告归因、反作弊、安全 </td>  
+                    <td><a href="https://www.kuaishou.com/about/policy" target="_blank">快手内容联盟隐私协议</a>和<a href="https://u.kuaishou.com/home/detail/1220" target="_blank">SDK使用规范</a></td>  
+                  </tr>  
+                  <tr>  
+                    <td>快手内容联盟 </td>  
+                    <td>com.kwad.sdk </td>  
+                    <td>增强广告 </td>  
+                    <td>基础信息：设备品牌、设备型号、软件系统版本、存储信息、运营商信息、设备时区、设备语言、网络信息等基础信息  
+                设备标识：IMEIs、MEID、OAID、AndroidID、IMSIs、ICCID  
+                位置信息：IP地址、MAC地址、GPS位置信息、基站信息、WIFI信息  
+                应用信息：应用安装列表  
+                其他信息：传感器信息、sim卡激活信息 </td>  
+                    <td style="font-size:12px">  
+                    android.permission.ACCESS_NETWORK_STATE <br>  
+                    android.permission.INTERNET <br>  
+                    android.permission.READ_PHONE_STATE <br>  
+                    android.permission.ACCESS_WIFI_STATE <br>  
+                    android.permission.REQUEST_INSTALL_PACKAGES <br>  
+                    android.permission.VIBRATE <br>  
+                    android.permission.SET_WALLPAPER<br>  
+                    android.permission.READ_EXTERNAL_STORAGE <br>  
+                    android.permission.WRITE_EXTERNAL_STORAGE <br>  
+                    android.permission.ACCESS_COARSE_LOCATION <br>  
+                    android.permission.BLUETOOTH  
+                    </td>  
+                    <td>广告投放、广告归因、反作弊、安全 </td>  
+                    <td><a href="https://www.kuaishou.com/about/policy" target="_blank">快手内容联盟隐私协议</a>和<a href="https://u.kuaishou.com/home/detail/1220" target="_blank">SDK使用规范</a></td>  
+                  </tr>  
+                  <tr>  
+                    <td>优量汇 </td>  
+                    <td>com.qq.e </td>  
+                    <td>增强广告 </td>  
+                    <td>基站、附近的WIFI、连接的WIFI、位置信息、设备制造商、设备型号、操作系统版本、屏幕分辨率、屏幕方向、屏幕DPI、IP地址、加速度传感器、磁场传感器、OAID、IMEI/MEID（Device ID）、Android_ID、包名、版本号、进程名称、运行状态、可疑行为、应用安装信息 </td>  
+                    <td style="font-size:12px">  
+                    android.permission.INTERNET <br>  
+                    android.permission.ACCESS_NETWORK_STATE <br>  
+                    android.permission.ACCESS_WIFI_STATE <br>  
+                    android.permission.REQUEST_INSTALL_PACKAGES <br>  
+                    android.permission.CHANGE_NETWORK_STATE<br>   
+                    android.permission.QUERY_ALL_PACKAGES <br>  
+                    android.permission.REORDER_TASKS<br>  
+                    android.permission.VIBRATE <br>  
+                    android.permission.ACCESS_COARSE_LOCATION   
+                    </td>  
+                    <td style="font-size:12px">广告投放与监测归因、广告主统计投放结果、减少App崩溃、确保服务器正常运行、提升可扩展性和性能</td>  
+                    <td><a href="https://e.qq.com/dev/help_detail.html?cid=2005&amp;pid=5983" target="_blank">优量汇隐私协议</a></td>  
+                  </tr>  
+                  <tr>  
+                    <td>穿山甲 </td>  
+                    <td>com.bytedance.sdk.openadsdk</td>  
+                    <td>增强广告 </td>  
+                    <td>设备品牌、型号、软件系统版本、屏幕密度、屏幕分辨率、设备语言、设备时区、sim卡信息（mcc&amp;mnc）、CPU信息、可用存储空间大小、MAC地址、设备标识符（如IMEI、IMSI、ICCID、GAID（仅GMS服务）、MEID、硬件序列号build_serial、AndroidID、OAID、运营商信息、Wi-Fi状态、网络信号强度、IP地址、应用包名、运行中的进程信息、版本号、应用前后台状态、软件列表信息、线性加速度传感器、磁场传感器、旋转矢量传感器、精确位置信息、粗略位置信息（WiFi列表、WLAN接入点（如SSID，BSSID）、基站） </td>  
+                    <td style="font-size:12px">  
+                    android.permission.ACCESS_NETWORK_STATE <br>  
+                    android.permission.READ_PHONE_STATE <br>  
+                    android.permission.WRITE_EXTERNAL_STORAGE   
+                    </td>  
+                    <td>广告投放合作、广告归因、反作弊 </td>  
+                    <td><a href="https://www.pangle.cn/privacy/partner" target="_blank">穿山甲隐私协议</a></td>  
+                  </tr>  
+                  <tr>  
+                    <td>Sigmob </td>  
+                    <td>com.sigmob.windad </td>  
+                    <td>增强广告 </td>  
+                    <td>设备信息：设备品牌、型号、操作系统版本、OAID、分辨率等基础设备信息  
+                应用信息：应用名称、应用包名、应用版本号等  
+                其他：运营商信息、时区</td>  
+                    <td style="font-size:12px">  
+                    android.permission.ACCESS_NETWORK_STATE<br>  
+                    android.permission.INTERNET <br>  
+                    android.permission.ACCESS_WIFI_STATE <br>  
+                    android.permission.CHANGE_WIFI_STATE <br>  
+                    android.permission.READ_PHONE_STATE <br>  
+                    android.permission.REQUEST_INSTALL_PACKAGES <br>  
+                    android.permission.QUERY_ALL_PACKAGES  
+                    </td>  
+                    <td>广告投放、广告主归因、反作弊 </td>  
+                    <td><a href="https://doc.sigmob.com/Sigmob%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/%E5%90%88%E8%A7%84%E6%9D%A1%E6%AC%BE/%E9%9A%90%E7%A7%81%E6%94%BF%E7%AD%96/" target="_blank">Sigmob隐私协议</a></td>  
+                  </tr>  
+                  <tr>  
+                    <td>百度百青藤</td>  
+                    <td>com.baidu.mobads.proxy </td>  
+                    <td>增强广告 </td>  
+                    <td>设备信息：设备品牌、型号、软件系统版本、分辨率、网络信号强度、传感器信息，磁盘总空间、系统总内存空间、手机重启信息、手机系统更新时间等基础信息、OAID、AndroidID、屏幕宽高，屏幕像素密度，系统版本号，设备厂商，设备型号，手机运营商，手机网络状态，设备剩余存储空间，手机重启时间和更新时间  
+                开发者应用信息：应用包名、应用前后台状态  
+                设备信息：IMEI、IMSI、MEID  
+                位置信息</td>  
+                    <td style="font-size:12px">  
+                    android.permission.INTERNET<br>  
+                        android.permission.ACCESS_NETWORK_STATE<br>  
+                        android.permission.ACCESS_WIFI_STATE<br>  
+                        android.permission.READ_PHONE_STATE<br>  
+                        android.permission.ACCESS_COARSE_LOCATION<br>  
+                        android.permissio.WRITE_EXTERNAL_STORAGE<br>  
+                    </td>  
+                    <td>为最终用户提供安全保障、改善我们的产品和服务，开展内部审计、数据分析和研究 </td>  
+                    <td><a href="https://union.baidu.com/bqt/#/legal/policies" target="_blank">百度百青藤隐私协议</a></td>  
+                  </tr>  
+                
+                  <tr>  
+                    <td>HUAWEI Ads</td>  
+                    <td>com.huawei.hms.ads.lite</td>  
+                    <td>增强广告 </td>  
+                    <td>设备信息、网络信息、位置信息、应用信息、应用使用信息、上下文信息</td>  
+                    <td style="font-size:12px">  
+                    android.permission.INTERNET<br>  
+                        android.permission.ACCESS_NETWORK_STATE<br>  
+                        android.permission.ACCESS_WIFI_STATE<br>  
+                    </td>  
+                    <td>单次请求的广告定向投放、程序化广告投放、广告监测归因与反作弊。</td>  
+                    <td><a href="https://developer.huawei.com/consumer/cn/doc/HMSCore-Guides/whale-hong-kinetic-energy-sdk-privacy-statement-0000001658283582" target="_blank">HUAWEI Ads 隐私声明</a><br><br>和<br><br><a href="https://developer.huawei.com/consumer/cn/doc/HMSCore-Guides/whale-hong-kinetic-sdk-compliance-user-guide-0000001658442922" target="_blank">HUAWEI Ads SDK隐私安全说明</a></td>  
+                  </tr>  
+                
+                  <tr>  
+                    <td>章鱼广告</td>  
+                    <td>com.octopus.ad</td>  
+                    <td>增强广告 </td>  
+                    <td>设备品牌、设备型号、设备时区、设备语言、系统版本、开发者应用名、应用版本号、应用包名、网络类型、UserAgent信息、网络状态、崩溃信息、性能数据、屏幕高宽、屏幕方向、屏幕DPI信息、系统更新时间、开机时间、磁盘空间、物理内存、设备ID（OAID、GAID）、IMEI 用户授权才收集、USB调试模式、cpu、运行状态、运营商、传感器信息、掠过手势内容</td>  
+                    <td style="font-size:12px">  
+                    android.permission.INTERNET<br>  
+                        android.permission.ACCESS_NETWORK_STATE<br>  
+                        android.permission.ACCESS_WIFI_STATE<br>  
+                        android.permission.WRITE_EXTERNAL_STORAGE<br>  
+                        android.permission.READ_EXTERNAL_STORAGE<br>  
+                    </td>  
+                    <td>基于用户设备信息调整广告投放、统计分析、反作弊、实现广告正常显示与交互功能，通过崩溃信息，以此来优化代码缺陷，最大程度减少App崩溃。通过收集SDK运行过程中性能数据，以优化SDK的性能。统计广告数据，以用于广告主统计投放结果。</td>  
+                    <td><a href="https://doc.adintl.cn/#/zh-cn/guide/UsePrivacy" target="_blank">章鱼广告SDK隐私政策</a></td>  
+                  </tr>  
+                
+                  <tr>  
+                    <td>倍孜广告</td>  
+                    <td>com.beizi.ad</td>  
+                    <td>增强广告 </td>  
+                    <td>设备品牌、设备型号、设备时区、设备语言、系统版本、网络类型、UserAgent信息、屏幕高宽、屏幕方向、屏幕DPI信息、系统更新时间、开机时间、磁盘空间、物理内存、运营商、sim卡状态、传感器信息、掠过手势内容、cpu、设备ID(国内用户OAID、海外用户GAID)、开发者应用名、应用版本号、应用包名、运行状态、使用数据、诊断数据</td>  
+                    <td style="font-size:12px">  
+                    android.permission.INTERNET<br>  
+                        android.permission.ACCESS_NETWORK_STATE<br>  
+                        android.permission.ACCESS_WIFI_STATE<br>  
+                        android.permission.WRITE_EXTERNAL_STORAGE<br>  
+                        android.permission.READ_EXTERNAL_STORAGE<br>  
+                    </td>  
+                    <td>广告投放策略、统计分析服务、反作弊分析、广告正常显示与交互功能的实现、广告归因、最大程度减少App崩溃、确保服务器正常运行、提升可扩展性和性能</td>  
+                    <td><a href="https://sdkdoc.beizi.biz/#/zh-cn/guide/UsePrivacy" target="_blank">BeiZi SDK隐私保护声明</a></td>  
+                  </tr>  
+                
+                  <tr>  
+                    <td>泛连</td>  
+                    <td>com.fl.saas.s2s</td>  
+                    <td>增强广告 </td>  
+                    <td>设备品牌、型号、软件系统版本、屏幕密度、屏幕分辨率、设备语言、设备时区、IMEI、IMSI、ICCID、GAID、MEID、IDFA、IDFV、AndroidID、OAID、手机系统重启时间、设备的MAC地址、User Agent、IP地址、运营商信息、Wi-Fi状态、网络信号强度、应用版本、应用包名、应用名称、应用前后台状态、应用列表信息、加速度传感器、陀螺仪传感器、广告的展示、点击及转化等交互数据、系统崩溃数据、性能数据</td>  
+                    <td style="font-size:12px">  
+                    android.permission.INTERNET<br>  
+                        android.permission.ACCESS_NETWORK_STATE<br>  
+                        android.permission.ACCESS_WIFI_STATE<br>  
+                        android.permission.VIBRATE<br>  
+                        android.permission.REQUEST_INSTALL_PACKAGES<br>  
+                        android.permission.READ_PHONE_STATE<br>  
+                    </td>  
+                    <td>广告投放及广告监测归因、反作弊、摇一摇广告投放、广告投放统计分析、提升SDK的稳定性，减少APP的崩溃</td>  
+                    <td><a href="https://www.adfunlink.com/doc/privacy.html" target="_blank">Funlink隐私保护声明</a></td>  
+                  </tr>  
+                
+                  <tr>  
+                    <td>聚力阅盟</td>  
+                    <td>com.dcloudym</td>  
+                    <td>增强广告 </td>  
+                    <td>设备型号、操作系统版本、唯一设备标识符、设备环境等软硬件特征信息；GPS位置以及WLAN接入点、蓝牙和基站等传感器信息</td>  
+                    <td style="font-size:12px">  
+                    android.permission.INTERNET<br>  
+                        android.permission.ACCESS_NETWORK_STATE<br>  
+                        android.permission.ACCESS_WIFI_STATE<br>  
+                        android.permission.VIBRATE<br>  
+                        android.permission.REQUEST_INSTALL_PACKAGES<br>  
+                        android.permission.READ_PHONE_STATE<br>  
+                        android.permission.WRITE_EXTERNAL_STORAGE<br>  
+                        android.permission.ACCESS_COARSE_LOCATION<br>  
+                        android.permission.ACCESS_FINE_LOCATION<br>  
+                    </td>  
+                    <td>广告投放及广告监测归因、反作弊、摇一摇广告投放</td>  
+                    <td><a href="https://idbj.juliyuemeng.com/privacy" target="_blank">聚力阅盟隐私保护声明</a></td>  
+                  </tr>  
+            </tbody>
+        </table>
+    </div>
 
     <h2>本政策如何更新</h2>
     <p>星云小卫保留不时更新或修改本政策的权利。如果我们的隐私政策变更，我们会将最新版隐私政策发布在这里。如果我们对隐私政策做出了重大变更，我们还可能会通过不同渠道向您发送变更通知。</p>

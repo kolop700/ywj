@@ -80,6 +80,7 @@ const { proxy } = getCurrentInstance()
 const userStore = proxy.$store.user.useUserStore()
 const deviceStore = proxy.$store.device.useDeviceStore()
 const adStore = proxy.$store.ad.useAdStore()
+const adControlStore = proxy.$store.adControl.useAdControlStore()
 const deviceApi = proxy.$api.device
 
 // 广告相关状态
@@ -106,7 +107,7 @@ const updateListHeight = async () => {
 
 // 初始化广告管理器
 const initAdManager = () => {
-  adManager.initStore(adStore)
+  adManager.initStore(adStore, adControlStore)
   adManager.init()
 }
 

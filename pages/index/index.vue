@@ -59,7 +59,7 @@
         </view>
       </view>
     </view>
-    <!-- 底部广告区域 - 固定高度 -->
+    <!-- 底部广告区域 -->
     <view class="ad-section">
       <view class="divider"></view>
       <view class="ad-view">
@@ -72,52 +72,6 @@
         </ad>
       </view> 
     </view>
-
-    <!-- 远程开门弹框 -->
-    <uni-popup ref="popup" type="center" :mask-click="true" @change="onPopupChange">
-      <view class="device-popup">
-        <view class="popup-header">
-          <text>设备列表</text>
-          <text class="close-icon" @click="closePopup">×</text>
-        </view>
-        <!-- 添加搜索框 -->
-        <view class="search-box">
-          <input 
-            type="text" 
-            v-model="searchKey" 
-            placeholder="搜索设备名称" 
-            placeholder-class="placeholder"
-          />
-        </view>
-        <view class="device-list">
-          <view 
-            class="device-item" 
-            v-for="(item, index) in filteredDevices" 
-            :key="index"
-            :class="[item.online !== '1' ? 'state' : '']"
-            @click="handleDeviceClick(item)"
-          >
-            <view class="item-left">
-              <text class="item-title" :class="{'state': item.online !== '1'}">
-                {{ item.door_name }}
-              </text>
-              <view class="item-address" :class="{'state': item.online !== '1'}">
-                <text>地址：{{ item.comm_name }}{{ item.unit_name }}</text>
-              </view>
-            </view>
-            <view class="item-right">
-              <text 
-                class="status-text"
-                :class="{'state': item.online !== '1'}"
-              >
-                {{ item.online === '1' ? '在线' : '离线' }}
-              </text>
-            </view>
-          </view>
-        </view>
-        <view class="refresh-btn" @click="refreshDeviceList">刷新</view>
-      </view>
-    </uni-popup>
 
     <!-- 服务协议和隐私政策弹框 -->
     <uni-popup ref="agreementPopup" type="center" :mask-click="false">
@@ -261,7 +215,6 @@ const handleScanCode = async () => {
   if (!userStore.checkLogin()) return
   const result = await scanUtils.scanQRCode()
   console.log('扫码结果', result)
-  // http://localhost:5173/#/pages/door/scan?device_number=YN11373
   if (result) {
     uni.navigateTo({
       url: `/pages/door/scan?device_number=${result}`
@@ -275,88 +228,13 @@ const handleScanCode = async () => {
   }
 }
 
-// 设备列表弹框状态
-const showDeviceList = ref(false)
-const popup = ref(null)
 // 处理远程开门
 const handleRemoteOpen = () => {
   if (!userStore.checkLogin()) return
-  popup.value.open()
-}
-
-// 关闭弹框
-const closePopup = () => {
-  popup.value.close()
-}
-
-// 弹框状态变化回调
-const onPopupChange = (e) => {
-  showDeviceList.value = e.show
-}
-
-// 刷新设备列表
-const refreshDeviceList = async () => {
-  console.log('刷新设备列表', userStore.userId)
-  try {
-    // 尝试从服务器获取最新数据
-    const res = await deviceApi.getDoorList(userStore.userId)
-    if (res.data) {
-      // 直接更新 store 中的数据
-      deviceStore.setDeviceList(res.data)
-    }
-  } catch (error) {
-    console.error('获取设备列表失败', error)
-    // 如果请求失败且没有数据，显示错误提示
-    if (!deviceStore.deviceList.length) {
-      uni.showToast({
-        title: '获取设备列表失败',
-        icon: 'none'
-      })
-    }
-  }
-}
-
-// 处理设备点击
-const handleDeviceClick = async (device) => {
-  // 先检查登录状态
-  if (!userStore.checkLogin()) {
-    return
-  }
-
-  if (device.online === '1') {
-    // 调用开门方法
-    try {
-      const success = await doorAccessUtils.openDoor(device)
-      if (success) {
-        console.log('开门成功:', device)
-      }
-    } catch (error) {
-      console.error('开门操作失败:', error)
-    }
-  } else {
-    uni.showToast({
-      title: '设备离线',
-      icon: 'none',
-      duration: 3000
-    })
-  }
-}
-
-// 搜索关键词
-const searchKey = ref('')
-
-// 过滤后的设备列表
-const filteredDevices = computed(() => {
-  if (!searchKey.value) return deviceStore.filteredDevices
-  return deviceStore.filteredDevices.filter(item => {
-    const searchText = searchKey.value.toLowerCase()
-    const nameMatch = item.door_name?.toLowerCase().includes(searchText)
-    const addressMatch = `${item.comm_name || ''}${item.unit_name || ''}`
-      .toLowerCase()
-      .includes(searchText)
-    return nameMatch || addressMatch
+  uni.navigateTo({
+    url: '/workbench_package/pages/door-list/index'
   })
-})
+}
 
 // 添加刷新相关的状态
 const isRotating = ref(false)
@@ -576,20 +454,19 @@ const onAdError = (e) => {
 }
 
 .ad-section {
+  width: 100%;
   height: 225rpx;
   flex: none;
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
+  margin-top: 20rpx;
 
   .divider {
     height: 2rpx;
     background: #EEEEEE;
-    margin: 0;
   }
 
   .ad-view {
-    flex: 1;
+    height: 220rpx;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -597,200 +474,6 @@ const onAdError = (e) => {
     ad {
       width: 100%;
       height: 220rpx;
-    }
-  }
-}
-
-.device-popup {
-  width: 85vw;
-  height: 75vh;
-  background: #fff;
-  border-radius: 20rpx;
-  overflow: hidden;
-  position: relative;
-  z-index: 999;
-  padding: 0 0 20rpx 0;
-  display: flex;
-  flex-direction: column;
-
-  .popup-header {
-    flex: none;
-    padding: 30rpx;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #eee;
-    
-    .close-icon {
-      font-size: 40rpx;
-      color: #999;
-    }
-  }
-
-  .search-box {
-    flex: none;
-    margin: 20rpx;
-    padding: 20rpx;
-    background: #F8F8F8;
-    border-radius: 12rpx;
-
-    input {
-      width: 100%;
-      height: 64rpx;
-      background: #FFFFFF;
-      border-radius: 32rpx;
-      padding: 0 30rpx;
-      font-size: 28rpx;
-      box-sizing: border-box;
-    }
-
-    .placeholder {
-      color: #999;
-    }
-  }
-
-  .device-list {
-    flex: 1;
-    margin: 0 20rpx;
-    padding: 20rpx;
-    overflow-y: auto;
-    border-radius: 12rpx;
-    background: #F8F8F8;
-
-    .device-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      padding: 20rpx;
-      margin-bottom: 20rpx;
-      background: #FFFFFF;
-      border-radius: 12rpx;
-      transition: all 0.2s;
-      
-      &.state {
-        background: #F5F5F5;
-        
-        &:active {
-          background: #F5F5F5;
-          opacity: 0.8;
-        }
-      }
-      
-      &:active {
-        background: #FF0036;
-        
-        .item-left {
-          .item-title {
-            color: #FFFFFF;
-          }
-          
-          .item-address {
-            color: rgba(255, 255, 255, 0.8);
-          }
-        }
-        
-        .item-right {
-          .status-text {
-            color: #FFFFFF;
-          }
-        }
-      }
-
-      .item-left {
-        flex: 1;
-        
-        .item-title {
-          font-size: 28rpx;
-          color: #333;
-          font-weight: 500;
-          margin-bottom: 8rpx;
-          
-          &.state {
-            color: #999;
-          }
-        }
-        
-        .item-address {
-          font-size: 24rpx;
-          color: #666;
-          line-height: 1.4;
-          
-          &.state {
-            color: #999;
-          }
-        }
-      }
-      
-      .item-right {
-        .status-text {
-          font-size: 24rpx;
-          color: #FF0036;
-          
-          &.state {
-            color: #999;
-          }
-        }
-      }
-    }
-  }
-
-  .refresh-btn {
-    flex: none;
-    margin: 40rpx 20rpx 20rpx;
-    padding: 24rpx;
-    text-align: center;
-    background: #FF0036;
-    color: #fff;
-    font-size: 28rpx;
-    border-radius: 12rpx;
-  }
-
-  .device-stats {
-    display: flex;
-    justify-content: space-around;
-    padding: 20rpx;
-    background: #f8f8f8;
-    border-radius: 12rpx;
-    margin: 20rpx;
-
-    .stat-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      
-      .stat-label {
-        font-size: 24rpx;
-        color: #666;
-        margin-bottom: 8rpx;
-      }
-      
-      .stat-value {
-        font-size: 32rpx;
-        font-weight: bold;
-        color: #333;
-        
-        &.online {
-          color: #FF0036; // 在线设备数量显示红色
-        }
-        
-        &.offline {
-          color: #999; // 离线设备数量显示灰色
-        }
-      }
-    }
-  }
-}
-
-@media (min-width: 768px) {
-  .content-wrapper {
-    height: calc(94vh - 200rpx - 20rpx);
-    
-    .grid-wrapper {
-      height: 100%;
-    }
-    
-    .bottom-btns {
-      height: 25%;
     }
   }
 }

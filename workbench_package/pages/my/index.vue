@@ -20,6 +20,33 @@
         </view>
       </view>
       
+      <view class="menu-item" @tap="handleUserAgreement">
+        <view class="content">
+          <text>用户协议</text>
+        </view>
+        <view class="right-icon">
+          <image src="/static/icons/icon_right.png" mode="aspectFit"></image>
+        </view>
+      </view>
+
+      <view class="menu-item" @tap="handlePrivacyPolicy">
+        <view class="content">
+          <text>隐私政策</text>
+        </view>
+        <view class="right-icon">
+          <image src="/static/icons/icon_right.png" mode="aspectFit"></image>
+        </view>
+      </view>
+
+      <view class="menu-item" @tap="handleVersion">
+        <view class="content">
+          <text>程序版本</text>
+        </view>
+        <view class="right-text">
+          <text>v{{ appVersion }}</text>
+        </view>
+      </view>
+      
       <view class="menu-item" @tap="handleAccountDelete">
         <view class="content">
           <text class="delete-text">注销账号</text>
@@ -80,6 +107,27 @@ const { userType } = storeToRefs(userStore)
 const isAdLoaded = ref(false) // 控制广告加载状态
 const bannerAdId = ref('') // 初始化为空字符串
 
+// 获取应用版本号
+const appVersion = ref('')
+
+// 初始化版本号
+const initVersion = () => {
+  // #ifdef APP-PLUS
+  appVersion.value = plus.runtime.version
+  // #endif
+  
+  // #ifdef MP-WEIXIN
+  const accountInfo = uni.getAccountInfoSync()
+  appVersion.value = accountInfo.miniProgram.version
+  // #endif
+  
+  // 如果以上都不匹配，设置默认版本
+  if (!appVersion.value) {
+    const systemInfo = uni.getSystemInfoSync()
+    appVersion.value = systemInfo.appVersion || '1.0.0'
+  }
+}
+
 // 初始化广告
 const initAd = () => {
   setTimeout(() => {
@@ -91,6 +139,7 @@ const initAd = () => {
 
 onMounted(() => {
   initAd()
+  initVersion() // 初始化版本号
 })
 
 // 广告相关的事件处理函数
@@ -192,6 +241,29 @@ const handleAccountDelete = () => {
         }
       }
     }
+  })
+}
+
+// 处理用户协议点击
+const handleUserAgreement = () => {
+  uni.navigateTo({
+    url: '/user_package/pages/agreement/user'
+  })
+}
+
+// 处理隐私政策点击
+const handlePrivacyPolicy = () => {
+  uni.navigateTo({
+    url: '/user_package/pages/agreement/privacy'
+  })
+}
+
+// 处理版本信息点击
+const handleVersion = () => {
+  // 版本号点击时可以不做任何操作，或者显示更多版本信息
+  uni.showToast({
+    title: `当前版本：${appVersion.value}`,
+    icon: 'none'
   })
 }
 </script>
@@ -303,5 +375,11 @@ page {
       height: 220rpx;
     }
   }
+}
+
+.right-text {
+  font-size: 28rpx;
+  color: #999;
+  margin-right: 10rpx;
 }
 </style>

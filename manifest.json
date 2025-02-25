@@ -2,8 +2,8 @@
     "name" : "星云小卫",
     "appid" : "__UNI__F8D1DD9",
     "description" : "",
-    "versionName" : "1.0.9",
-    "versionCode" : 109,
+    "versionName" : "1.0.10",
+    "versionCode" : 110,
     "transformPx" : false,
     /* 5+App特有相关 */
     "app-plus" : {
@@ -52,7 +52,8 @@
                     "<uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\"/>",
                     "<uses-permission android:name=\"android.permission.ACCESS_COARSE_LOCATION\"/>"
                 ],
-                "abiFilters" : [ "armeabi-v7a", "arm64-v8a" ]
+                "abiFilters" : [ "armeabi-v7a", "arm64-v8a" ],
+                "minSdkVersion" : 21
             },
             /* ios打包配置 */
             "ios" : {
@@ -75,7 +76,18 @@
                 }
             },
             "sdkConfigs" : {
-                "ad" : {}
+                "ad" : {
+                    "gdt" : {},
+                    "ks" : {},
+                    "ks-content" : {},
+                    "sigmob" : {},
+                    "hw" : {},
+                    "bd" : {},
+                    "zy" : {},
+                    "bz" : {},
+                    "fl" : {},
+                    "jl" : {}
+                }
             },
             "icons" : {
                 "android" : {
@@ -108,6 +120,9 @@
                         "spotlight@2x" : "unpackage/res/icons/80x80.png"
                     }
                 }
+            },
+            "splashscreen" : {
+                "useOriginalMsgbox" : false
             }
         }
     },

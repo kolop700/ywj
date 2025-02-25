@@ -107,6 +107,20 @@
       >提交</button>
       <button class="register-btn" @click="goToLogin">返回登录</button>
     </view>
+
+    <!-- 底部广告区域 -->
+    <view class="ad-section">
+      <view class="divider"></view>
+      <view class="ad-view">
+        <ad 
+          v-if="bannerAdId"
+          :adpid="bannerAdId" 
+          @load="onAdLoad" 
+          @close="onAdClose" 
+          @error="onAdError">
+        </ad>
+      </view> 
+    </view>
   </view>
 </template>
 
@@ -114,9 +128,12 @@
 import { ref, computed, getCurrentInstance } from 'vue'
 import { onLoad } from "@dcloudio/uni-app"
 const { proxy } = getCurrentInstance()
+const adStore = proxy.$store.ad.useAdStore()
 
 onLoad((params) => {
   console.log(params)
+  bannerAdId.value = adStore.getBannerAdId() // 获取横幅广告 ID
+  console.log('bannerAdId', bannerAdId)
 })
 
 const form = ref({
@@ -322,6 +339,25 @@ const openPrivacyPolicy = () => {
 const goToLogin = () => {
   uni.navigateBack()
 }
+
+const isAdLoaded = ref(false) // 控制广告加载状态
+const bannerAdId = ref('') // 横幅广告 ID
+
+// 广告相关的事件处理函数
+const onAdLoad = (e) => {
+  console.log('广告加载成功', e)
+  isAdLoaded.value = true
+}
+
+const onAdClose = (e) => {
+  console.log('广告关闭', e)
+  isAdLoaded.value = false
+}
+
+const onAdError = (e) => {
+  console.error('广告加载失败', e)
+  isAdLoaded.value = false
+}
 </script>
 
 <style lang="scss">
@@ -329,6 +365,8 @@ const goToLogin = () => {
   min-height: 100vh;
   background-color: #fff;
   padding: 20rpx 40rpx;
+  display: flex;
+  flex-direction: column;
 }
 
 .form-container {
@@ -415,6 +453,7 @@ const goToLogin = () => {
 }
 
 .btn-container {
+  margin-bottom: auto;
   button {
     margin-top: 30rpx;
     width: 100%;
@@ -451,6 +490,31 @@ const goToLogin = () => {
     
     &:active {
       background-color: #f5f5f5;
+    }
+  }
+}
+
+.ad-section {
+  width: 100%;
+  height: 225rpx;
+  flex: none;
+  box-sizing: border-box;
+  margin-top: 20rpx;
+
+  .divider {
+    height: 2rpx;
+    background: #EEEEEE;
+  }
+
+  .ad-view {
+    height: 220rpx;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    ad {
+      width: 100%;
+      height: 220rpx;
     }
   }
 }

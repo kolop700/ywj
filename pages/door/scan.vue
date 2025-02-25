@@ -31,6 +31,18 @@
             >提交申请</button>
           </view>
     </view>
+	<view class="ad-section">
+	  <view class="divider"></view>
+	  <view class="ad-view">
+	    <ad 
+	      v-if="bannerAdId"
+	      :adpid="bannerAdId" 
+	      @load="onAdLoad" 
+	      @close="onAdClose" 
+	      @error="onAdError">
+	    </ad>
+	  </view> 
+	</view>
   </view>
 </template>
 
@@ -39,9 +51,11 @@ import { ref, getCurrentInstance, computed, inject, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 const { proxy } = getCurrentInstance()
 import { onLoad } from '@dcloudio/uni-app'
+const adStore = proxy.$store.ad.useAdStore()
 import doorAccessUtils from '@/utils/doorAccessUtils'
 import visitorPasswordUtils from '@/utils/visitorPasswordUtils'
-
+const isAdLoaded = ref(false) // 控制广告加载状态
+const bannerAdId = ref('') // 横幅广告 ID
 // 注入蓝牙实例
 const doorBleUtils = inject('doorBleUtils')
 
@@ -82,6 +96,8 @@ onLoad((options) => {
   }
   console.log('设备列表:', deviceList.value)
   console.log('匹配的设备:', matchedDevice.value)
+  bannerAdId.value = adStore.getBannerAdId() // 获取横幅广告 ID
+  console.log('bannerAdId' ,bannerAdId)
 })
 
 // 搜索设备
@@ -299,6 +315,21 @@ const openDoorWithPassword = async () => {
     sn: verifyResult.sn
   })
 }
+// 广告相关的事件处理函数
+const onAdLoad = (e) => {
+  console.log('广告加载成功', e)
+  isAdLoaded.value = true
+}
+
+const onAdClose = (e) => {
+  console.log('广告关闭', e)
+  isAdLoaded.value = false
+}
+
+const onAdError = (e) => {
+  console.error('广告加载失败', e)
+  isAdLoaded.value = false
+}
 </script>
 
 <style lang="scss" scoped>
@@ -308,7 +339,8 @@ const openDoorWithPassword = async () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 40rpx;
+  padding: 40rpx 40rpx 0;
+  box-sizing: border-box;
 }
 
 .device-number {
@@ -389,6 +421,7 @@ const openDoorWithPassword = async () => {
   width: 100%;
   border-radius: 20rpx;
   box-sizing: border-box;
+  margin-bottom: auto;
 }
 
 .section-title {
@@ -432,5 +465,29 @@ const openDoorWithPassword = async () => {
 
 .login-button.secondary {
   background-color: #FCA5A7;
+}
+.ad-section {
+  width: 100%;
+  height: 225rpx;
+  flex: none;
+  box-sizing: border-box;
+  margin-top: 20rpx;
+
+  .divider {
+    height: 2rpx;
+    background: #EEEEEE;
+  }
+
+  .ad-view {
+    height: 220rpx;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    ad {
+      width: 100%;
+      height: 220rpx;
+    }
+  }
 }
 </style> 

@@ -32,6 +32,20 @@
       <button class="register-btn" @click="goToRegister">注册</button>
     </view>
 
+    <!-- 底部广告区域 -->
+    <view class="ad-section">
+      <view class="divider"></view>
+      <view class="ad-view">
+        <ad 
+          v-if="bannerAdId"
+          :adpid="bannerAdId" 
+          @load="onAdLoad" 
+          @close="onAdClose" 
+          @error="onAdError">
+        </ad>
+      </view> 
+    </view>
+
     <!-- 提示信息弹窗 -->
     <uni-popup ref="message" type="message">
       <uni-popup-message :type="msgType" :message="messageText" :duration="2000"></uni-popup-message>
@@ -42,16 +56,40 @@
 <script setup>
 import { ref, getCurrentInstance } from 'vue'
 import { onLoad } from "@dcloudio/uni-app"
-onLoad((params) => {
-    console.log(params)
-})
+
 const { proxy } = getCurrentInstance()
+const adStore = proxy.$store.ad.useAdStore()
 const form = ref({
   user_account: '',
   password: ''
 })
 const msgType = ref('')
 const messageText = ref('')
+const isAdLoaded = ref(false) // 控制广告加载状态
+const bannerAdId = ref('') // 横幅广告 ID
+
+onLoad((params) => {
+  console.log(params)
+  bannerAdId.value = adStore.getBannerAdId() // 获取横幅广告 ID
+  console.log('bannerAdId', bannerAdId)
+})
+
+// 广告相关的事件处理函数
+const onAdLoad = (e) => {
+  console.log('广告加载成功', e)
+  isAdLoaded.value = true
+}
+
+const onAdClose = (e) => {
+  console.log('广告关闭', e)
+  isAdLoaded.value = false
+}
+
+const onAdError = (e) => {
+  console.error('广告加载失败', e)
+  isAdLoaded.value = false
+}
+
 const handleLogin = async () => {
   console.log(form.value)
   if (!form.value.user_account || !form.value.password) {
@@ -120,6 +158,7 @@ const goToForgotPassword = () => {
   padding: 0 40rpx;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
 }
 
 .login-view {
@@ -170,6 +209,7 @@ const goToForgotPassword = () => {
 }
 
 .btn-container {
+  margin-bottom: auto;
   button {
     width: 100%;
     height: 110rpx;
@@ -200,6 +240,31 @@ const goToForgotPassword = () => {
     
     &:active {
       background-color: #f5f5f5;
+    }
+  }
+}
+
+.ad-section {
+  width: 100%;
+  height: 225rpx;
+  flex: none;
+  box-sizing: border-box;
+  margin-top: 20rpx;
+
+  .divider {
+    height: 2rpx;
+    background: #EEEEEE;
+  }
+
+  .ad-view {
+    height: 220rpx;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    ad {
+      width: 100%;
+      height: 220rpx;
     }
   }
 }

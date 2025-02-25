@@ -51,16 +51,71 @@
         </view>
       </view> -->
     </view>
+
+    <!-- 底部广告区域 -->
+    <view class="ad-section" :class="{ 'ad-loaded': isAdLoaded }">
+      <view class="divider"></view>
+      <view class="ad-view" v-if="bannerAdId">
+        <ad 
+          :adpid="bannerAdId" 
+          @load="onAdLoad" 
+          @close="onAdClose" 
+          @error="onAdError">
+        </ad>
+      </view> 
+    </view>
   </view>
 </template>
 
 <script setup>
-import { ref, getCurrentInstance } from 'vue'
+import { ref, getCurrentInstance, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
+import { onLoad } from '@dcloudio/uni-app'
 
 const { proxy } = getCurrentInstance()
 const userStore = proxy.$store.user.useUserStore()
+const adStore = proxy.$store.ad.useAdStore()
 const { userType } = storeToRefs(userStore)
+
+const isAdLoaded = ref(false) // 控制广告加载状态
+const bannerAdId = ref('') // 初始化为空字符串
+
+// 初始化广告
+const initAd = () => {
+  setTimeout(() => {
+    const adId = adStore.getBannerAdId()
+    console.log('获取广告ID:', adId)
+    bannerAdId.value = adId
+  }, 100) // 延迟100ms加载广告
+}
+
+onMounted(() => {
+  initAd()
+})
+
+// 广告相关的事件处理函数
+const onAdLoad = (e) => {
+  console.log('广告加载成功', e)
+  isAdLoaded.value = true
+}
+
+const onAdClose = (e) => {
+  console.log('广告关闭', e)
+  isAdLoaded.value = false
+  // 广告关闭后，延迟重新加载
+  setTimeout(() => {
+    initAd()
+  }, 300)
+}
+
+const onAdError = (e) => {
+  console.error('广告加载失败', e)
+  isAdLoaded.value = false
+  // 广告加载失败后，延迟重试
+  setTimeout(() => {
+    initAd()
+  }, 300)
+}
 
 // 修改用户资料
 const handleUpdateProfile = () => {
@@ -149,12 +204,17 @@ page {
 
 .page-container {
   padding: 20rpx;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
 }
 
 .cu-list.menu {
   background: #FFFFFF;
   border-radius: 12rpx;
   overflow: hidden;
+  margin-bottom: auto;
   
   .menu-item {
     display: flex;
@@ -207,5 +267,41 @@ page {
 
 .delete-text {
   color: #FF0000 !important;
+}
+
+.ad-section {
+  width: 100%;
+  height: 225rpx;
+  flex: none;
+  box-sizing: border-box;
+  margin-top: 20rpx;
+  opacity: 0;
+  transition: all 0.3s ease-in-out;
+  transform: translateY(20rpx);
+
+  &.ad-loaded {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .divider {
+    height: 2rpx;
+    background: #EEEEEE;
+  }
+
+  .ad-view {
+    height: 220rpx;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #FFFFFF;
+    border-radius: 12rpx;
+    overflow: hidden;
+    
+    ad {
+      width: 100%;
+      height: 220rpx;
+    }
+  }
 }
 </style>

@@ -163,7 +163,7 @@ export default {
             type,
             mac: door.door_mac,
             cmd: "0",
-            sn: Date.now().toString(),
+            sn: "APP"+Date.now().toString(),
             info: doorpkg
           },
           success: (res) => {

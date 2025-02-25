@@ -7,7 +7,8 @@
  */
 const QR_REGEX = {
   YEFIOT: /^https:\/\/qrapp\.yefiot\.com\/qr\/yf\?c=.+$/,
-  SVR: /^https:\/\/svr\.yefiot\.com\/xy\?c=.+$/
+  SVR: /^https:\/\/svr\.yefiot\.com\/xy\?c=.+$/,
+  NEW_FORMAT: /^http:\/\/xy\.yefiot\.com\/public\/dl\/\?c=.+$/
 }
 
 const scanUtils = {
@@ -176,11 +177,13 @@ const scanUtils = {
           console.log('扫码结果:', res)
           
           // 验证二维码格式
-          if (QR_REGEX.YEFIOT.test(res.result) || QR_REGEX.SVR.test(res.result)) {
+          if (QR_REGEX.YEFIOT.test(res.result) || QR_REGEX.SVR.test(res.result) || QR_REGEX.NEW_FORMAT.test(res.result)) {
+            console.log('匹配成功:', res.result);
             // 提取参数 c 的值
             const codeParam = res.result.split('c=')[1]
             resolve(codeParam)
           } else {
+            console.log('匹配失败:', res.result);
             // 如果二维码格式不正确，返回空字符串
             uni.showToast({
               title: '无效的二维码格式',

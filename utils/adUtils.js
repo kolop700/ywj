@@ -149,7 +149,6 @@ class AdManager {
       this.rewardedVideoAd.onLoad(() => {
         console.log('激励广告加载成功')
       })
-
       this.rewardedVideoAd.onError((err) => {
         console.log('激励广告加载失败', err)
         // 先检查限制，避免不必要的广告加载

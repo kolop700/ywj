@@ -1,28 +1,17 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import {computed } from 'vue'
 
 // 广告控制类型
 export const AD_CONTROL_TYPES = {
-  NONE: 0,        // 不显示任何广告
-  BANNER: 10,     // 只显示 banner
-  REWARDED: 11,   // banner + 激励
-  INTERSTITIAL: 13 // banner + 插屏
+  NONE: '0',        // 不显示任何广告
+  BANNER: '1',     // 只显示 banner
+  REWARDED: '11',   // banner + 激励
+  INTERSTITIAL: '13' // banner + 插屏
 }
 
-export const useAdControlStore = defineStore('adControl', () => {
+ export const useAdControlStore = defineStore('adControl', () => {
   // 广告控制类型
-  const adType = ref(AD_CONTROL_TYPES.REWARDED) // 默认显示 banner + 插屏
-
-  // 从本地存储初始化
-  try {
-    const savedType = uni.getStorageSync('adControlType')
-    if (savedType !== '') {
-      adType.value = parseInt(savedType)
-    }
-  } catch (error) {
-    console.error('读取广告控制类型失败:', error)
-  }
-
+  const adType = ref(AD_CONTROL_TYPES.INTERSTITIAL) // 默认显示 banner + 插屏
   // 获取广告类型描述
   const getAdTypeDescription = (type) => {
     switch (type) {
@@ -62,7 +51,7 @@ export const useAdControlStore = defineStore('adControl', () => {
 
   return {
     // 状态
-    adType: currentAdType,
+    adType,
     adTypeDescription: currentAdTypeDescription,
     showBanner,
     showRewarded,

@@ -10,6 +10,8 @@
       />
     </view>
 
+   
+
     <!-- 设备列表 -->
     <scroll-view 
       class="device-list" 
@@ -52,7 +54,12 @@
         </view>
       </view>
     </scroll-view>
-
+    <!-- <view class="ad-free-date">
+      <text v-if="adFreeDate">免广告至：{{ adFreeDate }}</text>
+    </view>
+    <view class="reward-button">
+      <button @click="watchRewardedAd">观看激励广告获取奖励</button>
+    </view> -->
     <!-- 底部广告区域 -->
     <view class="ad-section">
       <view class="divider"></view>
@@ -110,7 +117,6 @@ const initAdManager = () => {
   adManager.initStore(adStore, adControlStore)
   adManager.init()
 }
-
 // 页面加载时设置高度和广告
 onMounted(async () => {
   windowHeight.value = getPageHeight()
@@ -243,6 +249,7 @@ const handleDeviceClick = async (device) => {
 const onScrollToLower = () => {
   console.log('滚动到底部')
 }
+
 </script>
 
 <style lang="scss">

@@ -54,6 +54,7 @@ import { onLoad } from '@dcloudio/uni-app'
 const adStore = proxy.$store.ad.useAdStore()
 import doorAccessUtils from '@/utils/doorAccessUtils'
 import visitorPasswordUtils from '@/utils/visitorPasswordUtils'
+import { adManager } from '@/utils/adUtils'
 const isAdLoaded = ref(false) // 控制广告加载状态
 const bannerAdId = ref('') // 横幅广告 ID
 // 注入蓝牙实例
@@ -98,6 +99,11 @@ onLoad((options) => {
   console.log('匹配的设备:', matchedDevice.value)
   bannerAdId.value = adStore.getBannerAdId() // 获取横幅广告 ID
   console.log('bannerAdId' ,bannerAdId)
+  
+  // 初始化广告管理器
+  const adControlStore = proxy.$store.adControl.useAdControlStore()
+  adManager.initStore(adStore, adControlStore)
+  adManager.init()
 })
 
 // 搜索设备
@@ -206,6 +212,16 @@ const openDoor = async () => {
         title: '开门成功',
         icon: 'success'
       })
+      // 开门成功后展示广告
+      try {
+        // 先尝试展示激励广告
+        const adResult = await adManager.showAd()
+        if (!adResult) {
+          console.log('广告展示受限：可能达到每日限制或间隔时间不足')
+        }
+      } catch (error) {
+        console.error('广告展示失败:', error)
+      }
     } catch (networkError) {
       uni.hideLoading()
       console.error('网络开门失败:', networkError)
@@ -215,6 +231,21 @@ const openDoor = async () => {
         throw new Error('蓝牙模块未初始化')
       }
       await doorBleUtils.openDoorWithBle(matchedDevice.value, userStore.userId)
+      // 蓝牙开门成功后显示成功提示
+      uni.showToast({
+        title: '开门成功',
+        icon: 'success'
+      })
+      // 蓝牙开门成功后展示广告
+      try {
+        // 先尝试展示激励广告
+        const adResult = await adManager.showAd()
+        if (!adResult) {
+          console.log('广告展示受限：可能达到每日限制或间隔时间不足')
+        }
+      } catch (error) {
+        console.error('广告展示失败:', error)
+      }
     }
   } catch (error) {
     uni.hideLoading()
@@ -261,6 +292,16 @@ const openBleDoor = async () => {
       title: '开门成功',
       icon: 'success'
     })
+    // 开门成功后展示广告
+    try {
+      // 先尝试展示激励广告
+      const adResult = await adManager.showAd()
+      if (!adResult) {
+        console.log('广告展示受限：可能达到每日限制或间隔时间不足')
+      }
+    } catch (error) {
+      console.error('广告展示失败:', error)
+    }
   } catch (error) {
     uni.hideLoading()
     console.error('蓝牙开门失败:', error)
@@ -309,11 +350,42 @@ const openDoorWithPassword = async () => {
   const verifyResult = await verifyVisitorPassword()
   if (!verifyResult.success) return
   
-  // 验证成功后，调用开门接口
-  await visitorPasswordUtils.openDoor({
-    deviceNumber: deviceNumber.value,
-    sn: verifyResult.sn
-  })
+  try {
+    uni.showLoading({
+      title: '正在开门...',
+      mask: true
+    })
+    // 验证成功后，调用开门接口
+    await visitorPasswordUtils.openDoor({
+      deviceNumber: deviceNumber.value,
+      sn: verifyResult.sn
+    })
+    
+    uni.hideLoading()
+    uni.showToast({
+      title: '开门成功',
+      icon: 'success'
+    })
+    
+    // 开门成功后展示广告
+    try {
+      // 先尝试展示激励广告
+      const adResult = await adManager.showAd()
+      if (!adResult) {
+        console.log('广告展示受限：可能达到每日限制或间隔时间不足')
+      }
+    } catch (error) {
+      console.error('广告展示失败:', error)
+    }
+  } catch (error) {
+    uni.hideLoading()
+    console.error('访客密码开门失败:', error)
+    uni.showToast({
+      title: '开门失败，请重试',
+      icon: 'none',
+      duration: 2000
+    })
+  }
 }
 // 广告相关的事件处理函数
 const onAdLoad = (e) => {

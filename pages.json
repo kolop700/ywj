@@ -115,7 +115,6 @@
 					"path": "pages/door-list/index",
 					"style": {
 						"navigationBarTitleText": "远程开门",
-						"enablePullDownRefresh": true,
 						"app-plus": {
 							"bounce": "none"
 						}

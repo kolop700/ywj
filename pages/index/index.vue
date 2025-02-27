@@ -232,13 +232,6 @@ const handleScanCode = async () => {
 const handleRemoteOpen = () => {
   if (!userStore.checkLogin()) return
   
-  // 尝试显示广告
-  try {
-    adStore.showAd('rewarded')
-  } catch (error) {
-    console.error('广告展示失败:', error)
-  }
-  
   uni.navigateTo({
     url: '/workbench_package/pages/door-list/index'
   })

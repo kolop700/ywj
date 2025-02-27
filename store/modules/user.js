@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import userApi from '@/api/user/user'
 import deviceApi from '@/api/device/device' // 引入设备API
 import { useDeviceStore } from './device'
+import { useAdControlStore } from './adControl' // 引入广告控制 store
 
 export const useUserStore = defineStore('user', () => {
   const userInfo = ref({})
@@ -118,7 +119,13 @@ export const useUserStore = defineStore('user', () => {
   async function loginSuccess(data, options = {}) {
     userInfo.value = data
     user_id.value = data.user_id
-    
+    console.log("广告类型", userInfo.value.ad_type_app)
+
+    // 获取广告控制 store
+    const adControlStore = useAdControlStore()
+    // 设置广告类型
+    adControlStore.setAdType(userInfo.value.ad_type_app)
+
     // 清空设备列表
     const deviceStore = useDeviceStore()
     deviceStore.clearDeviceList()

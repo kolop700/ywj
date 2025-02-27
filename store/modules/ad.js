@@ -34,8 +34,8 @@ const AD_IDS = {
 
 // 创建广告状态管理
 export const useAdStore = defineStore('ad', () => {
-  const isTestMode = ref(true) // 默认关闭测试模式
-  const adControlStore = useAdControlStore() // 使用广告控制 store
+  const isTestMode = ref(false) // 默认关闭测试模式
+
 
   // 获取当前平台
   const getPlatform = () => {
@@ -45,6 +45,7 @@ export const useAdStore = defineStore('ad', () => {
 
   // 获取广告ID
   const getAdId = (type) => {
+	 const adControlStore = useAdControlStore() // 使用广告控制 store
     // 检查广告控制类型
     if (adControlStore.adType === AD_CONTROL_TYPES.NONE) {
       return '11111'

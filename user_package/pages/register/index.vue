@@ -295,10 +295,9 @@ const handleSubmit = async () => {
        // 重置成功后执行登录
        const userStore = proxy.$store.user.useUserStore()
         try {
-          await userStore.login({
-            user_acct: form.value.phone,
-            user_password: form.value.password
-          })
+          userStore.setUserAccount(form.value.phone)
+          userStore.setUserPassword(form.value.password)
+     
           // 登录成功后显示重置成功提示
           uni.showToast({ 
             title: '注册成功', 

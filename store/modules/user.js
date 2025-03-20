@@ -108,9 +108,17 @@ export const useUserStore = defineStore('user', () => {
         }, res.data[0].expire_date)
         maxExpireDate.value = maxDate
       }
+      console.log("更新房间列表", res)
       return Promise.resolve(res)
     } catch (error) {
+      console.log("更新房间列表失败", error)
       maxExpireDate.value = userInfo.value.expire_date
+      // 根据返回的 code 判断是否跳转到房屋申请页面
+      if (error.code === '1') {
+        uni.navigateTo({
+          url: '/pages/house/apply'
+        })
+      }
       return Promise.reject(error)
     }
   }
@@ -187,6 +195,16 @@ export const useUserStore = defineStore('user', () => {
     return await userApi.bindUserRoom(params)
   }
 
+  // 设置账号
+  function setUserAccount(account) {
+    userInfo.value.user_acct = account
+  }
+
+  // 设置密码
+  function setUserPassword(password) {
+    userInfo.value.user_password = password
+  }
+
   return {
     userInfo,
     user_id,
@@ -206,7 +224,9 @@ export const useUserStore = defineStore('user', () => {
     getUserRoomList,
     bindUserRoom,
     userCardA,
-    userCardB
+    userCardB,
+    setUserAccount,  // 导出设置账号方法
+    setUserPassword  // 导出设置密码方法
   }
 }) 
 

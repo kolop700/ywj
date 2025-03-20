@@ -112,9 +112,6 @@ const handleLogin = async () => {
     console.log(res)
     if (res.code === "0") {
       // 保存用户信息到pinia store
-      const userData = res.data[0]
-      proxy.$store.user.useUserStore().loginSuccess(userData)
-      
       uni.showToast({
         title: '登录成功',
         icon: 'success'
@@ -122,6 +119,8 @@ const handleLogin = async () => {
       // 延迟返回登录页
       setTimeout(() => {
         uni.navigateBack()
+        const userData = res.data[0]
+        proxy.$store.user.useUserStore().loginSuccess(userData)
       }, 2000)
     } else {
       uni.showToast({

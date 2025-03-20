@@ -173,6 +173,8 @@ onLoad(() => {
   checkAppUpdate() // 检查版本更新
   bannerAdId.value = adStore.getBannerAdId() // 获取横幅广告 ID
   console.log('bannerAdId' ,bannerAdId)
+  console.log('onLoad', userStore)
+  userStore.login({ showLoading: false })
 })
 
 // 在组件挂载后检查首次打开状态
@@ -268,6 +270,9 @@ const agreementPopup = ref(null)
 const checkFirstOpen = () => {
   if (!agreementStore.checkAgreement()) {
     agreementPopup.value.open()
+  } else {
+    // 同意协议后直接跳转到登录页面
+    userStore.checkLogin()
   }
 }
 
@@ -275,6 +280,10 @@ const checkFirstOpen = () => {
 const handleAgree = () => {
   agreementStore.setAgreement(true)
   agreementPopup.value.close()
+  // 同意协议后直接跳转到登录页面
+  uni.navigateTo({
+    url: '/user_package/pages/login/index'
+  })
 }
 
 // 处理不同意

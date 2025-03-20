@@ -226,10 +226,8 @@ const handleReset = async () => {
         // 重置成功后执行登录
         const userStore = proxy.$store.user.useUserStore()
         try {
-          await userStore.login({
-            user_acct: form.value.phone,
-            user_password: form.value.newPassword
-          })
+          userStore.setUserAccount(form.value.phone)
+          userStore.setUserPassword(form.value.newPassword)
           // 登录成功后显示重置成功提示
           uni.showToast({ 
             title: '重置密码成功', 

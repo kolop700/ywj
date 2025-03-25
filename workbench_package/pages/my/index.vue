@@ -46,6 +46,16 @@
           <text>v{{ appVersion }}</text>
         </view>
       </view>
+
+      <!-- 绑定微信选项 -->
+      <view class="menu-item" @tap="handleBindWechat">
+        <view class="content">
+          <text>绑定微信</text>
+        </view>
+        <view class="right-icon">
+          <image src="/static/icons/icon_right.png" mode="aspectFit"></image>
+        </view>
+      </view>
       
       <!-- 注销账号选项，仅在 iOS 平台显示 -->
       <view 
@@ -276,6 +286,49 @@ const handleVersion = () => {
     title: `当前版本：${appVersion.value}`,
     icon: 'none'
   })
+}
+
+// 处理绑定微信
+const handleBindWechat = () => {
+  console.log('点击绑定微信按钮')
+  
+  // #ifdef MP-WEIXIN
+  uni.showModal({
+    title: '提示',
+    content: '您当前已在微信小程序中，无需绑定',
+    showCancel: false
+  })
+  // #endif
+  
+  // #ifdef APP-PLUS
+  uni.showModal({
+    title: '绑定微信',
+    content: '是否跳转到微信小程序进行绑定？',
+    success: (res) => {
+      if (res.confirm) {
+        console.log('用户确认跳转')
+        // 使用 uni.navigateToMiniProgram 跳转到小程序
+        uni.navigateToMiniProgram({
+          appId: 'wx6a5561be592cc61d', // 目标小程序的 appId
+          path: 'pages/qropen/qropen', // 目标小程序的页面路径
+          success(res) {
+            console.log('跳转成功', res)
+          },
+          fail(err) {
+            console.error('跳转失败', err)
+            uni.showToast({
+              title: '跳转失败，请确保已安装微信',
+              icon: 'none',
+              duration: 2000
+            })
+          }
+        })
+      } else {
+        console.log('用户取消跳转')
+      }
+    }
+  })
+  // #endif
 }
 </script>
 

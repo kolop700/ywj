@@ -143,6 +143,14 @@
           3、本《协议》的版权由星云智慧所有，星云智慧保留一切解释和修改权利。
         </view>
       </view>
+
+      <view class="section">
+        <view class="section-title">更新日期</view>
+        <view class="section-content">
+          <view>更新日期：2024年3月19日</view>
+          <view>生效日期：2024年3月19日</view>
+        </view>
+      </view>
     </view>
   </view>
 </template>

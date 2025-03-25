@@ -33,9 +33,8 @@ export const useUserStore = defineStore('user', () => {
 
   // 判断是否登录
   const isLogin = computed(() => {
-    return !!user_id.value && !!userInfo.value.user_acct
+    return !!userInfo.value.user_acct && !! userInfo.value.user_password
   })
-
   // 获取账号
   const userAcct = computed(() => {
     return userInfo.value.user_acct || ''

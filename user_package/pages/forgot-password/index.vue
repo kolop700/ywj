@@ -66,7 +66,7 @@
     </view>
 
     <!-- 底部广告区域 -->
-    <view class="ad-section">
+    <!-- <view class="ad-section">
       <view class="divider"></view>
       <view class="ad-view">
         <ad 
@@ -77,7 +77,7 @@
           @error="onAdError">
         </ad>
       </view> 
-    </view>
+    </view> -->
   </view>
 </template>
 

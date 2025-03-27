@@ -22,32 +22,18 @@
         placeholder="请输入密码"
         placeholder-class="placeholder"
       />
-    </view>
-
-    <!-- 协议同意选项 -->
-    <view class="agreement">
-      <checkbox-group @change="onCheckboxChange">
-        <checkbox 
-          :checked="checked" 
-          color="#FF0036"
-          style="transform:scale(0.7)"
-        />
-      </checkbox-group>
-      <text class="text-agreement">我已阅读并同意本程序的</text>
-      <text class="link" @tap="openUserAgreement">《用户服务协议》</text>
-      <text class="normal-text">及</text>
-      <text class="link" @tap="openPrivacyPolicy">《隐私政策》</text>
+      
+      <text class="forgot-password" @click="goToForgotPassword">忘记密码?</text>
     </view>
     
     <!-- 按钮区域 -->
     <view class="btn-container">
       <button class="login-btn" @click="handleLogin">登录</button>
       <button class="register-btn" @click="goToRegister">注册</button>
-      <text class="forgot-password" @click="goToForgotPassword">忘记密码?</text>
     </view>
 
     <!-- 底部广告区域 -->
-    <!-- <view class="ad-section">
+    <view class="ad-section">
       <view class="divider"></view>
       <view class="ad-view">
         <ad 
@@ -58,7 +44,7 @@
           @error="onAdError">
         </ad>
       </view> 
-    </view> -->
+    </view>
 
     <!-- 提示信息弹窗 -->
     <uni-popup ref="message" type="message">
@@ -77,7 +63,6 @@ const form = ref({
   user_account: '',
   password: ''
 })
-const checked = ref(false)
 const msgType = ref('')
 const messageText = ref('')
 const isAdLoaded = ref(false) // 控制广告加载状态
@@ -105,31 +90,8 @@ const onAdError = (e) => {
   isAdLoaded.value = false
 }
 
-// 协议勾选改变
-const onCheckboxChange = (e) => {
-  checked.value = e.detail.value.length > 0
-}
-
-// 打开用户协议
-const openUserAgreement = () => {
-  uni.navigateTo({ url: '/user_package/pages/agreement/user' })
-}
-
-// 打开隐私政策
-const openPrivacyPolicy = () => {
-  uni.navigateTo({ url: '/user_package/pages/agreement/privacy' })
-}
-
 const handleLogin = async () => {
-  if (!checked.value) {
-    uni.showToast({
-      title: '请先同意用户协议和隐私政策',
-      icon: 'none',
-      duration: 2000
-    })
-    return
-  }
-
+  console.log(form.value)
   if (!form.value.user_account || !form.value.password) {
     uni.showToast({
       title: '账号和密码不能为空',
@@ -236,14 +198,17 @@ const goToForgotPassword = () => {
     color: #999;
     font-size: 32rpx;
   }
+  
+  .forgot-password {
+    color: #FF0036;
+    font-size: 32rpx;
+    text-align: right;
+    padding: 20rpx 0 60rpx;
+  }
 }
 
 .btn-container {
   margin-bottom: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
   button {
     width: 100%;
     height: 110rpx;
@@ -276,12 +241,6 @@ const goToForgotPassword = () => {
       background-color: #f5f5f5;
     }
   }
-
-  .forgot-password {
-    color: #FF0036;
-    font-size: 32rpx;
-    margin-top: 20rpx;
-  }
 }
 
 .ad-section {
@@ -306,23 +265,6 @@ const goToForgotPassword = () => {
       width: 100%;
       height: 220rpx;
     }
-  }
-}
-
-.agreement {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  margin-bottom: 20rpx;
-  
-  .text-agreement, .normal-text {
-    font-size: 28rpx;
-    color: #A7A7A7;
-  }
-  
-  .link {
-    color: #FF0036;
-    font-size: 28rpx;
   }
 }
 </style> 

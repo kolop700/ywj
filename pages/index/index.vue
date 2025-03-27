@@ -184,11 +184,21 @@ onMounted(() => {
 
 // 处理网格项点击
 const handleGridItemClick = (item) => {
-  // 检查是否同意了协议
+  // #ifdef APP-PLUS
+  const platform = uni.getSystemInfoSync().osName
+  if (platform === 'ios' && !agreementStore.checkAgreement()) {
+    agreementPopup.value.open()
+    return
+  }
+  // #endif
+  
+  // #ifdef H5
   if (!agreementStore.checkAgreement()) {
     agreementPopup.value.open()
     return
   }
+  // #endif
+  
   if (item.needLogin && !userStore.checkLogin()) {
     return
   }
@@ -199,18 +209,6 @@ const handleGridItemClick = (item) => {
   }
 }
 
-// 处理登录按钮点击
-const handleLoginClick = () => {
-  if (!agreementStore.checkAgreement()) {
-    // 如果没有同意协议，显示协议弹框
-    agreementPopup.value.open()
-  } else {
-    // 如果已经同意协议，直接跳转到登录页面
-    uni.navigateTo({
-      url: '/user_package/pages/login/index'
-    })
-  }
-}
 
 // 处理扫码开门
 const handleScanCode = async () => {
@@ -268,12 +266,24 @@ const agreementPopup = ref(null)
 
 // 检查是否首次打开应用
 const checkFirstOpen = () => {
+  // #ifdef APP-PLUS
+  const platform = uni.getSystemInfoSync().osName
+  if (platform === 'ios' && !agreementStore.checkAgreement()) {
+    agreementPopup.value.open()
+  } else {
+    // 同意协议后直接跳转到登录页面
+    userStore.checkLogin()
+  }
+  // #endif
+  
+  // #ifdef H5
   if (!agreementStore.checkAgreement()) {
     agreementPopup.value.open()
   } else {
     // 同意协议后直接跳转到登录页面
     userStore.checkLogin()
   }
+  // #endif
 }
 
 // 处理同意

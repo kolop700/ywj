@@ -85,7 +85,7 @@
     </view>
 
     <!-- 协议同意选项 -->
-    <!-- <view class="agreement">
+    <view class="agreement">
       <checkbox-group @change="onCheckboxChange">
         <checkbox 
           :checked="checked" 
@@ -97,7 +97,7 @@
       <text class="link" @tap="openUserAgreement">《用户服务协议》</text>
       <text class="normal-text">及</text>
       <text class="link" @tap="openPrivacyPolicy">《隐私政策》</text>
-    </view> -->
+    </view>
 
     <!-- 提交按钮 -->
     <view class="btn-container">
@@ -109,7 +109,7 @@
     </view>
 
     <!-- 底部广告区域 -->
-    <view class="ad-section">
+    <!-- <view class="ad-section">
       <view class="divider"></view>
       <view class="ad-view">
         <ad 
@@ -120,7 +120,7 @@
           @error="onAdError">
         </ad>
       </view> 
-    </view>
+    </view> -->
   </view>
 </template>
 
@@ -161,9 +161,8 @@ const isFormValid = computed(() => {
          form.value.name && 
          form.value.password && 
          form.value.confirmPassword && 
-         form.value.gender
-        //   &&
-        //  checked.value
+         form.value.gender &&
+         checked.value
 })
 
 // 验证手机号
@@ -283,10 +282,10 @@ const onCheckboxChange = (e) => {
 
 // 提交表单
 const handleSubmit = async () => {
-  // if (!checked.value) {
-  //   uni.showToast({ title: '请先同意用户协议和隐私政策', icon: 'none' })
-  //   return
-  // }
+  if (!checked.value) {
+    uni.showToast({ title: '请先同意用户协议和隐私政策', icon: 'none' })
+    return
+  }
   
   if (validateForm()) {
     try {

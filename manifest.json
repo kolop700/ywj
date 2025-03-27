@@ -2,8 +2,8 @@
     "name" : "星云小卫",
     "appid" : "__UNI__F8D1DD9",
     "description" : "",
-    "versionName" : "1.0.12",
-    "versionCode" : 112,
+    "versionName" : "1.0.13",
+    "versionCode" : 11,
     "transformPx" : false,
     /* 5+App特有相关 */
     "app-plus" : {
@@ -72,7 +72,9 @@
                     "NSLocalNetworkUsageDescription" : "需要访问网络来进行通讯"
                 },
                 "capabilities" : {
-                    "entitlements" : {}
+                    "entitlements" : {
+                        "com.apple.developer.associated-domains" : [ "https://xy.yefiot.com/apple-app-site-association/" ]
+                    }
                 }
             },
             "sdkConfigs" : {
@@ -93,7 +95,8 @@
                         "appid" : "wx6a5561be592cc61d",
                         "UniversalLinks" : ""
                     }
-                }
+                },
+                "oauth" : {}
             },
             "icons" : {
                 "android" : {

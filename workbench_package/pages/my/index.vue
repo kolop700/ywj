@@ -61,7 +61,6 @@
       <view 
         class="menu-item" 
         @tap="handleAccountDelete"
-        v-if="platform === 'ios'"
       >
         <view class="content">
           <text class="delete-text">注销账号</text>

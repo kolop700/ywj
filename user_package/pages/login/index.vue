@@ -22,6 +22,13 @@
         placeholder="请输入密码"
         placeholder-class="placeholder"
       />
+      <text class="forgot-password" @click="goToForgotPassword">忘记密码?</text>
+    </view>
+    
+    <!-- 按钮区域 -->
+    <view class="btn-container">
+      <button class="login-btn" @click="handleLogin">登录</button>
+      <button class="register-btn" @click="goToRegister">注册</button>
     </view>
 
     <!-- 协议同意选项 -->
@@ -37,13 +44,6 @@
       <text class="link" @tap="openUserAgreement">《用户服务协议》</text>
       <text class="normal-text">及</text>
       <text class="link" @tap="openPrivacyPolicy">《隐私政策》</text>
-    </view>
-    
-    <!-- 按钮区域 -->
-    <view class="btn-container">
-      <button class="login-btn" @click="handleLogin">登录</button>
-      <button class="register-btn" @click="goToRegister">注册</button>
-      <text class="forgot-password" @click="goToForgotPassword">忘记密码?</text>
     </view>
 
     <!-- 底部广告区域 -->
@@ -226,20 +226,23 @@ const goToForgotPassword = () => {
     outline: none;  /* 移除焦点时的边框 */
     box-sizing: border-box;  /* 边框和内边距包含在宽度内 */
     width: 100%;  /* 输入框宽度 */
-    
-    &:last-of-type {
-      margin-bottom: 20rpx;
-    }
   }
   
   .placeholder {
     color: #999;
     font-size: 32rpx;
   }
+
+  .forgot-password {
+    color: #FF0036;
+    font-size: 32rpx;
+    text-align: right;
+    margin-bottom: 20rpx;
+  }
 }
 
 .btn-container {
-  margin-bottom: auto;
+  margin-bottom: 20rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -276,12 +279,6 @@ const goToForgotPassword = () => {
       background-color: #f5f5f5;
     }
   }
-
-  .forgot-password {
-    color: #FF0036;
-    font-size: 32rpx;
-    margin-top: 20rpx;
-  }
 }
 
 .ad-section {
@@ -313,7 +310,7 @@ const goToForgotPassword = () => {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  margin-bottom: 20rpx;
+  margin-bottom: 40rpx;
   
   .text-agreement, .normal-text {
     font-size: 28rpx;

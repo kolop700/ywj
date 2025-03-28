@@ -84,6 +84,15 @@
       </view>
     </view>
 
+    <!-- 提交按钮 -->
+    <view class="btn-container">
+      <button 
+        :class="['login-btn', {'btn-disabled': !isFormValid}]" 
+        @click="handleSubmit"
+      >提交</button>
+      <button class="register-btn" @click="goToLogin">返回登录</button>
+    </view>
+
     <!-- 协议同意选项 -->
     <view class="agreement">
       <checkbox-group @change="onCheckboxChange">
@@ -97,15 +106,6 @@
       <text class="link" @tap="openUserAgreement">《用户服务协议》</text>
       <text class="normal-text">及</text>
       <text class="link" @tap="openPrivacyPolicy">《隐私政策》</text>
-    </view>
-
-    <!-- 提交按钮 -->
-    <view class="btn-container">
-      <button 
-        :class="['login-btn', {'btn-disabled': !isFormValid}]" 
-        @click="handleSubmit"
-      >提交</button>
-      <button class="register-btn" @click="goToLogin">返回登录</button>
     </view>
 
     <!-- 底部广告区域 -->
@@ -433,25 +433,8 @@ const onAdError = (e) => {
   }
 }
 
-.agreement {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  margin-top: 30rpx;
-  
-  .text-agreement, .normal-text {
-    font-size: 28rpx;
-    color: #A7A7A7;
-  }
-  
-  .link {
-    color: #FF0036;
-    font-size: 28rpx;
-  }
-}
-
 .btn-container {
-  margin-bottom: auto;
+  margin-bottom: 20rpx;
   button {
     margin-top: 30rpx;
     width: 100%;
@@ -489,6 +472,23 @@ const onAdError = (e) => {
     &:active {
       background-color: #f5f5f5;
     }
+  }
+}
+
+.agreement {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 40rpx;
+  
+  .text-agreement, .normal-text {
+    font-size: 28rpx;
+    color: #A7A7A7;
+  }
+  
+  .link {
+    color: #FF0036;
+    font-size: 28rpx;
   }
 }
 

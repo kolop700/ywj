@@ -50,6 +50,11 @@ export const useUserStore = defineStore('user', () => {
     return userInfo.value.user_id || ''
   })
 
+  // 获取密码
+  const userPassword = computed(() => {
+    return userInfo.value.user_password || ''
+  })
+
   // 登录方法
   async function login(loginDataOrOptions = null, options = {}) {
     try {
@@ -218,6 +223,8 @@ export const useUserStore = defineStore('user', () => {
     userName,
     userAcct,
     userId,
+    userPassword,  // 导出密码获取方法
+    setUserPassword,  // 导出密码设置方法
     checkLogin,
     updateRoomList,
     getUserRoomList,

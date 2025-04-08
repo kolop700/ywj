@@ -2,8 +2,8 @@
     "name" : "星云小卫",
     "appid" : "__UNI__F8D1DD9",
     "description" : "",
-    "versionName" : "1.0.15",
-    "versionCode" : 115,
+    "versionName" : "1.0.17",
+    "versionCode" : 117,
     "transformPx" : false,
     /* 5+App特有相关 */
     "app-plus" : {
@@ -76,8 +76,7 @@
                     "entitlements" : {
                         "com.apple.developer.associated-domains" : [
                             "applinks:static-mp-d359e8b4-3a97-4d30-9a87-c7e4f5f68d74.next.bspapp.com",
-                            "applinks:xy.yefiot.com/apple-app-site-association",
-                            "applinks:xy.yefiot.com/apple-app-site-association/"
+                            "applinks:xy.yefiot.com"
                         ]
                     }
                 }
@@ -98,7 +97,7 @@
                 "share" : {
                     "weixin" : {
                         "appid" : "wx35c997a2abfc3ab6",
-                        "UniversalLinks" : "https://static-mp-d359e8b4-3a97-4d30-9a87-c7e4f5f68d74.next.bspapp.com/uni-universallinks/__UNI__F8D1DD9/"
+                        "UniversalLinks" : "https://xy.yefiot.com/app/"
                     }
                 },
                 "oauth" : {}
@@ -146,7 +145,7 @@
     "quickapp" : {},
     /* 小程序特有相关 */
     "mp-weixin" : {
-        "appid" : "wx35c997a2abfc3ab6",
+        "appid" : "wx5b6d42238441c0ea",
         "setting" : {
             "urlCheck" : false
         },

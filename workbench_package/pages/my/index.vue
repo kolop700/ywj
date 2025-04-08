@@ -112,6 +112,7 @@
 import { ref, getCurrentInstance, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { onLoad } from '@dcloudio/uni-app'
+import { encrypt, decrypt } from '@/utils/aesUtils'
 
 const { proxy } = getCurrentInstance()
 const userStore = proxy.$store.user.useUserStore()
@@ -301,8 +302,8 @@ const handleBindWechat = () => {
   
   // #ifdef APP-PLUS
   console.log('当前用户信息：', {
-    userId: userStore.userAcct,
-    token: userStore.userId
+    account: userStore.userAcct,
+    password: userStore.userPassword
   })
   
   uni.showModal({
@@ -311,9 +312,29 @@ const handleBindWechat = () => {
     success: (res) => {
       if (res.confirm) {
         console.log('用户确认跳转')
-        // 构建查询参数
-        const query = `userId=${userStore.userAcct}&token=${userStore.userId}&timestamp=${Date.now()}`
-        console.log('准备跳转，携带参数：', query)
+        
+        // 加密前的原始数据
+        const originalData = {
+          account: userStore.userAcct,
+          password: userStore.userPassword,
+          timestamp: Date.now()
+        }
+        
+        // 对数据进行加密
+        const encryptedAccount = encrypt(originalData.account)
+        const encryptedPassword = encrypt(originalData.password)
+        
+        // 检查加密是否成功
+        if (!encryptedAccount || !encryptedPassword) {
+          uni.showToast({
+            title: '数据加密失败',
+            icon: 'none'
+          })
+          return
+        }
+        
+        // 构建加密后的查询参数
+        const query = `account=${encodeURIComponent(encryptedAccount)}&password=${encodeURIComponent(encryptedPassword)}&timestamp=${originalData.timestamp}`
         
         // 使用 plus.share.getServices 打开微信小程序
         plus.share.getServices(
@@ -325,7 +346,7 @@ const handleBindWechat = () => {
               weixinService.launchMiniProgram({
                 id: "gh_1329871b16ba",  // 微信小程序原始 ID
                 path: `pages/index/index?${query}`, // 小程序页面路径，带参数
-                type: 0,          // 0-正式版；1-测试版；2-体验版
+                type: 1,          // 0-正式版；1-测试版；2-体验版
               })
             } else {
               console.log('未找到微信服务')

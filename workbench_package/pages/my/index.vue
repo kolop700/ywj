@@ -19,7 +19,15 @@
           <image src="/static/icons/icon_right.png" mode="aspectFit"></image>
         </view>
       </view>
-      
+        <!-- 绑定微信选项 -->
+        <view class="menu-item" @tap="handleBindWechat">
+        <view class="content">
+          <text>绑定微信视频通过授权</text>
+        </view>
+        <view class="right-icon">
+          <image src="/static/icons/icon_right.png" mode="aspectFit"></image>
+        </view>
+      </view>
       <view class="menu-item" @tap="handleUserAgreement">
         <view class="content">
           <text>用户协议</text>
@@ -47,16 +55,7 @@
         </view>
       </view>
 
-      <!-- 绑定微信选项 -->
-      <view class="menu-item" @tap="handleBindWechat">
-        <view class="content">
-          <text>绑定微信</text>
-        </view>
-        <view class="right-icon">
-          <image src="/static/icons/icon_right.png" mode="aspectFit"></image>
-        </view>
-      </view>
-      
+    
       <!-- 注销账号选项，仅在 iOS 平台显示 -->
       <view 
         class="menu-item" 
@@ -345,7 +344,7 @@ const handleBindWechat = () => {
               console.log('找到微信服务，准备打开小程序')
               weixinService.launchMiniProgram({
                 id: "gh_1329871b16ba",  // 微信小程序原始 ID
-                path: `pages/index/index?${query}`, // 小程序页面路径，带参数
+                path: `"pages/voipbind/voipbind?${query}`, // 小程序页面路径，带参数
                 type: 1,          // 0-正式版；1-测试版；2-体验版
               })
             } else {

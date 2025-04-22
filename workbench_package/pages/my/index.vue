@@ -19,8 +19,19 @@
           <image src="/static/icons/icon_right.png" mode="aspectFit"></image>
         </view>
       </view>
-        <!-- 绑定微信选项 -->
-        <view class="menu-item" @tap="handleBindWechat">
+
+      <!-- 添加权限详情选项 -->
+      <view class="menu-item" @tap="handleOpenAppSettings">
+        <view class="content">
+          <text>应用权限详情</text>
+        </view>
+        <view class="right-icon">
+          <image src="/static/icons/icon_right.png" mode="aspectFit"></image>
+        </view>
+      </view>
+
+      <!-- 绑定微信选项 -->
+      <view class="menu-item" @tap="handleBindWechat">
         <view class="content">
           <text>绑定微信视频通过授权</text>
         </view>
@@ -367,6 +378,49 @@ const handleBindWechat = () => {
         console.log('用户取消跳转')
       }
     }
+  })
+  // #endif
+}
+
+// 打开应用权限设置
+const handleOpenAppSettings = () => {
+  // #ifdef APP-PLUS
+  try {
+    // iOS权限检查
+    if (uni.getSystemInfoSync().platform === 'ios') {
+      const UIApplicationClass = plus.ios.importClass("UIApplication")
+      const NSURLClass = plus.ios.importClass("NSURL")
+      const settingsUrl = NSURLClass.URLWithString('app-settings:')
+      const application = UIApplicationClass.sharedApplication()
+      application.openURL(settingsUrl)
+    } else {
+      // Android权限检查
+      const main = plus.android.runtimeMainActivity()
+      const Intent = plus.android.importClass('android.content.Intent')
+      const Settings = plus.android.importClass('android.provider.Settings')
+      const Uri = plus.android.importClass('android.net.Uri')
+      
+      const intent = new Intent()
+      intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+      const uri = Uri.fromParts('package', main.getPackageName(), null)
+      intent.setData(uri)
+      
+      main.startActivity(intent)
+    }
+  } catch (e) {
+    console.error('打开设置失败:', e)
+    uni.showToast({
+      title: '打开设置失败',
+      icon: 'none'
+    })
+  }
+  // #endif
+  
+  // #ifdef MP-WEIXIN
+  uni.showModal({
+    title: '提示',
+    content: '小程序环境下无法直接打开权限设置',
+    showCancel: false
   })
   // #endif
 }

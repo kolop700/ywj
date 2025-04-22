@@ -345,7 +345,7 @@ const handleBindWechat = () => {
               weixinService.launchMiniProgram({
                 id: "gh_1329871b16ba",  // 微信小程序原始 ID
                 path: `"pages/voipbind/voipbind?${query}`, // 小程序页面路径，带参数
-                type: 1,          // 0-正式版；1-测试版；2-体验版
+                type: 0,          // 0-正式版；1-测试版；2-体验版
               })
             } else {
               console.log('未找到微信服务')

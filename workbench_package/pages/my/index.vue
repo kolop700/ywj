@@ -33,64 +33,15 @@
       <!-- 绑定微信选项 -->
       <view class="menu-item" @tap="handleBindWechat">
         <view class="content">
-          <text>绑定微信视频通过授权</text>
+          <text>绑定微信视频通话授权</text>
         </view>
         <view class="right-icon">
           <image src="/static/icons/icon_right.png" mode="aspectFit"></image>
         </view>
       </view>
-      <view class="menu-item" @tap="handleUserAgreement">
-        <view class="content">
-          <text>用户协议</text>
-        </view>
-        <view class="right-icon">
-          <image src="/static/icons/icon_right.png" mode="aspectFit"></image>
-        </view>
-      </view>
-
-      <view class="menu-item" @tap="handlePrivacyPolicy">
-        <view class="content">
-          <text>隐私政策</text>
-        </view>
-        <view class="right-icon">
-          <image src="/static/icons/icon_right.png" mode="aspectFit"></image>
-        </view>
-      </view>
-
-      <view class="menu-item" @tap="handleVersion">
-        <view class="content">
-          <text>程序版本</text>
-        </view>
-        <view class="right-text">
-          <text>v{{ appVersion }}</text>
-        </view>
-      </view>
-
-    
-      <!-- 注销账号选项，仅在 iOS 平台显示 -->
+            <!-- 管理员入口 -->
       <view 
-        class="menu-item" 
-        @tap="handleAccountDelete"
-      >
-        <view class="content">
-          <text class="delete-text">注销账号</text>
-        </view>
-        <view class="right-icon">
-          <image src="/static/icons/icon_right.png" mode="aspectFit"></image>
-        </view>
-      </view>
-      
-      <!-- <view class="menu-item" @tap="handleHelp">
-        <view class="content">
-          <text>使用帮助</text>
-        </view>
-        <view class="right-icon">
-          <image src="/static/icons/icon_right.png" mode="aspectFit"></image>
-        </view>
-      </view> -->
-      
-      <!-- <view 
-        v-if="userStore.userType === '2'" 
+        v-if="isAdmin" 
         class="menu-item"
         @tap="handleAdminLogin"
       >
@@ -100,7 +51,18 @@
         <view class="right-icon">
           <image src="/static/icons/icon_right.png" mode="aspectFit"></image>
         </view>
-      </view> -->
+      </view>
+
+
+      <!-- 关于我们选项 -->
+      <view class="menu-item" @tap="handleAbout">
+        <view class="content">
+          <text>关于我们</text>
+        </view>
+        <view class="right-icon">
+          <image src="/static/icons/icon_right.png" mode="aspectFit"></image>
+        </view>
+      </view>
     </view>
 
     <!-- 底部广告区域 -->
@@ -119,10 +81,10 @@
 </template>
 
 <script setup>
-import { ref, getCurrentInstance, onMounted } from 'vue'
+import { ref, getCurrentInstance, onMounted, onLoad } from 'vue'
 import { storeToRefs } from 'pinia'
-import { onLoad } from '@dcloudio/uni-app'
 import { encrypt, decrypt } from '@/utils/aesUtils'
+import userApi from '@/api/user/user'
 
 const { proxy } = getCurrentInstance()
 const userStore = proxy.$store.user.useUserStore()
@@ -131,9 +93,7 @@ const { userType } = storeToRefs(userStore)
 
 const isAdLoaded = ref(false) // 控制广告加载状态
 const bannerAdId = ref('') // 初始化为空字符串
-
-// 获取应用版本号
-const appVersion = ref('')
+const isAdmin = ref(false) // 是否是管理员
 
 // 平台判断
 const platform = ref('')
@@ -165,12 +125,41 @@ const initAd = () => {
   }, 100) // 延迟100ms加载广告
 }
 
+// 检查管理员权限
+const checkAdminStatus = async () => {
+  try {
+    // #ifdef MP-WEIXIN
+    // 获取用户信息
+    const userInfo = uni.getStorageSync('userInfo')
+    if (!userInfo) {
+      console.log('未获取到用户信息')
+      isAdmin.value = false
+      return
+    }
+    
+    const res = await userApi.getUserStatus(userInfo.user_id)
+    isAdmin.value = res.data && res.data.length > 0
+    console.log('管理员权限检查结果:', isAdmin.value)
+    // #endif
+    
+    // #ifdef APP-PLUS
+    const res = await userApi.getUserStatus(userStore.userId)
+    isAdmin.value = res.data && res.data.length > 0
+    console.log('管理员权限检查结果:', isAdmin.value)
+    // #endif
+  } catch (error) {
+    console.error('检查管理员权限失败:', error)
+    isAdmin.value = false
+  }
+}
+
 onMounted(() => {
   initAd()
   initVersion() // 初始化版本号
   // 获取平台信息
   const systemInfo = uni.getSystemInfoSync()
   platform.value = systemInfo.platform.toLowerCase()
+  checkAdminStatus()
 })
 
 // 广告相关的事件处理函数
@@ -229,73 +218,41 @@ const handleHelp = () => {
 
 // 管理员登录
 const handleAdminLogin = () => {
+  // #ifdef MP-WEIXIN
   uni.navigateTo({
     url: '/manageModule/pages/adminLogin/adminLogin'
   })
-}
-
-// 账号注销
-const handleAccountDelete = () => {
-  uni.showModal({
-    title: '注销账号',
-    content: '注销后，您的所有数据（包括人脸数据）将在30天内删除，且无法恢复。确定要注销吗？',
-    confirmText: '确认注销',
-    confirmColor: '#FF0000',
-    cancelText: '再想想',
-    success: async (res) => {
-      if (res.confirm) {
-        try {
-          // // 这里调用注销账号的API
-          await userStore.deleteAccount()
-          uni.showToast({
-            title: '账号注销成功',
-            icon: 'success'
-          })
-          // 跳转到主页，然后跳转到登录页
-          setTimeout(() => {
-            uni.reLaunch({
-              url: '/pages/index/index',
-              success: () => {
-                setTimeout(() => {
-                  uni.redirectTo({
-                    url: '/user_package/pages/login/index'
-                  })
-                }, 100)
-              }
-            })
-          }, 1500)
-        } catch (error) {
-          uni.showToast({
-            title: '注销失败，请稍后重试',
-            icon: 'none'
-          })
-        }
+  // #endif
+  
+  // #ifdef APP-PLUS
+  plus.share.getServices(
+    (services) => {
+      console.log('获取到的服务列表：', services)
+      const weixinService = services.find(item => item.id === "weixin")
+      if (weixinService) {
+        console.log('找到微信服务，准备打开小程序')
+        weixinService.launchMiniProgram({
+          id: "gh_1329871b16ba",  // 微信小程序原始 ID
+          path: `manageModule/pages/adminLogin/adminLogin?fromApp=1`, // 小程序页面路径，添加fromApp标识
+          type: 0,          // 0-正式版；1-测试版；2-体验版
+        })
+      } else {
+        console.log('未找到微信服务')
+        uni.showToast({
+          title: '请安装微信',
+          icon: 'none'
+        })
       }
+    },
+    (error) => {
+      console.error('获取服务失败:', error)
+      uni.showToast({
+        title: '获取微信服务失败',
+        icon: 'none'
+      })
     }
-  })
-}
-
-// 处理用户协议点击
-const handleUserAgreement = () => {
-  uni.navigateTo({
-    url: '/user_package/pages/agreement/user'
-  })
-}
-
-// 处理隐私政策点击
-const handlePrivacyPolicy = () => {
-  uni.navigateTo({
-    url: '/user_package/pages/agreement/privacy'
-  })
-}
-
-// 处理版本信息点击
-const handleVersion = () => {
-  // 版本号点击时可以不做任何操作，或者显示更多版本信息
-  uni.showToast({
-    title: `当前版本：${appVersion.value}`,
-    icon: 'none'
-  })
+  )
+  // #endif
 }
 
 // 处理绑定微信
@@ -423,6 +380,22 @@ const handleOpenAppSettings = () => {
     showCancel: false
   })
   // #endif
+}
+
+// 在 script 部分添加 handleAbout 函数
+const handleAbout = () => {
+  uni.navigateTo({
+    url: '/workbench_package/pages/about/index'
+  })
+}
+
+const appVersion = ref('')
+
+const handleVersion = () => {
+  uni.showToast({
+    title: `当前版本：${appVersion.value}`,
+    icon: 'none'
+  })
 }
 </script>
 

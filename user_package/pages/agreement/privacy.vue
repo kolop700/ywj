@@ -73,7 +73,7 @@
       <view class="section">
         <view class="section-title">账号注销流程</view>
         <view class="section-content">
-          <view>1. 注销入口：您可以在"我的"页面中找到"注销账号"选项。</view>
+          <view>1. 注销入口：您可以在"我的"的“关于我们”找到"注销账号"选项。</view>
           <view>2. 注销流程：</view>
           <view>• 点击"注销账号"后，系统会要求您进行身份验证；</view>
           <view>• 验证通过后，您需要阅读并确认注销须知；</view>

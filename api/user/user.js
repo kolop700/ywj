@@ -158,5 +158,17 @@ export default {
      ...defaultOptions,
      ...options
    })
+  },
+  // 获取是否是管理员用户
+  getUserStatus(user_id, options = {}) {
+    return request({
+      url: BASE_API + 'openSQL/',
+      method: 'post',
+      data: {
+        sql: `SELECT * FROM t_room_user WHERE user_id =  ''${user_id}'' AND user_type = 2`
+      },
+      ...defaultOptions,
+      ...options
+    })
   }
 } 

@@ -45,6 +45,12 @@
 					"background": "transparent" // 设置背景透明
 				}
 			}
+		},
+		{
+			"path": "workbench_package/pages/about/index",
+			"style": {
+				"navigationBarTitleText": "关于我们"
+			}
 		}
 	],
 	"subPackages": [

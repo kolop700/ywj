@@ -88,11 +88,11 @@ export default {
   // 获取用户房间列表
   getUserRoomList(user_id, options = {}) {
     return request({
-      url: BASE_API + 'getUserRoomList/',
+      url: BASE_API + 'openSQL/',
       method: 'post',
-      data: {
-        user_id
-      },
+     data: {
+       sql: `SELECT * FROM v_room_ad_user WHERE user_id =  ''${user_id}''`
+       },
       ...defaultOptions,
       ...options
     })

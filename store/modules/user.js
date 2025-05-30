@@ -9,6 +9,7 @@ export const useUserStore = defineStore('user', () => {
   const userInfo = ref({})
   const user_id = ref('')
   const maxExpireDate = ref('') // 最大过期日期
+  const adType = ref('') // 新增广告类型
   
   // 基础图片URL
   const BASE_IMG_URL = 'https://xy.yefiot.com/yefiot/v1/'
@@ -111,6 +112,30 @@ export const useUserStore = defineStore('user', () => {
           return room.expire_date > max ? room.expire_date : max
         }, res.data[0].expire_date)
         maxExpireDate.value = maxDate
+
+        // 定义广告类型优先级
+        const adPriority = {
+          '11': 4, // banner + 激励 最高优先级
+          '13': 3, // banner + 插屏
+          '1': 2,  // 只显示 banner
+          '0': 1   // 不显示任何广告 最低优先级
+        }
+        
+        // 从所有房间中找出优先级最高的广告类型
+        const selectedAd = res.data.reduce((highest, room) => {
+          const currentAdType = room.ad_prod_app
+          const currentPriority = adPriority[currentAdType] || 0
+          const highestPriority = adPriority[highest] || 0
+          return currentPriority > highestPriority ? currentAdType : highest
+        }, '0') // 默认值为'0'
+
+        console.log('选择的广告类型:', selectedAd)
+        // 存储选择的广告类型
+        adType.value = selectedAd
+        
+        // 获取广告控制 store 并设置广告类型
+        const adControlStore = useAdControlStore()
+        adControlStore.setAdType(selectedAd)
       }
       console.log("更新房间列表", res)
       return Promise.resolve(res)
@@ -132,12 +157,6 @@ export const useUserStore = defineStore('user', () => {
     userInfo.value = data
     user_id.value = data.user_id
     console.log("广告类型", userInfo.value.ad_type_app)
-
-    // 获取广告控制 store
-    const adControlStore = useAdControlStore()
-    // 设置广告类型
-    adControlStore.setAdType(userInfo.value.ad_type_app)
-
     // 清空设备列表
     const deviceStore = useDeviceStore()
     deviceStore.clearDeviceList()
@@ -232,7 +251,8 @@ export const useUserStore = defineStore('user', () => {
     userCardA,
     userCardB,
     setUserAccount,  // 导出设置账号方法
-    setUserPassword  // 导出设置密码方法
+    setUserPassword,  // 导出设置密码方法
+    adType
   }
 }) 
 

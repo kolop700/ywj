@@ -45,12 +45,6 @@
 					"background": "transparent" // 设置背景透明
 				}
 			}
-		},
-		{
-			"path": "workbench_package/pages/about/index",
-			"style": {
-				"navigationBarTitleText": "关于我们"
-			}
 		}
 	],
 	"subPackages": [
@@ -73,6 +67,12 @@
 					"path": "pages/register/index",
 					"style": {
 						"navigationBarTitleText": "用户注册"
+					}
+				},
+				{
+					"path": "pages/vip/index",
+					"style": {
+						"navigationBarTitleText": "会员中心"
 					}
 				},
 				{
@@ -108,7 +108,7 @@
 					"path": "pages/qrcode/index",
 					"style": {
 						"navigationBarTitleText": "二维码界面",
-						"statusBarBackgroundColor": "#FCDEDE"
+						"statusBarBackgroundColor": "#E9E4FF"
 					}
 				},
 				{
@@ -131,15 +131,21 @@
 							"bounce": "none"
 						}
 					}
+				},
+				{
+					"path": "pages/about/index",
+					"style": {
+						"navigationBarTitleText": "关于我们"
+					}
 				}				
 			]
 		}
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "云小卫",
-		"navigationBarBackgroundColor": "#F8F8F8",
-		"backgroundColor": "#F8F8F8",
+		"navigationBarTitleText": "云卫家",
+		"navigationBarBackgroundColor": "#F5F6FC",
+		"backgroundColor": "#F5F6FC",
 		"app-plus": {
             "bounce": "none" 
         }

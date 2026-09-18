@@ -1,4 +1,5 @@
 import { useUserStore } from '@/store/modules/user'
+import { httpRequest } from '@/utils/nativeHttp'
 
 // 使用与 request.js 相同的基础URL配置
 const BASE_URL = process.env.NODE_ENV === 'development' && process.env.UNI_PLATFORM === 'h5' 
@@ -155,22 +156,32 @@ export default {
       })
 
       // 使用原生请求
+      const reqSn = 'APP' + Date.now().toString()
+      console.log('[开门] 走到 mqttpost 请求处，发送参数:', JSON.stringify({
+        url: `${BASE_URL}/yefiot/v1/mqttpost/`,
+        type,
+        mac: door.door_mac,
+        cmd: '0',
+        sn: reqSn,
+        info: doorpkg + '","opencode":"369',
+      }))
       return new Promise((resolve, reject) => {
-        uni.request({
+        httpRequest({
           url: `${BASE_URL}/yefiot/v1/mqttpost/`,
           method: 'POST',
           data: {
             type,
             mac: door.door_mac,
             cmd: "0",
-            sn: "APP"+Date.now().toString(),
-            info: doorpkg
+            sn: reqSn,
+            info: doorpkg + '","opencode":"369',
           },
           success: (res) => {
             if (res.statusCode === 200 && res.data) {
+              console.log('[开门] 响应原文:', JSON.stringify(res.data))
               if (res.data.mac === door.door_mac) {
-                const { msg_info } = res.data.data[0]
-                console.log('开门响应:', msg_info)
+                const { msg_info, opencode } = res.data.data[0]
+                console.log('开门响应:', msg_info, 'opencode:', opencode)
 
                 switch (msg_info) {
                   case 'HD3BB68W':
@@ -207,7 +218,7 @@ export default {
                       icon: 'none',
                       duration: 3000
                     })
-                    resolve(true)
+                    resolve({ success: true, opencode })
                 }
               } else {
                 uni.showToast({
@@ -241,5 +252,26 @@ export default {
       console.error('开门失败:', error)
       return false
     }
+  },
+
+  // 生成脱机临时密码（30分钟一个时间片，算法需与设备固件一致）
+  // 参数: device 设备对象（需含 factory_code 出厂码、door_mac）
+  //       date 时间对象，默认当前时间
+  genOfflinePsw(device, date = new Date()) {
+    if (!device || !device.factory_code || !device.door_mac) {
+      console.error('生成脱机密码失败：缺少 factory_code 或 door_mac', device)
+      return ''
+    }
+    const ds = date.getFullYear() * (date.getMonth() + 1) * date.getDate()
+    const ms = date.getHours() * 60 + date.getMinutes()
+    const sl = ds * (Math.floor(ms / 30) + 1)
+
+    let hash = 0
+    const str = device.factory_code + device.door_mac
+    for (let i = 0; i < str.length; i++) {
+      hash = ((hash * 31 + str.charCodeAt(i)) & 0xFFFFFFFF) >>> 0
+    }
+    hash = (hash ^ sl) >>> 0
+    return hash.toString().slice(-6).padStart(6, '0')
   }
 } 

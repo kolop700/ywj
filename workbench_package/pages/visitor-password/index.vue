@@ -268,43 +268,33 @@ onReady(() => {
 </script>
 
 <style scoped>
-.nav-custom {
-  padding: 20rpx;
-  background-color: #fff;
-}
-
-.content {
-  text-align: center;
-  font-size: 32rpx;
-  font-weight: 500;
-}
-
-.divider {
-  height: 1rpx;
-  background-color: #eee;
-}
-
-.divider_40rpx {
-  height: 40rpx;
-  background: #EEEEEE;
+.container {
+  min-height: 100vh;
+  padding-bottom: 40rpx;
+  box-sizing: border-box;
 }
 
 .title {
-  background-color: white;
-  padding-left: 24rpx;
-  padding-top: 30rpx;
+  background-color: transparent;
+  padding-left: 30rpx;
+  padding-top: 34rpx;
+  padding-bottom: 18rpx;
   font-family: PingFang SC, PingFang SC;
   font-weight: 800;
   font-size: 34rpx;
-  color: #303030;
+  color: #1f2435;
   line-height: 34rpx;
   text-align: left;
 }
 
 .scroll-container {
   max-height: 380rpx;
-  background-color: white;
-  padding: 20rpx 40rpx;
+  margin: 0 24rpx;
+  background-color: #ffffff;
+  border-radius: 24rpx;
+  padding: 20rpx 24rpx;
+  box-shadow: 0 6rpx 24rpx rgba(74, 108, 247, 0.07);
+  box-sizing: border-box;
 }
 
 .flex {
@@ -321,48 +311,62 @@ onReady(() => {
   padding: 0 30rpx;
   height: 84rpx;
   width: 100%;
-  margin-top: 17rpx;
+  margin-top: 20rpx;
   font-family: PingFang SC, PingFang SC;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 28rpx;
-  line-height: 28rpx;
+  line-height: 84rpx;
+  border-radius: 42rpx;
+  box-sizing: border-box;
 }
 
+/* 设备选中态：蓝紫渐变 */
 .bg-red {
-  background-color: #ff4d4f;
+  background-image: var(--brand-grad);
+  background-color: #4a6cf7;
   color: white;
+  border: none;
+  box-shadow: 0 10rpx 24rpx rgba(74, 108, 247, 0.25);
 }
 
+/* 刷新按钮：品牌描边 */
 .line-red {
-  border: 1px solid #ff4d4f;
-  color: #ff4d4f;
-  background-color: white;
+  border: 1px solid #ccd4fb;
+  color: var(--brand);
+  background-color: #ffffff;
 }
 
+/* 设备未选态：浅紫描边 */
 .textsecondary {
-  color: #ff4d4f;
-  background-color: #EFEFEF;
-  border: 1px solid #eee;
+  color: var(--brand);
+  background-color: #ffffff;
+  border: 1px solid #e3e8fd;
 }
 
 .divider-botton {
-  background-color: white;
+  background-color: transparent;
   width: 100%;
-  height: 60rpx;
+  height: 24rpx;
+}
+
+.divider_40rpx {
+  height: 24rpx;
+  background: transparent;
 }
 
 .info-section {
-  background-color: white;
-  border-radius: 10rpx;
-  margin-top: 40rpx;
-  padding: 0 40rpx;
+  background-color: #ffffff;
+  border-radius: 24rpx;
+  margin: 0 24rpx;
+  padding: 0 28rpx;
+  box-shadow: 0 6rpx 24rpx rgba(74, 108, 247, 0.07);
 }
 
 .info-item {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  height: 80rpx;
+  height: 92rpx;
   font-family: PingFang SC, PingFang SC;
   font-weight: 500;
   font-size: 30rpx;
@@ -377,20 +381,28 @@ onReady(() => {
 }
 
 .label {
-  color: #888;
+  color: #9aa1bd;
 }
 
 .endlabel {
   margin-left: 20rpx;
-  color: #888;
+  color: #b4bacd;
 }
 
 .value {
   margin-left: 50rpx;
+  color: #1f2435;
+  font-weight: 600;
+}
+
+.divider {
+  height: 1rpx;
+  background-color: #f0f1f8;
 }
 
 .button-view {
-  background-color: white;
-  margin: 40rpx;
+  background-color: transparent;
+  margin: 44rpx 24rpx 0;
+  padding-bottom: 30rpx;
 }
 </style>

@@ -1,0 +1,34 @@
+[
+    {
+        "merged": "com.yefiot.cloudguard.app-merged_res-55:/mipmap-mdpi_ic_launcher.png.flat",
+        "source": "com.yefiot.cloudguard.app-main-56:/mipmap-mdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.yefiot.cloudguard.app-merged_res-55:/xml_file_paths.xml.flat",
+        "source": "com.yefiot.cloudguard.app-main-56:/xml/file_paths.xml"
+    },
+    {
+        "merged": "com.yefiot.cloudguard.app-merged_res-55:/drawable_ic_launcher.xml.flat",
+        "source": "com.yefiot.cloudguard.app-main-56:/drawable/ic_launcher.xml"
+    },
+    {
+        "merged": "com.yefiot.cloudguard.app-merged_res-55:/mipmap-hdpi_ic_launcher.png.flat",
+        "source": "com.yefiot.cloudguard.app-main-56:/mipmap-hdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.yefiot.cloudguard.app-merged_res-55:/mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "com.yefiot.cloudguard.app-main-56:/mipmap-xhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.yefiot.cloudguard.app-merged_res-55:/mipmap-xxhdpi_ic_launcher.png.flat",
+        "source": "com.yefiot.cloudguard.app-main-56:/mipmap-xxhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.yefiot.cloudguard.app-merged_res-55:/mipmap-xxxhdpi_ic_launcher.png.flat",
+        "source": "com.yefiot.cloudguard.app-main-56:/mipmap-xxxhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.yefiot.cloudguard.app-merged_res-55:/xml_network_security_config.xml.flat",
+        "source": "com.yefiot.cloudguard.app-main-56:/xml/network_security_config.xml"
+    }
+]

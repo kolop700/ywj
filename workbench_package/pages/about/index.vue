@@ -1,8 +1,11 @@
 <template>
   <view class="page-container">
     <!-- 菜单列表 -->
-    <view class="cu-list menu">
+    <view class="menu-group">
       <view class="menu-item" @tap="handleUserAgreement">
+        <view class="menu-icon icon-blue">
+          <up-icon name="file-text" size="22" color="#4A6CF7"></up-icon>
+        </view>
         <view class="content">
           <text>用户协议</text>
         </view>
@@ -12,6 +15,9 @@
       </view>
 
       <view class="menu-item" @tap="handlePrivacyPolicy">
+        <view class="menu-icon icon-purple">
+          <up-icon name="lock" size="22" color="#8B5CF6"></up-icon>
+        </view>
         <view class="content">
           <text>隐私政策</text>
         </view>
@@ -21,6 +27,9 @@
       </view>
 
       <view class="menu-item" @tap="handleVersion">
+        <view class="menu-icon icon-cyan">
+          <up-icon name="info-circle" size="22" color="#3D7EFF"></up-icon>
+        </view>
         <view class="content">
           <text>程序版本</text>
         </view>
@@ -34,6 +43,9 @@
         class="menu-item" 
         @tap="handleAccountDelete"
       >
+        <view class="menu-icon icon-red">
+          <up-icon name="trash" size="22" color="#FF4D6A"></up-icon>
+        </view>
         <view class="content">
           <text class="delete-text">注销账号</text>
         </view>
@@ -142,74 +154,98 @@ onMounted(() => {
 
 <style lang="scss">
 page {
-  background: #F5F5F5;
-  height: 100vh;
+  background: #F5F6FC;
+  min-height: 100vh;
 }
 
 .page-container {
-  padding: 20rpx;
+  padding: 24rpx;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
 }
 
-.cu-list.menu {
+/* 菜单分组白卡 */
+.menu-group {
   background: #FFFFFF;
-  border-radius: 12rpx;
+  border-radius: 24rpx;
   overflow: hidden;
-  margin-bottom: auto;
-  
+  box-shadow: 0 6rpx 24rpx rgba(74, 108, 247, 0.06);
+
   .menu-item {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 32rpx 24rpx;
+    padding: 30rpx 28rpx;
     position: relative;
-    
+    transition: background 0.2s;
+
+    &:active {
+      background: #F5F7FE;
+    }
+
     // 分割线
     &:not(:last-child)::after {
       content: '';
       position: absolute;
-      left: 24rpx;
+      left: 108rpx;
       right: 24rpx;
       bottom: 0;
       height: 1px;
-      background-color: #EEEEEE;
+      background-color: #F0F1F8;
       transform: scaleY(0.5);
     }
-    
-    .content {
-      flex: 1;
-      text {
-        font-size: 28rpx;
-        color: #333333;
-        font-weight: 400;
-      }
-    }
-    
-    .right-icon {
-      width: 32rpx;
-      height: 32rpx;
+
+    .menu-icon {
+      width: 68rpx;
+      height: 68rpx;
+      border-radius: 22rpx;
       display: flex;
       align-items: center;
       justify-content: center;
-      
+      flex: none;
+      margin-right: 24rpx;
+
+      &.icon-blue { background: #E5EBFF; }
+      &.icon-purple { background: #EFE9FF; }
+      &.icon-cyan { background: #DEEFFF; }
+      &.icon-red { background: #FEE9EC; }
+    }
+
+    .content {
+      flex: 1;
+      min-width: 0;
+
+      text {
+        font-size: 29rpx;
+        color: #232838;
+        font-weight: 500;
+      }
+    }
+
+    .right-icon {
+      width: 32rpx;
+      height: 32rpx;
+      flex: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
       image {
         width: 100%;
         height: 100%;
       }
     }
+
+    .right-text {
+      font-size: 28rpx;
+      color: #9AA0B5;
+      margin-right: 10rpx;
+    }
   }
 }
 
-.right-text {
-  font-size: 28rpx;
-  color: #999;
-  margin-right: 10rpx;
-}
-
 .delete-text {
-  color: #FF0000 !important;
+  color: #FF4D6A !important;
 }
-</style> 
+</style>

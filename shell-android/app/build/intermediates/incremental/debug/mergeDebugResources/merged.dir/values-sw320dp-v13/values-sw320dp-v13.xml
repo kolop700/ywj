@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="lmb_confirm_dialog_text_size_large">14sp</dimen>
+    <dimen name="lmb_confirm_dialog_text_size_normal">12sp</dimen>
+    <dimen name="lmb_myoffer_half_screen_icon_size">50dp</dimen>
+    <dimen name="sdm_confirm_dialog_text_size_large">14sp</dimen>
+    <dimen name="sdm_confirm_dialog_text_size_normal">12sp</dimen>
+    <dimen name="sdm_myoffer_half_screen_icon_size">50dp</dimen>
+</resources>

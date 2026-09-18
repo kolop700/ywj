@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- 默认禁止明文；如后端调试需临时放开，可按域名配置 -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+
+    <!-- 业务后端（如需在调试环境使用 http 可在此放开，生产保持 https） -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">xy.yefiot.com</domain>
+        <domain includeSubdomains="true">yefiot.com</domain>
+    </domain-config>
+</network-security-config>

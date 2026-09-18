@@ -40,7 +40,7 @@
           <!-- 提交按钮 -->
           <view class="button-container">
             <button 
-              class="cu-btn bg-red login-button"
+              class="cu-btn login-button"
               :class="{'secondary': !isFormValid}"
               @click="submitForm"
               type="submit"
@@ -85,53 +85,45 @@
         </view>
       </view>
 
-      <!-- 广告区域 -->
-      <view class="ad-section">
-        <!-- <view class="ad-container"> -->
-      <!--    <image class="ad-image" src="/static/images/ad-placeholder.png" mode="aspectFill"></image>
-          <view class="ad-text"></view> -->
-        <!-- </view> -->
-      </view>
-    
-      <!-- 弹框部分 -->
-      <uni-popup ref="buildingPopup" type="center">
-        <view class="modal-content">
+      <!-- 弹框部分（自管理遮罩，不依赖 uni-popup，确保选择后必能关闭） -->
+      <view class="popup-mask" v-if="buildingPopupVisible" @tap="hideDialog">
+        <view class="modal-content" @tap.stop>
           <view class="modal-header">
             <text class="header-text">选择楼宇地址</text>
-            <text class="close-icon" @click="hideDialog">×</text>
+            <text class="close-icon" @tap="hideDialog">×</text>
           </view>
           <scroll-view class="modal-body" scroll-y>
             <view 
               v-for="(item, index) in searchResults" 
               :key="item.unit_id"
               class="device-option"
-              @click="selectDialogBuilding(item)"
+              @tap="selectDialogBuilding(item)"
             >
               {{item.unitname}}
             </view>
           </scroll-view>
         </view>
-      </uni-popup>
+      </view>
     
-      <uni-popup ref="roomPopup" type="center" :animation="true" :maskClick="true">
-        <view class="modal-content">
+      <view class="popup-mask" v-if="roomPopupVisible" @tap="hideRoomDialog">
+        <view class="modal-content" @tap.stop>
           <view class="modal-header">
             <text class="header-text">选择房号</text>
-            <text class="close-icon" @click="hideRoomDialog">×</text>
+            <text class="close-icon" @tap="hideRoomDialog">×</text>
           </view>
           <scroll-view class="modal-body" scroll-y>
             <view 
               v-for="(item, index) in roomList" 
               :key="item.id"
               class="device-option"
-              @click="selectDialogRoom(index)"
+              @tap="selectDialogRoom(index)"
               :class="{'selected': item.selected}"
             >
               {{item.floor_name}}{{item.room_name}}
             </view>
           </scroll-view>
         </view>
-      </uni-popup>
+      </view>
     </view>
 </template>
 <script setup>
@@ -235,9 +227,9 @@ const isFormValid = computed(() => {
   return formData.value.building && formData.value.room
 })
 
-// 弹窗引用
-const buildingPopup = ref(null)
-const roomPopup = ref(null)
+// 弹窗显隐（自管理遮罩，不依赖 uni-popup 的实例方法）
+const buildingPopupVisible = ref(false)
+const roomPopupVisible = ref(false)
 
 // 输入变化处理
 const inputChange = (e) => {
@@ -266,7 +258,7 @@ const scanQRCode = async () => {
         if (unitInfo.type === '1') {
           // 大门机，显示楼宇选择弹框
           searchResults.value = res.data
-          buildingPopup.value.open()
+          buildingPopupVisible.value = true
         } else if (unitInfo.type === '2') {
           // 单元机，直接选中单元
           selectedUnit.value = unitInfo
@@ -328,7 +320,7 @@ const showBuildingSearch = async () => {
     
     if (Array.isArray(res.data) && res.data.length > 0) {
       searchResults.value = res.data
-      buildingPopup.value.open()
+      buildingPopupVisible.value = true
     } else {
       uni.showToast({
         title: '未找到相关楼宇',
@@ -346,7 +338,7 @@ const showBuildingSearch = async () => {
 
 // 隐藏楼宇搜索
 const hideDialog = () => {
-  buildingPopup.value.close()
+  buildingPopupVisible.value = false
 }
 
 // 选择房间
@@ -358,12 +350,12 @@ const selectRoom = () => {
     })
     return
   }
-  roomPopup.value.open()
+  roomPopupVisible.value = true
 }
 
 // 隐藏房间选择
 const hideRoomDialog = () => {
-  roomPopup.value.close()
+  roomPopupVisible.value = false
 }
 
 // 选择楼宇
@@ -402,9 +394,7 @@ const loadRoomList = async () => {
         selected: false
       }))
       
-      setTimeout(() => {
-        roomPopup.value.open()
-      }, 100)
+      roomPopupVisible.value = true
     } else {
       uni.showToast({
         title: '获取房间列表失败',
@@ -485,7 +475,7 @@ const submitForm = async () => {
 /* #ifdef MP-WEIXIN */
 page {
   height: 100vh;
-  background-color: #F5F5F5;
+  background-color: #f5f6fc;
 }
 /* #endif */
 
@@ -495,7 +485,7 @@ page {
   height: v-bind(windowHeight);
   display: flex;
   flex-direction: column;
-  background: #F5F5F5;
+  background: #f5f6fc;
   box-sizing: border-box;
   padding-bottom: env(safe-area-inset-bottom);
 }
@@ -506,9 +496,8 @@ page {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #F5F5F5;
+  background: #f5f6fc;
   position: relative;
-  padding-bottom: 150rpx; /* 为广告区域预留空间 */
 }
 /* #endif */
 
@@ -541,20 +530,6 @@ page {
 }
 /* #endif */
 
-.ad-section {
-  /* #ifdef MP-WEIXIN || APP-PLUS */
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  /* #endif */
-  background: #FFFFFF;
-  padding: 15rpx 20rpx;
-  height: 150rpx;
-  box-sizing: border-box;
-  width: 100%;
-  z-index: 99;
-}
 
 .card {
   height: 100%;
@@ -571,31 +546,6 @@ page {
   padding: 0 15rpx;
 }
 
-.ad-container {
-  width: 100%;
-  height: 100%;
-  background: #F8F8F8;
-  border-radius: 12rpx;
-  overflow: hidden;
-  position: relative;
-  /* #ifdef MP-WEIXIN */
-  margin-bottom: 0;
-  /* #endif */
-}
-
-.ad-image {
-  width: 100%;
-  height: 100%;
-}
-
-.ad-text {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  color: #999;
-  font-size: 28rpx;
-}
 
 .input-container {
   margin-top: 15rpx;
@@ -689,7 +639,7 @@ padding: 20rpx;
   text-align: center;
   font-size: 28rpx;
   color: #333;
-  background: #F5F5F5;
+  background: #f5f6fc;
   margin-bottom: 20rpx;
   border-radius: 8rpx;
 }
@@ -699,12 +649,18 @@ padding: 20rpx;
   color: #fff;
 }
 
-/* 修改弹出层背景 */
-:deep(.uni-popup) {
-  /* #ifdef MP-WEIXIN || APP-PLUS */
+/* 自管理遮罩层（替代 uni-popup） */
+.popup-mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
   z-index: 999;
-  /* #endif */
-  background-color: rgba(0, 0, 0, 0.5) !important;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* 图标组样式 */
@@ -820,7 +776,7 @@ padding: 20rpx;
   }
   
   .login-button.secondary {
-	background-color: #FCA5A7;
+	background-color: #B9C4FA;
   }
 
   .divider {
@@ -830,4 +786,123 @@ padding: 20rpx;
   }
 
 
+
+/* ==================
+        云卫家品牌改版覆盖
+ ==================== */
+
+.page-gap {
+  display: none;
+}
+
+/* 页头渐变标题区 */
+.apply-header {
+  background-image: var(--brand-grad-deep);
+}
+
+/* 表单区悬浮白卡 */
+.form-section {
+  margin: 24rpx 24rpx 0;
+  padding: 30rpx 10rpx 6rpx;
+  border-radius: 24rpx;
+  box-shadow: 0 6rpx 24rpx rgba(74, 108, 247, 0.07);
+  width: auto;
+  box-sizing: border-box;
+}
+
+/* 输入行圆角胶囊 */
+.custom-input {
+  border: none;
+  border-radius: 50rpx;
+  background: #f3f5fc;
+  padding-left: 36rpx;
+  margin-bottom: 24rpx;
+}
+
+/* 扫一扫 / 搜索 小按钮品牌化 */
+.scan-btn {
+  background-color: var(--brand-soft);
+  color: var(--brand);
+  border-radius: 30rpx;
+}
+
+.search-btn {
+  background-color: #ffffff;
+  color: var(--brand);
+  border: 1rpx solid var(--brand);
+  border-radius: 30rpx;
+}
+
+/* 提交按钮渐变 */
+.login-button {
+  background-image: var(--brand-grad);
+  background-color: #4a6cf7;
+  color: #ffffff;
+  border-radius: 50rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12rpx 28rpx rgba(74, 108, 247, 0.28);
+}
+
+.login-button.secondary {
+  background-image: none;
+  background-color: #b9c4fa;
+  color: #ffffff;
+  box-shadow: none;
+}
+
+/* 分割线淡化为间距 */
+.divider_10 {
+  height: 24rpx;
+  background: transparent;
+}
+
+.divider {
+  background: #eff1f9;
+}
+
+/* 列表区悬浮白卡 */
+.list-section {
+  background: transparent;
+  padding: 24rpx 24rpx 0;
+  box-sizing: border-box;
+}
+
+.card {
+  border-radius: 24rpx;
+  box-shadow: 0 6rpx 24rpx rgba(74, 108, 247, 0.07);
+  overflow: hidden;
+}
+
+.house-item {
+  padding: 10rpx 6rpx;
+}
+
+/* 状态徽章：权限正常-品牌蓝，异常保留红 */
+.status-normal {
+  color: var(--brand);
+  background: rgba(74, 108, 247, 0.1);
+  border-radius: 8rpx;
+}
+
+.status-error {
+  border-radius: 8rpx;
+}
+
+/* 弹框选项选中态品牌化 */
+.device-option {
+  background: #f3f5fc;
+  border-radius: 16rpx;
+}
+
+.device-option.selected {
+  background-color: var(--brand);
+  background-image: var(--brand-grad);
+  color: #fff;
+}
+
+.modal-header {
+  border-bottom-color: #eff1f9;
+}
 </style> 

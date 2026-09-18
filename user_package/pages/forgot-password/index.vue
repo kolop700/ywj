@@ -1,5 +1,11 @@
 <template>
-  <view class="container">
+  <view class="container" :class="{ 'has-ad': bannerAdId }">
+    <!-- 页头说明 -->
+    <view class="auth-head">
+      <text class="auth-title">重置密码</text>
+      <text class="auth-sub">通过手机验证码找回登录密码</text>
+    </view>
+
     <view class="form-container">
       <!-- 手机号 -->
       <view class="form-item">
@@ -9,7 +15,7 @@
           type="number"
           v-model="form.phone"
           placeholder="手机号码"
-          placeholder-style="color: #999999;"
+          placeholder-style="color: #9aa1bd;"
         />
       </view>
 
@@ -21,7 +27,7 @@
             class="input"
             v-model="form.code"
             placeholder="请输入验证码"
-            placeholder-style="color: #999999;"
+            placeholder-style="color: #9aa1bd;"
           />
           <button 
             class="code-btn" 
@@ -38,8 +44,8 @@
           class="input"
           type="password"
           v-model="form.newPassword"
-          placeholder="请输入密码"
-          placeholder-style="color: #999999;"
+          placeholder="请输入新密码"
+          placeholder-style="color: #9aa1bd;"
         />
       </view>
 
@@ -50,8 +56,8 @@
           class="input"
           type="password"
           v-model="form.confirmPassword"
-          placeholder="请再次输入密码"
-          placeholder-style="color: #999999;"
+          placeholder="请再次输入新密码"
+          placeholder-style="color: #9aa1bd;"
         />
       </view>
     </view>
@@ -59,25 +65,19 @@
     <!-- 提交按钮 -->
     <view class="btn-container">
       <button 
-        :class="['login-btn', {'btn-disabled': !isFormValid}]" 
+        :class="['wg-btn-primary', {'btn-disabled': !isFormValid}]" 
         @click="handleReset"
       >确定</button>
-      <button class="register-btn" @click="goToLogin">返回登录</button>
+      <button class="wg-btn-outline" @click="goToLogin">返回登录</button>
     </view>
 
-    <!-- 底部广告区域 -->
-    <!-- <view class="ad-section">
-      <view class="divider"></view>
+    <!-- 底部横幅广告（Taku）：常驻页面底部（fixed，不随滚动移动） -->
+    <view class="ad-section" v-if="bannerAdId">
+      <view class="ad-divider"></view>
       <view class="ad-view">
-        <ad 
-          v-if="bannerAdId"
-          :adpid="bannerAdId" 
-          @load="onAdLoad" 
-          @close="onAdClose" 
-          @error="onAdError">
-        </ad>
-      </view> 
-    </view> -->
+        <taku-banner :placement-id="bannerAdId"></taku-banner>
+      </view>
+    </view>
   </view>
 </template>
 
@@ -86,6 +86,9 @@ import { ref, computed, getCurrentInstance } from 'vue'
 import { onLoad } from "@dcloudio/uni-app"
 const { proxy } = getCurrentInstance()
 const adStore = proxy.$store.ad.useAdStore()
+
+// 横幅广告位 ID（Taku placementId，空/全关时不展示；随 adType 自动响应更新）
+const bannerAdId = computed(() => adStore.getBannerAdId())
 
 const form = ref({
   phone: '', // 预设手机号
@@ -100,30 +103,9 @@ const counter = ref(60)
 const savedVerifyCode = ref('')
 const savedPhone = ref('')
 
-const isAdLoaded = ref(false) // 控制广告加载状态
-const bannerAdId = ref('') // 横幅广告 ID
-
 onLoad((params) => {
   console.log(params)
-  bannerAdId.value = adStore.getBannerAdId() // 获取横幅广告 ID
-  console.log('bannerAdId', bannerAdId)
 })
-
-// 广告相关的事件处理函数
-const onAdLoad = (e) => {
-  console.log('广告加载成功', e)
-  isAdLoaded.value = true
-}
-
-const onAdClose = (e) => {
-  console.log('广告关闭', e)
-  isAdLoaded.value = false
-}
-
-const onAdError = (e) => {
-  console.error('广告加载失败', e)
-  isAdLoaded.value = false
-}
 
 // 计算属性判断表单是否有效
 const isFormValid = computed(() => {
@@ -263,125 +245,147 @@ const goToLogin = () => {
 <style lang="scss">
 .container {
   min-height: 100vh;
-  background-color: #fff;
-  padding: 20rpx 40rpx;
+  padding: 30rpx 30rpx 60rpx;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
+
+  /* 有横幅广告时预留底部空间，避免内容被悬浮横幅遮挡 */
+  &.has-ad {
+    padding-bottom: 220rpx;
+  }
 }
 
+/* ===== 页头说明 ===== */
+.auth-head {
+  margin: 6rpx 6rpx 0;
+
+  .auth-title {
+    display: block;
+    font-size: 42rpx;
+    font-weight: 700;
+    color: #1f2435;
+  }
+
+  .auth-sub {
+    display: block;
+    margin-top: 12rpx;
+    font-size: 25rpx;
+    color: #9aa0b5;
+  }
+}
+
+/* ===== 表单白卡 ===== */
 .form-container {
+  margin-top: 32rpx;
+  background: #ffffff;
+  border-radius: 24rpx;
+  padding: 10rpx 30rpx;
+  box-shadow: 0 8rpx 30rpx rgba(74, 108, 247, 0.08);
+  overflow: hidden;
+
   .form-item {
     display: flex;
     align-items: center;
-    padding: 25rpx 0;
-    border-bottom: 1px solid #eee;
-    
-    .label {
-      width: 140rpx;
-      font-size: 30rpx;
-      color: #303030;
-      font-weight: 500;
+    min-height: 112rpx;
+    padding: 20rpx 0;
+    border-bottom: 1rpx solid #f0f1f8;
+
+    &:last-child {
+      border-bottom: none;
     }
-    
+
+    .label {
+      flex: none;
+      width: 130rpx;
+      font-size: 29rpx;
+      color: #232838;
+      font-weight: 600;
+    }
+
     .input {
       flex: 1;
       font-size: 30rpx;
-      color: #303030;
+      color: #2b2f3a;
     }
-    
+
     .verify-code-box {
       flex: 1;
       display: flex;
       align-items: center;
-      
+
       .input {
         flex: 1;
       }
-      
+
       .code-btn {
+        flex: none;
         margin-left: 20rpx;
-        font-size: 28rpx;
-        color: #FF0036;
-        background: #fff;
-        border: 1px solid #FF0036;
-        border-radius: 4px;
-        padding: 0 20rpx;
-        height: 60rpx;
-        line-height: 60rpx;
-        
+        font-size: 27rpx;
+        color: var(--brand);
+        background: var(--brand-soft);
+        border: 1rpx solid #ccd4fb;
+        border-radius: 34rpx;
+        padding: 0 24rpx;
+        height: 68rpx;
+        line-height: 66rpx;
+
+        &::after {
+          border: none;
+        }
+
         &[disabled] {
-          color: #999;
-          border-color: #999;
+          color: #a6aabf;
+          background: #f3f4fa;
+          border-color: #eeeeee;
         }
       }
     }
   }
 }
 
+/* ===== 按钮区域 ===== */
 .btn-container {
-  margin-bottom: auto;
-  button {
-    margin-top: 30rpx;
-    width: 100%;
-    height: 100rpx;
-    line-height: 100rpx;
-    font-size: 36rpx;
-    font-weight: 800;
-    border-radius: 12rpx;
-    margin-bottom: 30rpx;
-    
-    &::after {
-      border: none;
-    }
+  margin-top: 48rpx;
+
+  .wg-btn-primary,
+  .wg-btn-outline {
+    height: 96rpx;
+    line-height: 96rpx;
+    border-radius: 48rpx;
+    margin-bottom: 26rpx;
+    font-size: 34rpx;
+    font-weight: 700;
   }
-  
-  .login-btn {
-    background-color: #FF0036;
-    color: #fff;
-    
-    &:active {
-      opacity: 0.8;
-    }
-    
-    &.btn-disabled {
-       background-color: #FCA5A7;
-      opacity: 1;
-    }
-  }
-  
-  .register-btn {
-    background-color: #fff;
-    color: #333;
-    border: 1rpx solid #FF0036;
-    
-    &:active {
-      background-color: #f5f5f5;
-    }
+
+  .wg-btn-outline {
+    margin-bottom: 0;
   }
 }
 
+/* ===== 底部横幅广告（Taku）：常驻页面底部 ===== */
 .ad-section {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
   width: 100%;
-  height: 225rpx;
-  flex: none;
   box-sizing: border-box;
-  margin-top: 20rpx;
+  background: #ffffff;
+  box-shadow: 0 -6rpx 20rpx rgba(31, 48, 152, 0.08);
 
-  .divider {
+  .ad-divider {
     height: 2rpx;
-    background: #EEEEEE;
+    background: #eeeeee;
   }
 
   .ad-view {
-    height: 220rpx;
     display: flex;
     justify-content: center;
     align-items: center;
-    
-    ad {
-      width: 100%;
-      height: 220rpx;
-    }
+    min-height: 120rpx;
+    padding: 8rpx 0;
   }
 }
-</style> 
+</style>

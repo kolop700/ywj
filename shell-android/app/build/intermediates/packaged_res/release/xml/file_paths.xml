@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 应用内更新下载目录（getExternalFilesDir(DOWNLOADS)） -->
+    <external-files-path name="downloads" path="Download/" />
+    <external-files-path name="apk" path="apk/" />
+    <!-- 内部缓存（分享图片等） -->
+    <cache-path name="cache" path="." />
+    <files-path name="files" path="." />
+    <!-- 相册保存（应用私有 Pictures） -->
+    <external-files-path name="pictures" path="Pictures/" />
+</paths>

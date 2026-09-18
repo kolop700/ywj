@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:ns1="http://schemas.android.com/tools">
+    <color name="black">#FF000000</color>
+    <color name="brand_primary">#2E7BF6</color>
+    <color name="brand_primary_dark">#1F5FD0</color>
+    <color name="scan_mask">#B3000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <string name="app_name">云卫家</string>
+    <string name="scan_hint">将门禁二维码放入框内，即可自动扫描</string>
+    <style name="Theme.CloudGuard" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/brand_primary</item>
+        <item name="colorPrimaryDark">@color/brand_primary_dark</item>
+        <item name="colorAccent">@color/brand_primary</item>
+        <item name="android:windowBackground">@color/white</item>
+        <item name="android:statusBarColor">@color/brand_primary</item>
+        <item name="android:windowLightStatusBar" ns1:targetApi="m">false</item>
+    </style>
+    <style name="Theme.CloudGuard.Scan" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="android:windowBackground">@color/black</item>
+        <item name="android:statusBarColor">@color/black</item>
+    </style>
+</resources>

@@ -5,6 +5,8 @@ const path = require('path');
 
 // https://vitejs.dev/config/
 export default defineConfig({
+	// H5 产物被原生壳以本地资源加载，必须使用相对路径
+	base: './',
 	plugins: [
 		uni(),
 		AutoImport({

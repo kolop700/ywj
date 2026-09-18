@@ -13,5 +13,21 @@ unpackage/dist/build/
 unpackage/dist/dev/
 unpackage/
 
+# npm 本地缓存（构建包装脚本使用）
+.npm-cache/
+
+# 工作区内便携式 Android 工具链（JDK/SDK/Gradle 缓存，体积大且为本机专属）
+.toolchain/
+
+# Android 本地 SDK 路径（各机器不同）
+shell-android/local.properties
+
+# Android 正式包签名密码（证书本体保留在 shell-android/keystore/，密码不入库）
+shell-android/keystore.properties
+
 # python
 *.pyc
+
+# iOS 签名凭据（p12 私钥 / 描述文件，禁止入库，仅保留在本机 证书/ 目录）
+*.p12
+*.mobileprovision

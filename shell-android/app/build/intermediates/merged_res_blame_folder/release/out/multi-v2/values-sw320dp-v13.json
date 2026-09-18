@@ -1,0 +1,36 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.yefiot.cloudguard.app-mergeReleaseResources-53:/values-sw320dp-v13/values-sw320dp-v13.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\Administrator\\Desktop\\ywj\\.toolchain\\gradle-home\\caches\\transforms-3\\8037256a526fe7104518bde1aef0864b\\transformed\\jetified-anythink_adx_sdk_kuying_6.5.77_necessary\\res\\values-sw320dp-v13\\values-sw320dp-v13.xml",
+                    "from": {
+                        "startLines": "2,3,4",
+                        "startColumns": "4,4,4",
+                        "startOffsets": "55,121,188",
+                        "endColumns": "65,66,64",
+                        "endOffsets": "116,183,248"
+                    },
+                    "to": {
+                        "startLines": "5,6,7",
+                        "startColumns": "4,4,4",
+                        "startOffsets": "253,319,386",
+                        "endColumns": "65,66,64",
+                        "endOffsets": "314,381,446"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\Administrator\\Desktop\\ywj\\.toolchain\\gradle-home\\caches\\transforms-3\\c0532e618136681b8fecdb62c8476393\\transformed\\jetified-core-sdk-libs-7-6.5.68.9\\res\\values-sw320dp-v13\\values-sw320dp-v13.xml",
+                    "from": {
+                        "startLines": "2,3,4",
+                        "startColumns": "4,4,4",
+                        "startOffsets": "55,121,188",
+                        "endColumns": "65,66,64",
+                        "endOffsets": "116,183,248"
+                    }
+                }
+            ]
+        }
+    ]
+}

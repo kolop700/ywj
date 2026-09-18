@@ -11,6 +11,9 @@
     <div class="header">
 
       <div class="qr-rode-view">
+        <view class="arrow-refresh" @tap="refreshQRCode">
+          <up-icon name="reload" size="20" color="#4A6CF7"></up-icon>
+        </view>
         <up-qrcode
           ref="qrcodeRef"
           :size="250"
@@ -20,7 +23,6 @@
           @result="onQRCodeGenerated"
           @longpress="save"
         ></up-qrcode>
-        <image class="arrow" :src="`/static/icons/icon_refresh.png`" @tap="refreshQRCode"></image>
       </div>
     </div>
 
@@ -53,7 +55,7 @@
     </div>
 
     <div class="padding flex flex-direction">
-      <button form-type="submit" class="cu-btn bg-red login-button" @tap="shareToFriend">保存到本地相册</button>
+      <button form-type="submit" class="cu-btn login-button" @tap="shareToFriend">保存到本地相册</button>
     </div>
 <!-- 
     <div class="footer">
@@ -71,7 +73,7 @@ const qrcodeRef = ref(null)
 const imgUrl = ref('/static')
 const doorPassword = ref('')
 const qrCodeValue = ref('')
-const navBgColor = ref('linear-gradient(#FCD3D3, #FCDEDE)')
+const navBgColor = ref('linear-gradient(#4A6CF7, #8B5CF6)')
 const statusBarHeight = ref(0)
 
 // 有效次数选项
@@ -202,8 +204,8 @@ onMounted(() => {
 
   // 设置状态栏颜色
   uni.setNavigationBarColor({
-    frontColor: '#000000',
-    backgroundColor: '#FCD3D3',
+    frontColor: '#ffffff',
+    backgroundColor: '#4A6CF7',
     animation: {
       duration: 0,
       timingFunc: 'easeIn'
@@ -214,17 +216,18 @@ onMounted(() => {
 
 <style scoped>
 .bg-qr-rode {
-  background-image: linear-gradient(#FCD3D3, #FCDEDE);
-  color: var(--darkGray);
+  background-image: linear-gradient(#4A6CF7, #8B5CF6);
+  color: #ffffff;
 }
 
 .header {
   width: 100%;
-  background-image: linear-gradient(#FCDEDE, #FFFFFF);
+  background-image: linear-gradient(180deg, #4A6CF7 0%, #8B5CF6 100%);
   display: flex;
   justify-content: center;
   align-items: center;
-  padding-top: 20rpx; /* 移除之前的padding-top，因为navbar组件会自动处理安全区域 */
+  padding-top: 30rpx; /* 移除之前的padding-top，因为navbar组件会自动处理安全区域 */
+  padding-bottom: 46rpx;
 }
 
 .button-view {
@@ -233,17 +236,23 @@ onMounted(() => {
   margin-top: 40rpx;
 }
 
-.arrow {
-  margin-top: 10rpx;
-  width: 100rpx;
-  height: 100rpx;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  transition: all 0.3s;
+/* 刷新按钮（圆形浅底） */
+.arrow-refresh {
+  position: absolute;
+  right: 26rpx;
+  top: 26rpx;
+  z-index: 2;
+  width: 76rpx;
+  height: 76rpx;
+  border-radius: 50%;
+  background: #f3f5fc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6rpx 16rpx rgba(74, 108, 247, 0.12);
 }
 
-.arrow:active {
+.arrow-refresh:active {
   animation: rotate 0.3s linear;
 }
 
@@ -266,14 +275,24 @@ onMounted(() => {
   padding: 0 30rpx;
   font-size: 36rpx;
   height: 100rpx;
+  line-height: 100rpx;
   text-align: center;
   font-style: normal;
   text-transform: none;
   font-family: PingFang SC, PingFang SC;
   font-weight: 800;
+  background-image: var(--brand-grad);
+  background-color: #4a6cf7;
+  color: #ffffff;
+  border-radius: 50rpx;
+  box-shadow: 0 12rpx 28rpx rgba(74, 108, 247, 0.28);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .qr-rode-view {
+  position: relative;
   margin-top: 20rpx;
   background-color: white;
   display: flex;
@@ -283,21 +302,25 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
   padding: 20rpx;
-  border-radius: 10rpx;
+  border-radius: 28rpx;
+  box-shadow: 0 20rpx 60rpx rgba(31, 48, 152, 0.25);
 }
 
 .info-section {
   background-color: white;
-  border-radius: 10rpx;
-  padding-left: 40rpx;
-  padding-right: 40rpx;
+  border-radius: 24rpx;
+  margin: -30rpx 24rpx 0;
+  padding-left: 30rpx;
+  padding-right: 30rpx;
+  box-shadow: 0 6rpx 24rpx rgba(74, 108, 247, 0.07);
+  position: relative;
 }
 
 .info-item {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  height: 80rpx;
+  height: 88rpx;
   font-family: PingFang SC, PingFang SC;
   font-weight: 500;
   font-size: 30rpx;
@@ -322,9 +345,9 @@ onMounted(() => {
   text-align: right;
   margin-left: 50rpx;
   font-family: PingFang SC, PingFang SC;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 30rpx;
-  color: #A4A4A4;
+  color: #4A6CF7;
   line-height: 3rpx;
   text-align: left;
   text-transform: none;
@@ -351,7 +374,7 @@ onMounted(() => {
 
 .divider {
   height: 1rpx;
-  background-color: #eee;
+  background-color: #f0f1f8;
   margin: 10rpx 0;
 }
 
@@ -396,7 +419,7 @@ onMounted(() => {
 
 .custom-nav {
   width: 100%;
-  background-image: linear-gradient(#FCD3D3, #FCDEDE);
+  background-image: linear-gradient(#4A6CF7, #8B5CF6);
   position: fixed;
   top: 0;
   z-index: 999;
@@ -427,7 +450,7 @@ onMounted(() => {
 
 /* 添加渐变导航栏样式 */
 :deep(.u-navbar__content) {
-  background-image: linear-gradient(#FCD3D3, #FCDEDE) !important;
+  background-image: linear-gradient(#4A6CF7, #8B5CF6) !important;
   background-color: transparent !important;
 }
 
@@ -474,19 +497,25 @@ onMounted(() => {
 }
 
 .label {
-  color: #888;
+  color: #9aa1bd;
   min-width: 150rpx;
 }
 
 .endlabel {
   margin-left: 20rpx;
-  color: #888;
+  color: #b4bacd;
   font-size: 24rpx;
 }
 
 .value {
   margin-left: 50rpx;
-  color: #303030;
+  color: var(--brand);
+}
+
+/* 保存按钮外间距 */
+.padding {
+  padding: 0 24rpx;
+  margin-top: 44rpx;
+  box-sizing: border-box;
 }
 </style>
-

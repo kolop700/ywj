@@ -19,7 +19,7 @@
       refresher-enabled
       :refresher-triggered="isTriggered"
       refresher-threshold="120"
-      refresher-background="#f8f8f8"
+      refresher-background="#f5f6fc"
       @refresherrefresh="onRefresh"
       @refresherrestore="onRestore"
       @refresherpulling="onPulling"
@@ -54,34 +54,31 @@
         </view>
       </view>
     </scroll-view>
-    <!-- <view class="ad-free-date">
-      <text v-if="adFreeDate">免广告至：{{ adFreeDate }}</text>
-    </view>
-    <view class="reward-button">
-      <button @click="watchRewardedAd">观看激励广告获取奖励</button>
-    </view> -->
-    <!-- 底部广告区域 -->
-    <view class="ad-section">
-      <view class="divider"></view>
+
+    <!-- 底部横幅广告（Taku） -->
+    <view class="ad-section" v-if="bannerAdId">
+      <view class="ad-divider"></view>
       <view class="ad-view">
-        <ad 
-          v-if="bannerAdId"
-          :adpid="bannerAdId" 
-          @load="onAdLoad" 
-          @close="onAdClose" 
-          @error="onAdError">
-        </ad>
-      </view> 
+        <taku-banner :placement-id="bannerAdId"></taku-banner>
+      </view>
     </view>
   </view>
+
+  <!-- 脱机临时密码弹窗 -->
+  <offline-pwd-popup
+    :visible="showOfflinePwd"
+    :device="offlineDevice"
+    @close="showOfflinePwd = false"
+  />
 </template>
 
 <script setup>
 import { ref, computed, getCurrentInstance, onMounted } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
-import doorAccessUtils from '@/utils/doorAccessUtils'
-import { getPageHeight, calculateScrollViewHeight } from '@/utils/layout'
 import { adManager } from '@/utils/adUtils'
+import doorAccessUtils from '@/utils/doorAccessUtils'
+import OfflinePwdPopup from '@/components/offline-pwd-popup/offline-pwd-popup.vue'
+import { getPageHeight } from '@/utils/layout'
 
 const { proxy } = getCurrentInstance()
 const userStore = proxy.$store.user.useUserStore()
@@ -90,9 +87,12 @@ const adStore = proxy.$store.ad.useAdStore()
 const adControlStore = proxy.$store.adControl.useAdControlStore()
 const deviceApi = proxy.$api.device
 
-// 广告相关状态
-const isAdLoaded = ref(false)
-const bannerAdId = ref('')
+// 横幅广告位 ID（Taku placementId，空/全关时不展示；随 adType 自动响应更新）
+const bannerAdId = computed(() => adStore.getBannerAdId())
+
+// 脱机密码弹窗状态
+const showOfflinePwd = ref(false)
+const offlineDevice = ref(null)
 
 // 页面高度
 const windowHeight = ref('100vh')
@@ -103,8 +103,19 @@ const listHeight = ref(750)
 const updateListHeight = async () => {
   // #ifdef MP-WEIXIN || APP-PLUS
   try {
-    const height = await calculateScrollViewHeight()
-    listHeight.value = height
+    const sys = uni.getSystemInfoSync()
+    const statusBarHeight = sys.statusBarHeight || 0
+    const navBarHeight = 44
+    // 测量搜索框高度
+    const searchBoxHeight = await new Promise((resolve) => {
+      uni.createSelectorQuery().select('.search-box').boundingClientRect((rect) => {
+        resolve(rect ? rect.height : 0)
+      }).exec()
+    })
+    // 计算列表可用高度 = 窗口高度 - 状态栏 - 导航栏 - 搜索框高度
+    const availableHeight = sys.windowHeight - statusBarHeight - navBarHeight - searchBoxHeight
+    // 转换为rpx
+    listHeight.value = availableHeight * (750 / sys.windowWidth)
   } catch (error) {
     console.error('计算高度失败:', error)
     listHeight.value = 750 // 默认高度
@@ -112,50 +123,23 @@ const updateListHeight = async () => {
   // #endif
 }
 
-// 初始化广告管理器
-const initAdManager = () => {
-  adManager.initStore(adStore, adControlStore)
-  adManager.init()
-}
-// 页面加载时设置高度和广告
+// 页面加载时设置高度
 onMounted(async () => {
   windowHeight.value = getPageHeight()
   await updateListHeight()
-  
-  // 初始化广告ID和广告管理器
-  try {
-    bannerAdId.value = adStore.getBannerAdId()
-    initAdManager()
-    console.log('广告ID:', bannerAdId.value)
-  } catch (error) {
-    console.error('获取广告ID失败:', error)
-  }
 })
 
 // 监听窗口大小变化
 onLoad(() => {
+  // 初始化广告管理器（预加载激励/插屏广告）
+  adManager.initStore(adStore, adControlStore)
+  adManager.init()
   // #ifdef MP-WEIXIN || APP-PLUS
   uni.onWindowResize(() => {
     updateListHeight()
   })
   // #endif
 })
-
-// 广告事件处理
-const onAdLoad = (e) => {
-  console.log('广告加载成功', e)
-  isAdLoaded.value = true
-}
-
-const onAdClose = (e) => {
-  console.log('广告关闭', e)
-  isAdLoaded.value = false
-}
-
-const onAdError = (e) => {
-  console.error('广告加载失败', e)
-  isAdLoaded.value = false
-}
 
 // 搜索关键词
 const searchKey = ref('')
@@ -216,15 +200,15 @@ const onPulling = () => {
 // 处理设备点击
 const handleDeviceClick = async (device) => {
   if (!userStore.checkLogin()) return
+  console.log('[设备完整信息]', JSON.stringify(device))
   
   if (device.online === '1') {
     try {
       const success = await doorAccessUtils.openDoor(device)
-      if (success) {
+      if (success && success.success) {
         console.log('开门成功:', device)
-        // 开门成功后展示广告
+        // 开门成功后展示广告（Taku 激励/插屏，按 adType）
         try {
-          // 先尝试展示激励广告
           const adResult = await adManager.showAd()
           if (!adResult) {
             console.log('广告展示受限：可能达到每日限制或间隔时间不足')
@@ -235,14 +219,28 @@ const handleDeviceClick = async (device) => {
       }
     } catch (error) {
       console.error('开门操作失败:', error)
+      // 数据同步成功（命令已下发）不算真正失败，不弹脱机密码
+      if (error === true) return
+      // 开门失败，弹出脱机临时密码
+      showOfflinePwdPopup(device)
     }
   } else {
-    uni.showToast({
-      title: '设备离线',
-      icon: 'none',
-      duration: 3000
-    })
+    // 设备离线，直接弹出脱机临时密码
+    showOfflinePwdPopup(device)
   }
+}
+
+// 开门失败/设备离线时弹出脱机临时密码
+const showOfflinePwdPopup = (device) => {
+  if (!device || !device.factory_code) {
+    uni.showToast({
+      title: '该设备缺少出厂码，无法生成脱机密码',
+      icon: 'none'
+    })
+    return
+  }
+  offlineDevice.value = device
+  showOfflinePwd.value = true
 }
 
 // 处理滚动到底部
@@ -256,7 +254,7 @@ const onScrollToLower = () => {
 /* #ifdef MP-WEIXIN */
 page {
   height: 100vh;
-  background-color: #F8F8F8;
+  background-color: #F5F6FC;
 }
 /* #endif */
 
@@ -264,154 +262,155 @@ page {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #F8F8F8;
+  background: #F5F6FC;
   box-sizing: border-box;
-  padding: 20rpx 20rpx 0 20rpx;
+  padding: 20rpx 24rpx 0 24rpx;
   position: relative;
 }
 
+/* 搜索框：浅紫灰胶囊 */
 .search-box {
-  height: 104rpx;
   flex: none;
   margin-bottom: 20rpx;
-  padding: 20rpx;
-  background: #FFFFFF;
-  border-radius: 12rpx;
+  padding: 0;
 
   input {
     width: 100%;
-    height: 64rpx;
-    background: #F8F8F8;
-    border-radius: 32rpx;
-    padding: 0 30rpx;
+    height: 84rpx;
+    background: #EEF1FB;
+    border: 1rpx solid #E4E9FD;
+    border-radius: 42rpx;
+    padding: 0 34rpx;
     font-size: 28rpx;
+    color: #1F2435;
     box-sizing: border-box;
+    transition: all 0.2s;
   }
 
   .placeholder {
-    color: #999;
+    color: #9AA0B5;
   }
 }
 
 .device-list {
   flex: 1;
-  background: #FFFFFF;
-  border-radius: 12rpx;
-  padding: 20rpx;
+  background: transparent;
   overflow-y: auto;
-  margin-bottom: 245rpx; // 广告高度 + 间距
   -webkit-overflow-scrolling: touch;
 
   .device-list-content {
-    padding-top: 40rpx;
+    padding-top: 8rpx;
+    // 为底部悬浮横幅广告预留滚动空间
+    padding-bottom: 200rpx;
   }
 
+  /* 设备行：白卡分组悬浮 */
   .device-item {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    padding: 20rpx;
+    align-items: center;
+    padding: 28rpx 26rpx;
     margin-bottom: 20rpx;
-    background: #F8F8F8;
-    border-radius: 12rpx;
+    background: #FFFFFF;
+    border-radius: 24rpx;
+    border: 1rpx solid #EEF0F8;
+    box-shadow: 0 6rpx 20rpx rgba(74, 108, 247, 0.06);
     transition: all 0.2s;
     
     &.state {
-      background: #F5F5F5;
-      
+      background: #FFFFFF;
+      box-shadow: 0 4rpx 14rpx rgba(31, 42, 122, 0.04);
+
       &:active {
-        background: #F5F5F5;
-        opacity: 0.8;
+        opacity: 0.75;
       }
     }
     
     &:active {
-      background: #FF0036;
-      
-      .item-left {
-        .item-title {
-          color: #FFFFFF;
-        }
-        
-        .item-address {
-          color: rgba(255, 255, 255, 0.8);
-        }
-      }
-      
-      .item-right {
-        .status-text {
-          color: #FFFFFF;
-        }
-      }
+      background: #F0F2FE;
+      border-color: #4A6CF7;
+      transform: scale(0.985);
     }
 
     .item-left {
       flex: 1;
-      
+      min-width: 0;
+
       .item-title {
         font-size: 28rpx;
-        color: #333;
-        font-weight: 500;
-        margin-bottom: 8rpx;
+        color: #232838;
+        font-weight: 600;
+        margin-bottom: 10rpx;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
         
         &.state {
-          color: #999;
+          color: #9AA0B5;
         }
       }
       
       .item-address {
         font-size: 24rpx;
-        color: #666;
+        color: #8A90A6;
         line-height: 1.4;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
         
         &.state {
-          color: #999;
+          color: #B4B9CC;
         }
       }
     }
     
     .item-right {
+      flex: none;
+      margin-left: 20rpx;
+
+      /* 在线：品牌绿徽章 / 离线：浅灰徽章 */
       .status-text {
-        font-size: 24rpx;
-        color: #FF0036;
+        font-size: 22rpx;
+        font-weight: 500;
+        color: #16A34A;
+        background: rgba(22, 163, 74, 0.1);
+        padding: 8rpx 20rpx;
+        border-radius: 26rpx;
+        line-height: 1.2;
         
         &.state {
-          color: #999;
+          color: #8A90A6;
+          background: #F0F1F8;
         }
       }
     }
   }
 }
 
+/* ===== 底部横幅广告（Taku）：悬浮于视口底部，不挤压列表滚动区 ===== */
 .ad-section {
-  position: absolute;
-  left: 20rpx;
-  right: 20rpx;
+  position: fixed;
+  left: 24rpx;
+  right: 24rpx;
   bottom: 0;
-  width: auto;
-  height: 225rpx;
-  background: #FFFFFF;
+  z-index: 10;
+  background: #ffffff;
+  border-radius: 24rpx 24rpx 0 0;
+  box-shadow: 0 -6rpx 20rpx rgba(74, 108, 247, 0.08);
   box-sizing: border-box;
-  z-index: 99;
 
-  .divider {
+  .ad-divider {
     height: 2rpx;
-    background: #EEEEEE;
+    background: #eeeeee;
   }
 
   .ad-view {
-    width: 100%;
-    height: 220rpx;
-    box-sizing: border-box;
     display: flex;
     justify-content: center;
     align-items: center;
-    background: #FFFFFF;
-    
-    ad {
-      width: 100%;
-      height: 100%;
-    }
+    min-height: 120rpx;
+    padding: 8rpx 0;
   }
 }
-</style> 
+
+</style>

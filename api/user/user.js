@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+import { httpUpload } from '@/utils/nativeHttp'
 const BASE_API = '/yefiot/v1/';
 
 // 添加默认配置
@@ -114,7 +115,7 @@ export default {
   // 上传用户人脸图片
   uploadUserFacePic(filePath, userAcct, options = {}) {
     return new Promise((resolve, reject) => {
-      uni.uploadFile({
+      httpUpload({
         url: process.env.NODE_ENV === 'development' && process.env.UNI_PLATFORM === 'h5' 
           ? '/yefiot/v1/uploadUserFacePic/'  // 开发环境使用代理
           : 'https://xy.yefiot.com/yefiot/v1/uploadUserFacePic/', // 生产环境使用完整URL

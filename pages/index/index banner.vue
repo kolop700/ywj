@@ -21,10 +21,6 @@
       <text>区块5</text>
     </view>
 
-    <!-- 广告区域 -->
-    <view class="ad-view">
-      <ad adpid="1111111111" @load="onload" @close="onclose" @error="onerror"></ad>
-    </view>
   </view>
 </template>
 
@@ -36,15 +32,6 @@ export default {
     }
   },
   methods: {
-    onload(e) {
-      console.log("onload")
-    },
-    onclose(e) {
-      console.log("onclose: " + e.detail)
-    },
-    onerror(e) {
-      console.log("onerror: " + e.detail.errCode + " message:: " + e.detail.errMsg)
-    }
   }
 }
 </script>
@@ -71,10 +58,4 @@ export default {
   font-size: 32rpx;
   font-weight: bold;
 }
-
-.ad-view {
-  background-color: #FFFFFF;
-  border-radius: 8rpx;
-  margin-top: 10px;
-}
-</style> 
+</style>

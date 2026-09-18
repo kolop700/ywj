@@ -81,15 +81,14 @@ export const calculateScrollViewHeight = () => {
     const statusBarHeight = sys.statusBarHeight || 0
     const navBarHeight = 44 // 导航栏高度
     
-    // 获取表单和广告区域高度
+    // 获取表单区域高度
     query.select('.form-section').boundingClientRect()
-    query.select('.ad-section').boundingClientRect()
-    
+
     query.exec((res) => {
-      const [formRect, adRect] = res
-      if (formRect && adRect) {
-        // 计算列表可用高度 = 窗口高度 - 状态栏 - 导航栏 - 表单高度 - 广告高度
-        const availableHeight = windowHeight - statusBarHeight - navBarHeight - formRect.height - adRect.height
+      const [formRect] = res
+      if (formRect) {
+        // 计算列表可用高度 = 窗口高度 - 状态栏 - 导航栏 - 表单高度
+        const availableHeight = windowHeight - statusBarHeight - navBarHeight - formRect.height
         // 转换为rpx
         const rpxHeight = (availableHeight * (750 / sys.windowWidth))
         resolve(rpxHeight)
@@ -107,26 +106,4 @@ export const calculateScrollViewHeight = () => {
 }
 
 
-// 布局样式
-// .container {
-//     min-height: v-bind(windowHeight);
-//     height: v-bind(windowHeight);
-//     display: flex;
-//     flex-direction: column;
-//     background: #F5F5F5;
-//     box-sizing: border-box;
-//     padding-bottom: env(safe-area-inset-bottom);
-//   }
-// .form-section {
-//     flex: none;  /* 不伸缩，保持自身大小 */
-//   }
-  
-//   .list-section {
-//     flex: 1;     /* 占据剩余空间 */
-//   }
-  
-//   .ad-section {
-//     flex: none;  /* 不伸缩，保持自身大小 */
-//     height: 150rpx;
-//   }
 

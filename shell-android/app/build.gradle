@@ -1,0 +1,143 @@
+// 云卫家 H5 原生壳 - Android 应用模块构建脚本
+// ============================================================
+// 说明：
+//  1) 本壳通过 WebView 加载编译好的 H5 产物（assets/www），并实现 JS 桥接。
+//  2) 广告：直接复用 nativeplugins/TakuAdsNativePlugin/android 下的
+//     Taku 核心 aar 与 Litemize 自定义平台 aar（18 个），不再走 DCloud。
+//  3) 微信分享：需将微信 OpenSDK aar 放入 app/libs/（见文件末尾说明）。
+// ============================================================
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+// Taku/Litemize 原生依赖目录（复用原自研插件的 aar / jar）
+def takuNativeDir = new File(projectDir, '../../nativeplugins/TakuAdsNativePlugin/android')
+
+// ---- 正式包签名配置 ----
+// 密码等敏感信息放在 shell-android/keystore.properties（已在 .gitignore 中排除，勿提交）。
+// 若该文件缺失（换机器 / CI），release 会退化为未签名包，但不会导致构建失败。
+def keystorePropsFile = rootProject.file('keystore.properties')
+def keystoreProps = new Properties()
+if (keystorePropsFile.exists()) {
+    keystorePropsFile.withInputStream { keystoreProps.load(it) }
+}
+
+android {
+    // namespace 为代码包路径（决定 Kotlin/Java 相对类名解析），不随对外包名调整
+    namespace 'com.yefiot.cloudguard'
+    compileSdk 34
+    // 显式指定 build-tools：AGP 8.1.4 默认会去拉 33.0.1，
+    // 但国内 dl.google.com 不可达，这里直接复用本地已部署的 34.0.0。
+    buildToolsVersion "34.0.0"
+
+    signingConfigs {
+        release {
+            if (keystorePropsFile.exists()) {
+                storeFile rootProject.file(keystoreProps['storeFile'])
+                storePassword keystoreProps['storePassword']
+                keyAlias keystoreProps['keyAlias']
+                keyPassword keystoreProps['keyPassword']
+                // 与历史云打包 APK 保持一致：V1 + V2 + V3 签名
+                // （部分微信版本 / 渠道 SDK 仍从 META-INF 读取签名，缺 V1 会导致校验失败；
+                //  V3 与历史云打包形态对齐，Android 9+ 设备优先使用）
+                enableV1Signing = true
+                enableV2Signing = true
+                enableV3Signing = true
+            }
+        }
+    }
+
+    defaultConfig {
+        // 对外包名：与历史云打包应用保持一致（应用市场 / 广告平台登记以此为准）
+        applicationId "com.yefiot.community"
+        minSdk 24
+        targetSdk 34
+        versionCode 100
+        versionName "1.0.0"
+
+        // Taku/Litemize 要求：仅支持 32/64 位 arm
+        ndk {
+            abiFilters 'armeabi-v7a', 'arm64-v8a'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            if (keystorePropsFile.exists()) {
+                signingConfig signingConfigs.release
+            }
+        }
+        debug {
+            minifyEnabled false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    buildFeatures {
+        viewBinding true
+    }
+
+    // 处理 Litemize / Taku aar 中可能重复的 META-INF
+    packagingOptions {
+        pickFirst 'META-INF/DEPENDENCIES'
+        pickFirst 'META-INF/LICENSE'
+        pickFirst 'META-INF/LICENSE.txt'
+        pickFirst 'META-INF/NOTICE'
+        pickFirst 'META-INF/NOTICE.txt'
+        pickFirst 'META-INF/*.kotlin_module'
+    }
+
+    lint {
+        abortOnError false
+    }
+}
+
+dependencies {
+    // ========== AndroidX / UI ==========
+    implementation 'androidx.core:core-ktx:1.12.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.11.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.activity:activity-ktx:1.8.2'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.2'
+    implementation 'androidx.webkit:webkit:1.9.0'
+    implementation 'androidx.exifinterface:exifinterface:1.3.7'
+
+    // ========== 扫码（内嵌 ZXing，无需 Google Play 服务） ==========
+    implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
+
+    // ========== 协程 ==========
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+
+    // ========== Taku / Litemize 广告原生依赖（复用自研插件目录） ==========
+    // 注意：Taku 核心 + Litemize 18 个 aar 均位于上述目录根下
+    implementation fileTree(dir: new File(takuNativeDir, '.'), include: ['*.aar'])
+    // libs/ 下的 jar（如 gson-2.8.4）
+    implementation fileTree(dir: new File(takuNativeDir, 'libs'), include: ['*.jar'])
+
+    // Taku/Litemize 官方标注的公共依赖
+    implementation 'com.github.bumptech.glide:glide:4.13.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.9.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
+
+    // ========== 微信 OpenSDK / 支付宝 SDK（支付 + 分享，aar 手动放置） ==========
+    // 【前置】compile 前必须将以下两个 aar 放入 app/libs/（gradle 已自动加载）：
+    //   1) 微信 OpenSDK：官方下载后重命名为 wechat-sdk-android.aar
+    //      https://developers.weixin.qq.com/doc/oplatform/Mobile_App/Access_Guide/Android.html
+    //   2) 支付宝：alipaySdk-15.8.x.aar（单 aar 无额外依赖）
+    //      https://opendocs.alipay.com/open/02np8p
+    //   详见 app/libs/README-SDK放置说明.txt
+    // 未放 aar 时 PayBridge.kt / WXEntryActivity.kt 会因缺少 SDK 类而编译失败
+    implementation fileTree(dir: 'libs', include: ['*.aar', '*.jar'])
+}

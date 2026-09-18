@@ -25,8 +25,14 @@ class DoorBleUtils {
       // 1. 初始化蓝牙
       await this.bleUtils.initBluetooth()
       
-      // 2. 搜索并连接设备
-      const targetDevice = bleDevice || await this.findAndConnectDevice(device.door_mac)
+      // 2. 搜索并连接设备（预扫描已找到则直接复用，避免重复扫描被系统限流）
+      let targetDevice
+      if (bleDevice && bleDevice.deviceId) {
+        await this.bleUtils.connectBleDevice(bleDevice.deviceId)
+        targetDevice = bleDevice
+      } else {
+        targetDevice = await this.findAndConnectDevice(device.door_mac)
+      }
       
       // 3. 发送开门指令
       await this.sendOpenCommand(targetDevice, userId)
@@ -72,20 +78,51 @@ class DoorBleUtils {
   }
 
   /**
+   * 广播名归一化：去除冒号/横线/空格等分隔符并转大写，规避 MAC 格式差异
+   */
+  normalizeName(v) {
+    return String(v == null ? '' : v).replace(/[^0-9a-zA-Z]/g, '').toUpperCase()
+  }
+
+  /**
    * 等待发现目标设备
    * @param {string} doorMac 设备MAC地址
    * @returns {Promise<Object>}
    */
   waitForDevice(doorMac) {
-    const targetDeviceName = 'BMXWL' + doorMac
-    
+    const normalizedTarget = this.normalizeName('BMXWL' + doorMac)
+    const macNorm = this.normalizeName(doorMac)
+
+    const isMatch = (d) => {
+      if (!d) return false
+      const name = this.normalizeName(d.name)
+      const localName = this.normalizeName(d.localName)
+      const deviceId = this.normalizeName(d.deviceId)
+      // 1) 广播名以 BMXWL 开头（门锁固定前缀）
+      if (name.startsWith('BMXWL') || localName.startsWith('BMXWL')) return true
+      // 2) 广播名严格等于「BMXWL + door_mac」
+      if (name === normalizedTarget || localName === normalizedTarget) return true
+      // 3) 广播名包含 door_mac（兼容不同批次标识、冒号/横线等格式差异）
+      if (macNorm.length >= 6 && (name.includes(macNorm) || localName.includes(macNorm))) return true
+      // 4) Android 上 deviceId 即 MAC 地址，直接与 door_mac 比对
+      if (macNorm && deviceId === macNorm) return true
+      return false
+    }
+
     return new Promise((resolve, reject) => {
+      // 预扫描可能已经找到过该设备，直接复用
+      const cached = (this.bleUtils.bleDevices.value || []).find(isMatch)
+      if (cached) {
+        resolve(cached)
+        return
+      }
+
       const timer = setTimeout(() => {
         reject(new Error('搜索设备超时'))
       }, 10000) // 10秒超时
-      
+
       uni.onBluetoothDeviceFound(res => {
-        const device = res.devices.find(d => d.name === targetDeviceName)
+        const device = (res.devices || []).find(isMatch)
         if (device) {
           clearTimeout(timer)
           resolve(device)

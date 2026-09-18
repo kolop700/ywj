@@ -4,12 +4,14 @@ import userApi from '@/api/user/user'
 import deviceApi from '@/api/device/device' // 引入设备API
 import { useDeviceStore } from './device'
 import { useAdControlStore } from './adControl' // 引入广告控制 store
+import { useAdStore } from './ad' // 引入广告 store（横幅预加载）
+import { applyVipAdControl, syncVipStatus, clearVip } from '@/utils/vipUtils' // 【VIP 免广告】VIP 状态同步与广告拦截（见 utils/vipUtils.js）
 
 export const useUserStore = defineStore('user', () => {
   const userInfo = ref({})
   const user_id = ref('')
   const maxExpireDate = ref('') // 最大过期日期
-  const adType = ref('') // 新增广告类型
+  const adType = ref('') // 广告类型（'0'全关/'1'仅横幅/'11'横幅+激励/'13'横幅+插屏）
   
   // 基础图片URL
   const BASE_IMG_URL = 'https://xy.yefiot.com/yefiot/v1/'
@@ -120,7 +122,7 @@ export const useUserStore = defineStore('user', () => {
           '1': 2,  // 只显示 banner
           '0': 1   // 不显示任何广告 最低优先级
         }
-        
+
         // 从所有房间中找出优先级最高的广告类型
         const selectedAd = res.data.reduce((highest, room) => {
           const currentAdType = room.ad_prod_app
@@ -132,10 +134,19 @@ export const useUserStore = defineStore('user', () => {
         console.log('选择的广告类型:', selectedAd)
         // 存储选择的广告类型
         adType.value = selectedAd
-        
-        // 获取广告控制 store 并设置广告类型
-        const adControlStore = useAdControlStore()
-        adControlStore.setAdType(selectedAd)
+
+        // 【VIP 免广告】VIP 用户广告全关（applyVipAdControl 内部置 NONE 并返回 true）；
+        // 非 VIP（或 VIP 开关关闭）按房间计算值正常设置并预热横幅。
+        if (applyVipAdControl()) {
+          console.log('[VIP] 已拦截房间广告类型设置（房间计算值为 ' + selectedAd + '，未生效）')
+        } else {
+          // 获取广告控制 store 并设置广告类型
+          const adControlStore = useAdControlStore()
+          adControlStore.setAdType(selectedAd)
+
+          // 广告类型确定后：预热横幅（提前竞价，用户进入页面时可直接复用展示）
+          useAdStore().preloadBanner()
+        }
       }
       console.log("更新房间列表", res)
       return Promise.resolve(res)
@@ -156,12 +167,14 @@ export const useUserStore = defineStore('user', () => {
   async function loginSuccess(data, options = {}) {
     userInfo.value = data
     user_id.value = data.user_id
-    console.log("广告类型", userInfo.value.ad_type_app)
     // 清空设备列表
     const deviceStore = useDeviceStore()
     deviceStore.clearDeviceList()
     
     try {
+      // 登录成功后先同步真实会员状态（决定房间广告计算与免广告拦截），再获取房间列表
+      await syncVipStatus(data.user_id)
+
       // 登录成功后获取房间列表
       await updateRoomList(options)
       
@@ -179,6 +192,8 @@ export const useUserStore = defineStore('user', () => {
   function logout() {
     userInfo.value = {}
     user_id.value = ''
+    // 【VIP 免广告】清除会员状态（user_type → normal，防止 VIP 状态残留到下一个账号）
+    clearVip()
     // 清空设备列表
     const deviceStore = useDeviceStore()
     deviceStore.clearDeviceList()

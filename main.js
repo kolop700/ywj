@@ -1,3 +1,7 @@
+// #ifdef H5
+// H5 原生壳桥接层：必须在业务代码前加载，补齐 WebView 中缺失的原生能力
+import '@/utils/h5-native-bridge'
+// #endif
 import App from './App'
 import uviewPlus from '@/uni_modules/uview-plus'
 import api from './api/index.js'
@@ -7,6 +11,7 @@ import { createPinia } from 'pinia';
 import { createPersistedState } from 'pinia-plugin-persistedstate';
 import BleUtils from '@/utils/bleUtils'
 import DoorBleUtils from '@/utils/doorBleUtils'
+import TakuBanner from '@/components/taku-banner/taku-banner.vue'
 
 // #ifndef VUE3
 import Vue from 'vue'
@@ -46,6 +51,9 @@ export function createApp() {
   app.use(pinia);
   app.config.globalProperties.$store = store;
   app.mixin(mixin);
+
+  // 全局注册横幅广告组件（页面内直接使用 <taku-banner :placement-id="..." />）
+  app.component('taku-banner', TakuBanner);
   
   // 初始化蓝牙实例并提供给组件
   const bleUtils = new BleUtils()

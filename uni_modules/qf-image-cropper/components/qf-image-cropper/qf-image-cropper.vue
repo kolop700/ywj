@@ -397,7 +397,24 @@
 					count: 1,
 					success: (res) => {
 						this.resetData();
-						this.initImage(res.tempFiles[0].path);
+						const file = res.tempFiles && res.tempFiles[0];
+						// #ifdef H5
+						// H5（含原生壳 WebView）下 uni.chooseImage 返回的是 blob: 临时地址，
+						// 部分 Android WebView 无法稳定渲染 blob 图片（表现为裁剪区域黑屏）。
+						// 这里统一改读为 data: URL，确保预览与裁剪稳定显示。
+						try {
+							if (file && typeof FileReader !== 'undefined') {
+								const reader = new FileReader();
+								reader.onload = () => this.initImage(reader.result);
+								reader.onerror = () => this.initImage(file.path);
+								reader.readAsDataURL(file);
+								return;
+							}
+						} catch (e) {
+							console.error('readAsDataURL failed', e);
+						}
+						// #endif
+						this.initImage(file ? file.path : res.tempFilePaths[0]);
 					}
 				});
 			},

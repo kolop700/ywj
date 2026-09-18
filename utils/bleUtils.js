@@ -73,7 +73,7 @@ class BleUtils {
   onBluetoothDeviceFound() {
     uni.onBluetoothDeviceFound((res) => {
       console.log('发现新设备原始数据:', res.devices)
-      res.devices.forEach(device => {
+      ;(res.devices || []).forEach(device => {
         console.log('设备信息:', {
           deviceId: device.deviceId,
           name: device.name,
@@ -83,41 +83,15 @@ class BleUtils {
           advertisServiceUUIDs: device.advertisServiceUUIDs,
           serviceData: device.serviceData
         })
-        
-        // 这里假设设备名称以 'BMXWL' 开头
-        if (device.name) {
-          console.log('设备名称存在:', device.name)
-          if (device.name.startsWith('BMXWL')) {
-            console.log('找到目标设备:', device.name)
-            // 检查是否已存在该设备
-            const isExist = this.bleDevices.value.some(d => d.deviceId === device.deviceId)
-            if (!isExist) {
-              console.log('添加新设备到列表')
-              this.bleDevices.value.push(device)
-              console.log('当前设备列表:', this.bleDevices.value)
-            } else {
-              console.log('设备已存在于列表中')
-            }
-          } else {
-            console.log('设备名称不匹配 BMXWL 前缀')
-          }
-        } else if (device.localName) {
-          console.log('使用 localName 替代:', device.localName)
-          if (device.localName.startsWith('BMXWL')) {
-            console.log('找到目标设备(localName):', device.localName)
-            const isExist = this.bleDevices.value.some(d => d.deviceId === device.deviceId)
-            if (!isExist) {
-              console.log('添加新设备到列表(localName)')
-              this.bleDevices.value.push({...device, name: device.localName})
-              console.log('当前设备列表:', this.bleDevices.value)
-            } else {
-              console.log('设备已存在于列表中')
-            }
-          } else {
-            console.log('localName 不匹配 BMXWL 前缀')
-          }
-        } else {
-          console.log('设备无名称信息')
+
+        // 缓存「全部」扫描到的设备（不再只按 BMXWL 前缀过滤）。
+        // 是否为目标门锁交由 doorBleUtils / 页面按 BMXWL 前缀、door_mac(MAC) 等规则判断，
+        // 避免门锁广播名缺失或格式差异时被提前过滤掉，导致永远匹配不到。
+        if (!device || !device.deviceId) return
+        const isExist = this.bleDevices.value.some(d => d.deviceId === device.deviceId)
+        if (!isExist) {
+          console.log('缓存设备:', device.deviceId, device.name || device.localName || '(无名)')
+          this.bleDevices.value.push(device)
         }
       })
     })

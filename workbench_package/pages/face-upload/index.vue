@@ -79,5 +79,8 @@ const handleCrop = async (e) => {
 </script>
 
 <style>
-
+page {
+	background: #F5F6FC;
+	min-height: 100vh;
+}
 </style>

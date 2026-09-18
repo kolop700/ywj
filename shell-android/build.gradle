@@ -1,0 +1,6 @@
+// 云卫家 H5 原生壳 - Android 顶层构建脚本
+// 仅声明插件版本，具体配置见 app/build.gradle
+plugins {
+    id 'com.android.application' version '8.1.4' apply false
+    id 'org.jetbrains.kotlin.android' version '1.9.22' apply false
+}

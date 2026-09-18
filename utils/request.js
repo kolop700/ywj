@@ -1,3 +1,5 @@
+import { httpRequest } from '@/utils/nativeHttp'
+
 // 根据环境设置baseURL
 const BASE_URL = process.env.NODE_ENV === 'development' && process.env.UNI_PLATFORM === 'h5' 
   ? '' // 开发环境下H5使用代理
@@ -28,7 +30,7 @@ const request = ({
                 TENANT_ID: 1,
             };
         }
-        uni.request({
+        httpRequest({
             url: BASE_URL + url,
             data: method === 'get' ? params : data,
             method: method,

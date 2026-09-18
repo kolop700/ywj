@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">云卫家</string>
+    <string name="scan_hint">将门禁二维码放入框内，即可自动扫描</string>
+</resources>

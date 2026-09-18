@@ -139,7 +139,7 @@
 
 <style>
 	page {
-		background: rgba(0, 0, 0, 0.5);/**设置窗口背景半透明*/
+		background: rgba(18, 26, 51, 0.55);/**设置窗口背景半透明*/
 	}
 </style>
 <style lang="scss" scoped>
@@ -151,9 +151,11 @@
 		left: 50%;
 		transform: translate(-50%, -50%);
 		background: #fff;
-		border-radius: 20rpx;
+		border-radius: 28rpx;
 		box-sizing: border-box;
-		border: 1px solid #eee;
+		border: none;
+		box-shadow: 0 24rpx 80rpx rgba(23, 35, 92, 0.35);
+		overflow: hidden;
 	}
 
 	.header-bg {
@@ -166,7 +168,7 @@
 		box-sizing: border-box;
 		.version {
 			font-size: 36rpx;
-			color: #026DF7;
+			color: var(--brand);
 			font-weight: 700;
 			width: 100%;
 			text-align: center;
@@ -182,7 +184,7 @@
 			.title {
 				font-size: 28rpx;
 				font-weight: 700;
-				color: #000000;
+				color: #1f2435;
 			}
 
 			.desc {
@@ -214,7 +216,7 @@
 				height: 96rpx;
 				box-sizing: border-box;
 				font-size: 32rpx;
-				border-radius: 10rpx;
+				border-radius: 48rpx;
 				letter-spacing: 2rpx;
 
 				&.force {
@@ -222,14 +224,17 @@
 				}
 
 				&.close {
-					border: 1px solid #E0E0E0;
+					border: 1rpx solid #ccd4fb;
+					background: #ffffff;
 					margin-right: 25rpx;
-					color: #000;
+					color: var(--brand);
 				}
 
 				&.upgrade {
-					background-color: #026DF7;
+					background-color: #4a6cf7;
+					background-image: var(--brand-grad);
 					color: white;
+					box-shadow: 0 12rpx 28rpx rgba(74, 108, 247, 0.28);
 				}
 			}
 
@@ -239,8 +244,8 @@
 				display: flex;
 				position: relative;
 				align-items: center;
-				border-radius: 6rpx;
-				background-color: #dcdcdc;
+				border-radius: 45rpx;
+				background-color: #eef0f6;
 				display: flex;
 				justify-content: flex-start;
 				padding: 0px;
@@ -249,18 +254,17 @@
 				overflow: hidden;
 
 				&.active {
-					background-color: #026DF7;
+					background-color: #4a6cf7;
+					background-image: var(--brand-grad);
 				}
 
 				.progress {
 					height: 100%;
-					background-color: #026DF7;
+					background-color: #4a6cf7;
+					background-image: var(--brand-grad);
 					padding: 0px;
 					box-sizing: border-box;
 					border: none;
-					border-top-left-radius: 10rpx;
-					border-bottom-left-radius: 10rpx;
-
 				}
 
 				.txt {
@@ -270,6 +274,7 @@
 					left: 50%;
 					transform: translate(-50%, -50%);
 					color: #fff;
+					z-index: 1;
 				}
 			}
 		}

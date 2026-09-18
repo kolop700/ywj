@@ -1,9 +1,18 @@
+// #ifdef H5
+// H5 原生壳：下载/安装/更新走原生桥接（Android: DownloadManager+FileProvider；iOS: 跳 App Store）
+import { NativeApp } from '@/utils/h5-native-bridge'
+// #endif
+
 /**
  * @description H5+下载App
  * @param downloadUrl:App下载链接
  * @param progressCallBack:下载进度回调
  */
 export const downloadApp = (downloadUrl, progressCallBack = () => {}, ) => {
+	// #ifdef H5
+	return NativeApp.download(downloadUrl, progressCallBack)
+	// #endif
+	// #ifndef H5
 	return new Promise((resolve, reject) => {
 		//创建下载任务
 		const downloadTask = plus.downloader.createDownload(downloadUrl, {
@@ -44,6 +53,7 @@ export const downloadApp = (downloadUrl, progressCallBack = () => {}, ) => {
 		//开始执行下载
 		downloadTask.start();
 	})
+	// #endif
 
 
 }
@@ -53,6 +63,22 @@ export const downloadApp = (downloadUrl, progressCallBack = () => {}, ) => {
  * @param callBack:安装成功回调
  */
 export const installApp = (fileName, callBack = () => {}) => {
+	// #ifdef H5
+	NativeApp.installPackage(fileName)
+		.then(() => {
+			if (typeof callBack === 'function') callBack()
+		})
+		.catch((error) => {
+			console.error('安装失败:', error)
+			uni.showToast({
+				title: '安装失败',
+				duration: 1500,
+				icon: "none"
+			})
+		})
+	return
+	// #endif
+	// #ifndef H5
 	//注册广播监听app安装情况
 	onInstallListening(callBack);
 	//开始安装
@@ -65,12 +91,14 @@ export const installApp = (fileName, callBack = () => {}) => {
 			icon: "none"
 		});
 	})
+	// #endif
 
 }
 /**
  * @description 注册广播监听APP是否成功
  * @param callBack:安装成功回调函数
  */
+// #ifndef H5
 const onInstallListening = (callBack = () => {}) => {
 
 	let mainActivity = plus.android.runtimeMainActivity(); //获取activity
@@ -91,3 +119,4 @@ const onInstallListening = (callBack = () => {}) => {
 
 
 }
+// #endif

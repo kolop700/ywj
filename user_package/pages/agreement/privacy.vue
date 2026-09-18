@@ -4,29 +4,29 @@
     <view class="content">
       <view class="section">
         <view class="section-content">
-          深圳市星云智慧物联科技有限公司（下文简称"星云小卫"、"我们"和"我们的"）深知隐私对您的重要性，并会尊重您的隐私。请在向星云小卫提交个人数据之前，阅读、了解本《隐私政策》（下文简称"本政策"）。本政策适用于显示本隐私政策、或链接至本隐私政策的星云小卫网站和产品、服务。
-          本政策阐述了星云小卫如何处理您的个人数据，但本政策可能并不涉及所有可能的数据处理情境。有关收集产品或服务特定数据的信息可能由星云小卫在补充政策中，或者在收集数据时提供的通知中发布。
+          深圳市越凡物联科技有限公司（下文简称"云卫家"、"我们"和"我们的"）深知隐私对您的重要性，并会尊重您的隐私。请在向云卫家提交个人数据之前，阅读、了解本《隐私政策》（下文简称"本政策"）。本政策适用于显示本隐私政策、或链接至本隐私政策的云卫家网站和产品、服务。
+          本政策阐述了云卫家如何处理您的个人数据，但本政策可能并不涉及所有可能的数据处理情境。有关收集产品或服务特定数据的信息可能由云卫家在补充政策中，或者在收集数据时提供的通知中发布。
         </view>
       </view>
 
       <view class="section">
-        <view class="section-title">星云小卫如何收集和使用您的个人数据</view>
+        <view class="section-title">云卫家如何收集和使用您的个人数据</view>
         <view class="section-content">
-          <view>1.1 个人数据是指单独使用或结合其他信息使用时能够确定个人身份的信息。此类数据会在您使用我们的网站、产品或服务，以及与我们互动时由您直接提交给我们。例如，当您创建星云小卫账户或联系我们获得支持时；或者我们通过记录您如何与我们的网站、产品或服务交互而获得；或者通过Cookie等技术，或者从您设备上运行的软件接收使用数据。在法律允许的情况下，我们还会从公用和商用第三方来源获取有关数据。例如，我们通过从其他公司购买统计数据来支持我们的服务。</view>
-          <view>1.2 我们收集的数据取决于您与星云小卫互动的方式，包括访问的网站或者使用的产品和服务等，包括姓名、性别、企业名称、职位、地址、电子邮箱、电话号码、登录信息（帐号和密码）、照片、证件信息、人脸信息等。我们还收集您提供给我们的信息和您发给我们的消息内容，例如您输入的查询信息或您为了获得客服支持而提供的问题或信息。</view>
-          <view>在某些情况下，您可以选择不向星云小卫产品提供个人数据，但如果您选择不提供，星云小卫可能无法为您提供相关产品或服务，也无法回应或解决您所遇到的问题。</view>
+          <view>1.1 个人数据是指单独使用或结合其他信息使用时能够确定个人身份的信息。此类数据会在您使用我们的网站、产品或服务，以及与我们互动时由您直接提交给我们。例如，当您创建云卫家账户或联系我们获得支持时；或者我们通过记录您如何与我们的网站、产品或服务交互而获得；或者通过Cookie等技术，或者从您设备上运行的软件接收使用数据。在法律允许的情况下，我们还会从公用和商用第三方来源获取有关数据。例如，我们通过从其他公司购买统计数据来支持我们的服务。</view>
+          <view>1.2 我们收集的数据取决于您与云卫家互动的方式，包括访问的网站或者使用的产品和服务等，包括姓名、性别、企业名称、职位、地址、电子邮箱、电话号码、登录信息（帐号和密码）、照片、证件信息、人脸信息等。我们还收集您提供给我们的信息和您发给我们的消息内容，例如您输入的查询信息或您为了获得客服支持而提供的问题或信息。</view>
+          <view>在某些情况下，您可以选择不向云卫家产品提供个人数据，但如果您选择不提供，云卫家可能无法为您提供相关产品或服务，也无法回应或解决您所遇到的问题。</view>
           <view>我们可能将您的个人数据用于以下目的：</view>
           <view>(a) 创建账户。</view>
           <view>(b) 登入账户。为便于您更安全、便捷地登入账户，您可选择我们提供的刷脸登录服务，向我们提供您的脸部图线或视频，以核验您的身份；脸部图像或视频属于您的个人敏感信息，您亦有权选择不需要使用刷脸登录服务，可以选择密码登录、短信登录等其他方式。</view>
           <view>(c) 实现您的交易或服务请求，包括履行订单；交付、激活或验证产品或服务；提供培训及认证并管理和处理培训及认证结果；参加线上或线下活动；应您的要求进行变更或者提供您请求的信息（例如产品或服务的营销资料、白皮书）；以及提供技术支持。</view>
           <view>(d) 消费交易验证。您在使用相关支付账户进行消费交易时，我们需对您的身份进行验证，以确保您的账户与资金安全。您可选择我们提供的刷脸验证服务，向我们提供您的脸部图线或视频，以核验您的身份；脸部图像或视频属于您的个人敏感信息，您亦有权选择不需要使用刷脸验证服务，可以选择静态密码、电子签名、短信验证等其他方式。</view>
-          <view>(e) 在您同意的情况下，与您联系；向您发送有关您可能感兴趣的产品和服务的信息；邀请您参与星云小卫活动（包括促销活动）、市场调查或满意度调查；或向您发送营销信息。如果您不想接收此类信息，则可以随时退订。</view>
+          <view>(e) 在您同意的情况下，与您联系；向您发送有关您可能感兴趣的产品和服务的信息；邀请您参与云卫家活动（包括促销活动）、市场调查或满意度调查；或向您发送营销信息。如果您不想接收此类信息，则可以随时退订。</view>
           <view>(f) 向您发送重要通知，如操作系统或应用程序更新和安装的通知。</view>
           <view>(g) 为您提供个性化用户体验和个性化内容。</view>
           <view>(h) 保护我们产品、服务和客户或用户的安全，执行与改善我们的防损和反欺诈计划。</view>
           <view>(i) 遵从和执行适用的法律要求，相关的行业标准或我们的政策。</view>
-          <view>1.3 星云小卫还可能收集和使用非识别性数据。非识别性数据是指无法用于确定个人身份的数据。例如，星云小卫的APP会收集汇总的统计数据，例如网站访问量。星云小卫收集此数据的目的在于了解用户如何使用自己的网站、产品和服务。借此，星云小卫可以改善自己的服务，更好地满足客户需求。星云小卫可能会自行决定出于其他目的收集、使用、处理、转移或披露非识别性数据。我们会尽力隔离您的个人数据和非识别性数据，并单独使用这两种数据。如果个人数据掺杂了非识别性数据，依旧会被视作个人数据处理。</view>
-          <view>1.4 当星云小卫处理您的个人数据时我们会遵从适用的法律的要求基于适当的合法性基础予以处理，包括：</view>
+          <view>1.3 云卫家还可能收集和使用非识别性数据。非识别性数据是指无法用于确定个人身份的数据。例如，云卫家的APP会收集汇总的统计数据，例如网站访问量。云卫家收集此数据的目的在于了解用户如何使用自己的网站、产品和服务。借此，云卫家可以改善自己的服务，更好地满足客户需求。云卫家可能会自行决定出于其他目的收集、使用、处理、转移或披露非识别性数据。我们会尽力隔离您的个人数据和非识别性数据，并单独使用这两种数据。如果个人数据掺杂了非识别性数据，依旧会被视作个人数据处理。</view>
+          <view>1.4 当云卫家处理您的个人数据时我们会遵从适用的法律的要求基于适当的合法性基础予以处理，包括：</view>
           <view>(a) 基于您的同意处理您的个人数据；</view>
           <view>(b) 当响应您的交易或服务请求时为履行合同处理您的个人数据；</view>
           <view>(c) 当与您联系、进行营销或市场调查，为改善我们的产品和服务，执行与改善我们的防损和反欺诈计划等目的处理您的个人数据时我们将基于我们或第三方的合法利益。这些合法利益包括，使我们能够更有效的管理和运营我们的业务并提供我们的产品和服务；保护我们的业务、系统、产品、服务和客户的安全；内部管理，遵从内部的政策和流程；我们在本政策中描述的其他合法利益等；</view>
@@ -40,33 +40,33 @@
       </view>
 
       <view class="section">
-        <view class="section-title">星云小卫如何使用 Cookie 和同类技术</view>
+        <view class="section-title">云卫家如何使用 Cookie 和同类技术</view>
         <view class="section-content">
           <view>2.1 Cookie</view>
           <view>为确保网站正常运转，我们有时会在计算机或移动设备上存储名为 Cookie 的小数据文件。Cookie 是一种网络服务器存储在计算机或移动设备上的纯文本文件。Cookie 的内容只能由创建它的服务器检索或读取。每个 Cookie 对您的网络浏览器或移动应用程序都是唯一的。Cookie 通常包含标识符、站点名称以及一些号码和字符。借助于 Cookie，网站能够存储用户偏好或购物篮内的商品等数据。</view>
-          <view>星云小卫启用Cookie的目的为改善用户体验：借助于 Cookie，网站能够记住用户的单次访问（使用会话 Cookie）或多次访问（使用永久 Cookie）；借助于 Cookie，网站能够保存设置，例如计算机或移动设备的语言、字体大小和其他浏览偏好。这意味着，用户无需在每次访问时重新配置用户偏好设置。</view>
-          <view>星云小卫不会将 Cookie 用于本政策所述目的之外的任何用途。</view>
+          <view>云卫家启用Cookie的目的为改善用户体验：借助于 Cookie，网站能够记住用户的单次访问（使用会话 Cookie）或多次访问（使用永久 Cookie）；借助于 Cookie，网站能够保存设置，例如计算机或移动设备的语言、字体大小和其他浏览偏好。这意味着，用户无需在每次访问时重新配置用户偏好设置。</view>
+          <view>云卫家不会将 Cookie 用于本政策所述目的之外的任何用途。</view>
           <view>您使用我们的网站意味着您同意按照如上所述使用Cookie。</view>
           <view>2.2 网站信标和像素标签</view>
-          <view>除 Cookie 外，我们还会在网站上使用网站信标和像素标签等其他同类技术。例如，星云小卫向您发送的电子邮件可能含有链接至星云小卫网站内容的点击 URL。如果您点击该链接，星云小卫则会跟踪此次点击，帮助我们了解您的产品和服务偏好并改善客户服务。</view>
+          <view>除 Cookie 外，我们还会在网站上使用网站信标和像素标签等其他同类技术。例如，云卫家向您发送的电子邮件可能含有链接至云卫家网站内容的点击 URL。如果您点击该链接，云卫家则会跟踪此次点击，帮助我们了解您的产品和服务偏好并改善客户服务。</view>
           <view>您使用我们的网站意味着您同意按照如上所述使用网站信标和像素标签。</view>
         </view>
       </view>
 
       <view class="section">
-        <view class="section-title">星云小卫如何披露您的个人数据</view>
+        <view class="section-title">云卫家如何披露您的个人数据</view>
         <view class="section-content">
-          <view>在某些服务由星云小卫的授权合作伙伴提供的情况下，星云小卫会如本政策描述与该合作伙伴共享您的个人数据。例如，在您上网购买星云小卫产品时，星云小卫必须与物流服务提供商共享您的个人数据才能安排送货，或者安排合作伙伴提供服务。</view>
-          <view>在适用的法律要求或响应法律程序的情况下，星云小卫也可能会向相关的执法机关或者其他政府机关披露您的个人数据。同时星云小卫还会在存在合理需求的情况下披露您的数据，例如出于执行合同以及我们认为为阻止身体损害或财产损失或调查可能的或实际的非法行为有必要披露且披露是适当的。</view>
+          <view>在某些服务由云卫家的授权合作伙伴提供的情况下，云卫家会如本政策描述与该合作伙伴共享您的个人数据。例如，在您上网购买云卫家产品时，云卫家必须与物流服务提供商共享您的个人数据才能安排送货，或者安排合作伙伴提供服务。</view>
+          <view>在适用的法律要求或响应法律程序的情况下，云卫家也可能会向相关的执法机关或者其他政府机关披露您的个人数据。同时云卫家还会在存在合理需求的情况下披露您的数据，例如出于执行合同以及我们认为为阻止身体损害或财产损失或调查可能的或实际的非法行为有必要披露且披露是适当的。</view>
         </view>
       </view>
 
       <view class="section">
         <view class="section-title">如何访问或修改您的个人数据</view>
         <view class="section-content">
-          <view>您应确保提交的所有个人数据都准确无误。星云小卫会尽力维护个人数据的准确和完整，并及时更新这些数据。</view>
+          <view>您应确保提交的所有个人数据都准确无误。云卫家会尽力维护个人数据的准确和完整，并及时更新这些数据。</view>
           <view>当适用的法律要求的情况下，您可能(1)有权访问我们持有的关于您的特定的个人数据；(2)要求我们更新或更正您的不准确的个人数据；(3)拒绝或限制我们使用您的个人数据；以及(4)要求我们删除您的个人数据。如果您想行使相关的权利，请在线反馈给我们。为保障安全，您可能需要提供书面请求。如果我们有合理依据认为这些请求存在欺骗性、无法实行或损害他人隐私权，我们则会拒绝处理请求。</view>
-          <view>当适用的法律要求的情况下，当星云小卫基于您的同意处理您的个人数据时，您还有权随时撤销您的同意。但撤销同意不会影响撤销前我们基于您的同意处理您个人数据的合法性及效力，也不影响我们基于其他适当的正当性基础处理您的个人数据。</view>
+          <view>当适用的法律要求的情况下，当云卫家基于您的同意处理您的个人数据时，您还有权随时撤销您的同意。但撤销同意不会影响撤销前我们基于您的同意处理您个人数据的合法性及效力，也不影响我们基于其他适当的正当性基础处理您的个人数据。</view>
         </view>
       </view>
 
@@ -89,9 +89,9 @@
       </view>
 
       <view class="section">
-        <view class="section-title">星云小卫如何保护和留存您的个人数据</view>
+        <view class="section-title">云卫家如何保护和留存您的个人数据</view>
         <view class="section-content">
-          <view>星云小卫重视个人数据的安全。我们采用适当的物理、管理和技术保障措施来保护您的个人数据不被未经授权访问、披露、使用、修改、损坏或丢失。例如，我们会使用加密技术确保数据的机密性；我们会使用保护机制防止数据遭到恶意攻击；传播和存储个人敏感信息（含人脸信息）时，我们将采用加密、权限控制、去标识化/匿名化等安全措施；我们会部署访问控制机制，确保只有授权人员才可访问个人数据；以及我们会举办安全和隐私保护培训课程，加强员工对于保护个人数据重要性的认识。我们会尽力保护您的个人数据，但是请注意任何安全措施都无法做到无懈可击。</view>
+          <view>云卫家重视个人数据的安全。我们采用适当的物理、管理和技术保障措施来保护您的个人数据不被未经授权访问、披露、使用、修改、损坏或丢失。例如，我们会使用加密技术确保数据的机密性；我们会使用保护机制防止数据遭到恶意攻击；传播和存储个人敏感信息（含人脸信息）时，我们将采用加密、权限控制、去标识化/匿名化等安全措施；我们会部署访问控制机制，确保只有授权人员才可访问个人数据；以及我们会举办安全和隐私保护培训课程，加强员工对于保护个人数据重要性的认识。我们会尽力保护您的个人数据，但是请注意任何安全措施都无法做到无懈可击。</view>
           <view>我们将会在达成本政策所述目的所需的期限内保留您的个人数据，除非按照法律要求或许可需要延长保留期或受到法律的允许。因为基于不同的场景和产品及服务的不同，数据的存储期可能会有所不同，我们用于确定存留期的标准包括：完成该业务目的需要留存个人数据的时间，包括提供产品和服务，维护相应的交易及业务记录，管控并提升产品与服务性能与质量，保证系统、产品和服务的安全，应对可能的用户查询或投诉，问题定位等；用户是否同意更长的留存期间；法律、合同等是否有保留数据的特殊要求等。</view>
           <view>只要您的账户是为您提供服务必须，我们都将保留您的注册信息。您也可以选择注销您的账号，在您注销账号后，我们会停止基于该账号提供产品和服务，并在无特殊法律要求的情况下，删除您相应的个人数据。</view>
           <view>需要重点提示的是，请您务必妥善保管好您的账户、密码及其他身份要素，我们会通过您的账户及其他身份要素识别您的身份，一旦您泄露了前述信息，您可能会蒙受损失，并可能对您产生不利。</view>
@@ -99,18 +99,18 @@
       </view>
 
       <view class="section">
-        <view class="section-title">星云小卫如何处理儿童的个人数据</view>
+        <view class="section-title">云卫家如何处理儿童的个人数据</view>
         <view class="section-content">
           <view>我们的产品、网站和服务主要面向成人。如果没有父母或监护人的同意，儿童不得创建自己的用户帐户。对于经父母同意而收集儿童个人数据的情况，我们只会在受到法律允许、父母或监护人明确同意或者保护儿童所必要的情况下使用或披露此数据。</view>
-          <view>如果星云小卫发现在未事先获得可证实的父母同意的情况下收集了儿童的个人数据，则会设法尽快删除相关数据。</view>
+          <view>如果云卫家发现在未事先获得可证实的父母同意的情况下收集了儿童的个人数据，则会设法尽快删除相关数据。</view>
         </view>
       </view>
 
       <view class="section">
         <view class="section-title">第三方提供商及其服务</view>
         <view class="section-content">
-          <view>为确保流畅的浏览体验，您可能会收到来自星云小卫及其合作伙伴外部的第三方（下文简称"第三方"）提供的内容或网络链接。星云小卫对此类第三方无控制权。您可选择是否访问第三方提供的链接、内容、产品和服务。</view>
-          <view>星云小卫无法控制第三方的隐私和数据保护政策，此类第三方不受到本政策的约束。在向第三方提交个人信息之前，请自行参见这些第三方的隐私保护政策。</view>
+          <view>为确保流畅的浏览体验，您可能会收到来自云卫家及其合作伙伴外部的第三方（下文简称"第三方"）提供的内容或网络链接。云卫家对此类第三方无控制权。您可选择是否访问第三方提供的链接、内容、产品和服务。</view>
+          <view>云卫家无法控制第三方的隐私和数据保护政策，此类第三方不受到本政策的约束。在向第三方提交个人信息之前，请自行参见这些第三方的隐私保护政策。</view>
           
           <view class="third-party-sdk">
             <view class="sdk-title">本应用使用的第三方SDK信息如下：</view>
@@ -187,140 +187,46 @@
               </view>
 
               <view class="table-row">
-                <view class="td">uni-ad</view>
-                <view class="td">-</view>
-                <view class="td">基础广告</view>
-                <view class="td">设备品牌、型号、操作系统版本、OAID、分辨率、IMEI、android ID、SIM卡IMSI信息、应用名称、应用包名、应用版本号、网络信息、应用安装列表、位置信息</view>
-                <view class="td">android.permission.ACCESS_NETWORK_STATE、android.permission.READ_PHONE_STATE、android.permission.ACCESS_COARSE_LOCATION</view>
-                <view class="td">广告投放合作，广告归因、反作弊、安全</view>
-                <view class="td"><a href="https://doc.dcloud.net.cn/markdown-share-docs/1d821cdd3cdf2681045ec4be94bc8404/">隐私协议</a></view>
-              </view>
-
-              <view class="table-row">
-                <view class="td">推啊</view>
-                <view class="td">engine.tuifish.com</view>
-                <view class="td">基础广告</view>
-                <view class="td">设备品牌、型号、操作系统版本、OAID、分辨率、IMEI、android ID、SIM卡IMSI信息、应用名称、应用包名、应用版本号、网络信息、应用安装列表、位置信息</view>
-                <view class="td">android.permission.ACCESS_NETWORK_STATE、android.permission.READ_PHONE_STATE、android.permission.ACCESS_COARSE_LOCATION</view>
-                <view class="td">识别广告、活动作弊行为；改善SDK崩溃率、推送个性化广告；广告投放</view>
-                <view class="td"><a href="https://yun.tuia.cn/tuia/sdk/agreement/index.html">推啊隐私协议</a></view>
-              </view>
-
-              <view class="table-row">
-                <view class="td">快手</view>
-                <view class="td">com.kwad.sdk</view>
-                <view class="td">增强广告</view>
-                <view class="td">基础信息：设备品牌、设备型号、软件系统版本、存储信息、运营商信息、设备时区、设备语言、网络信息等基础信息；设备标识：IMEIs、MEID、OAID、AndroidID、IMSIs、ICCID；位置信息：IP地址、MAC地址、GPS位置信息、基站信息、WIFI信息；应用信息：应用安装列表；其他信息：传感器信息、sim卡激活信息</view>
-                <view class="td">android.permission.ACCESS_NETWORK_STATE、android.permission.INTERNET、android.permission.READ_PHONE_STATE、android.permission.ACCESS_WIFI_STATE、android.permission.REQUEST_INSTALL_PACKAGES、android.permission.VIBRATE</view>
-                <view class="td">广告投放、广告归因、反作弊、安全</view>
-                <view class="td"><a href="https://www.kuaishou.com/about/policy">快手内容联盟隐私协议</a>和<a href="https://u.kuaishou.com/home/detail/1220">SDK使用规范</a></view>
-              </view>
-
-              <view class="table-row">
-                <view class="td">优量汇</view>
-                <view class="td">com.qq.e</view>
-                <view class="td">增强广告</view>
-                <view class="td">基站、附近的WIFI、连接的WIFI、位置信息、设备制造商、设备型号、操作系统版本、屏幕分辨率、屏幕方向、屏幕DPI、IP地址、加速度传感器、磁场传感器、OAID、IMEI/MEID（Device ID）、Android_ID、包名、版本号、进程名称、运行状态、可疑行为、应用安装信息</view>
-                <view class="td">android.permission.INTERNET、android.permission.ACCESS_NETWORK_STATE、android.permission.ACCESS_WIFI_STATE、android.permission.REQUEST_INSTALL_PACKAGES、android.permission.CHANGE_NETWORK_STATE、android.permission.QUERY_ALL_PACKAGES、android.permission.REORDER_TASKS、android.permission.VIBRATE、android.permission.ACCESS_COARSE_LOCATION</view>
-                <view class="td">广告投放与监测归因、广告主统计投放结果、减少App崩溃、确保服务器正常运行、提升可扩展性和性能</view>
-                <view class="td"><a href="https://e.qq.com/dev/help_detail.html?cid=2005&pid=5983">优量汇隐私协议</a></view>
-              </view>
-
-              <view class="table-row">
-                <view class="td">穿山甲</view>
-                <view class="td">com.bytedance.sdk.openadsdk</view>
-                <view class="td">增强广告</view>
-                <view class="td">设备品牌、型号、软件系统版本、屏幕密度、屏幕分辨率、设备语言、设备时区、sim卡信息（mcc&mnc）、CPU信息、可用存储空间大小、MAC地址、设备标识符（如IMEI、IMSI、ICCID、GAID（仅GMS服务）、MEID、硬件序列号build_serial、AndroidID、OAID、运营商信息、Wi-Fi状态、网络信号强度、IP地址、应用包名、运行中的进程信息、版本号、应用前后台状态、软件列表信息、线性加速度传感器、磁场传感器、旋转矢量传感器、精确位置信息、粗略位置信息（WiFi列表、WLAN接入点（如SSID，BSSID）、基站）</view>
-                <view class="td">android.permission.ACCESS_NETWORK_STATE、android.permission.READ_PHONE_STATE、android.permission.WRITE_EXTERNAL_STORAGE</view>
-                <view class="td">广告投放合作、广告归因、反作弊</view>
-                <view class="td"><a href="https://www.pangle.cn/privacy/partner">穿山甲隐私协议</a></view>
-              </view>
-
-              <view class="table-row">
-                <view class="td">Sigmob</view>
-                <view class="td">com.sigmob.windad</view>
-                <view class="td">增强广告</view>
-                <view class="td">设备信息：设备品牌、型号、操作系统版本、OAID、分辨率等基础设备信息；应用信息：应用名称、应用包名、应用版本号等；其他：运营商信息、时区</view>
-                <view class="td">android.permission.ACCESS_NETWORK_STATE、android.permission.INTERNET、android.permission.ACCESS_WIFI_STATE、android.permission.CHANGE_WIFI_STATE、android.permission.READ_PHONE_STATE、android.permission.REQUEST_INSTALL_PACKAGES、android.permission.QUERY_ALL_PACKAGES</view>
-                <view class="td">广告投放、广告主归因、反作弊</view>
-                <view class="td"><a href="https://doc.sigmob.com/Sigmob%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/%E5%90%88%E8%A7%84%E6%9D%A1%E6%AC%BE/%E9%9A%90%E7%A7%81%E6%94%BF%E7%AD%96/">Sigmob隐私协议</a></view>
-              </view>
-
-              <view class="table-row">
-                <view class="td">百度百青藤</view>
-                <view class="td">com.baidu.mobads.proxy</view>
-                <view class="td">增强广告</view>
-                <view class="td">设备信息：设备品牌、型号、软件系统版本、分辨率、网络信号强度、传感器信息，磁盘总空间、系统总内存空间、手机重启信息、手机系统更新时间等基础信息、OAID、AndroidID、屏幕宽高，屏幕像素密度，系统版本号，设备厂商，设备型号，手机运营商，手机网络状态，设备剩余存储空间，手机重启时间和更新时间；开发者应用信息：应用包名、应用前后台状态；设备信息：IMEI、IMSI、MEID；位置信息</view>
-                <view class="td">android.permission.INTERNET、android.permission.ACCESS_NETWORK_STATE、android.permission.ACCESS_WIFI_STATE、android.permission.READ_PHONE_STATE、android.permission.ACCESS_COARSE_LOCATION、android.permission.WRITE_EXTERNAL_STORAGE</view>
-                <view class="td">为最终用户提供安全保障、改善我们的产品和服务，开展内部审计、数据分析和研究</view>
-                <view class="td"><a href="https://union.baidu.com/bqt/#/legal/policies">百度百青藤隐私协议</a></view>
-              </view>
-
-              <view class="table-row">
-                <view class="td">HUAWEI Ads</view>
-                <view class="td">com.huawei.hms.ads.lite</view>
-                <view class="td">增强广告</view>
-                <view class="td">设备信息、网络信息、位置信息、应用信息、应用使用信息、上下文信息</view>
-                <view class="td">android.permission.INTERNET、android.permission.ACCESS_NETWORK_STATE、android.permission.ACCESS_WIFI_STATE</view>
-                <view class="td">单次请求的广告定向投放、程序化广告投放、广告监测归因与反作弊</view>
-                <view class="td"><a href="https://developer.huawei.com/consumer/cn/doc/HMSCore-Guides/whale-hong-kinetic-energy-sdk-privacy-statement-0000001658283582">HUAWEI Ads隐私声明</a>和<a href="https://developer.huawei.com/consumer/cn/doc/HMSCore-Guides/whale-hong-kinetic-sdk-compliance-user-guide-0000001658442922">HUAWEI Ads SDK隐私安全说明</a></view>
-              </view>
-
-              <view class="table-row">
-                <view class="td">章鱼广告</view>
-                <view class="td">com.octopus.ad</view>
-                <view class="td">增强广告</view>
-                <view class="td">设备品牌、设备型号、设备时区、设备语言、系统版本、开发者应用名、应用版本号、应用包名、网络类型、UserAgent信息、网络状态、崩溃信息、性能数据、屏幕高宽、屏幕方向、屏幕DPI信息、系统更新时间、开机时间、磁盘空间、物理内存、设备ID（OAID、GAID）、IMEI用户授权才收集、USB调试模式、cpu、运行状态、运营商、传感器信息、掠过手势内容</view>
-                <view class="td">android.permission.INTERNET、android.permission.ACCESS_NETWORK_STATE、android.permission.ACCESS_WIFI_STATE、android.permission.WRITE_EXTERNAL_STORAGE、android.permission.READ_EXTERNAL_STORAGE</view>
-                <view class="td">基于用户设备信息调整广告投放、统计分析、反作弊、实现广告正常显示与交互功能，通过崩溃信息优化代码缺陷，最大程度减少App崩溃。通过收集SDK运行过程中性能数据，以优化SDK的性能。统计广告数据，以用于广告主统计投放结果</view>
-                <view class="td"><a href="https://doc.adintl.cn/#/zh-cn/guide/UsePrivacy">章鱼广告SDK隐私政策</a></view>
-              </view>
-
-              <view class="table-row">
-                <view class="td">倍孜广告</view>
-                <view class="td">com.beizi.ad</view>
-                <view class="td">增强广告</view>
-                <view class="td">设备品牌、设备型号、设备时区、设备语言、系统版本、网络类型、UserAgent信息、屏幕高宽、屏幕方向、屏幕DPI信息、系统更新时间、开机时间、磁盘空间、物理内存、运营商、sim卡状态、传感器信息、掠过手势内容、cpu、设备ID(国内用户OAID、海外用户GAID)、开发者应用名、应用版本号、应用包名、运行状态、使用数据、诊断数据</view>
-                <view class="td">android.permission.INTERNET、android.permission.ACCESS_NETWORK_STATE、android.permission.ACCESS_WIFI_STATE、android.permission.WRITE_EXTERNAL_STORAGE、android.permission.READ_EXTERNAL_STORAGE</view>
-                <view class="td">广告投放策略、统计分析服务、反作弊分析、广告正常显示与交互功能的实现、广告归因、最大程度减少App崩溃、确保服务器正常运行、提升可扩展性和性能</view>
-                <view class="td"><a href="https://sdkdoc.beizi.biz/#/zh-cn/guide/UsePrivacy">BeiZi SDK隐私保护声明</a></view>
-              </view>
-
-              <view class="table-row">
-                <view class="td">泛连</view>
-                <view class="td">com.fl.saas.s2s</view>
-                <view class="td">增强广告</view>
-                <view class="td">设备品牌、型号、软件系统版本、屏幕密度、屏幕分辨率、设备语言、设备时区、IMEI、IMSI、ICCID、GAID、MEID、IDFA、IDFV、AndroidID、OAID、手机系统重启时间、设备的MAC地址、User Agent、IP地址、运营商信息、Wi-Fi状态、网络信号强度、应用版本、应用包名、应用名称、应用前后台状态、应用列表信息、加速度传感器、陀螺仪传感器、广告的展示、点击及转化等交互数据、系统崩溃数据、性能数据</view>
-                <view class="td">android.permission.INTERNET、android.permission.ACCESS_NETWORK_STATE、android.permission.ACCESS_WIFI_STATE、android.permission.VIBRATE、android.permission.REQUEST_INSTALL_PACKAGES、android.permission.READ_PHONE_STATE</view>
-                <view class="td">广告投放及广告监测归因、反作弊、摇一摇广告投放、广告投放统计分析、提升SDK的稳定性，减少APP的崩溃</view>
-                <view class="td"><a href="https://www.adfunlink.com/doc/privacy.html">Funlink隐私保护声明</a></view>
-              </view>
-
-              <view class="table-row">
-                <view class="td">聚力阅盟</view>
-                <view class="td">com.dcloudym</view>
-                <view class="td">增强广告</view>
-                <view class="td">设备型号、操作系统版本、唯一设备标识符、设备环境等软硬件特征信息；GPS位置以及WLAN接入点、蓝牙和基站等传感器信息</view>
-                <view class="td">android.permission.INTERNET、android.permission.ACCESS_NETWORK_STATE、android.permission.ACCESS_WIFI_STATE、android.permission.VIBRATE、android.permission.REQUEST_INSTALL_PACKAGES、android.permission.READ_PHONE_STATE、android.permission.WRITE_EXTERNAL_STORAGE、android.permission.ACCESS_COARSE_LOCATION、android.permission.ACCESS_FINE_LOCATION</view>
-                <view class="td">广告投放及广告监测归因、反作弊、摇一摇广告投放</view>
-                <view class="td"><a href="https://idbj.juliyuemeng.com/privacy">聚力阅盟隐私保护声明</a></view>
+                <view class="td">Taku SDK（塔酷广告聚合）</view>
+                <view class="td">通过 DCloud 原生插件 TakuAdsNativePlugin 集成（Taku 广告聚合 SDK，Android/iOS 端）</view>
+                <view class="td">广告展示</view>
+                <view class="td">设备品牌、设备型号、操作系统版本、屏幕密度与分辨率、设备语言、设备时区、sim卡信息（mcc&mnc）、CPU信息、运营商信息、Wi-Fi状态、网络信号强度、IP地址、设备标识符（Android ID、OAID、IDFA、IDFV、MAC地址等，IMEI等需用户授权后收集）、应用包名、运行中的进程信息、版本号、应用前后台状态、广告展示/点击等交互数据、传感器信息（如摇一摇等广告互动场景，可选）；实际收集项以 Taku 官方隐私政策为准</view>
+                <view class="td">android.permission.INTERNET、android.permission.ACCESS_NETWORK_STATE、android.permission.ACCESS_WIFI_STATE（具体以 Taku SDK 及各广告渠道实际申请为准）</view>
+                <view class="td">广告投放与聚合、广告监测归因、广告反作弊、保障广告正常展示与交互</view>
+                <view class="td"><a href="https://www.takuad.com/privacy-policy">Taku隐私政策</a></view>
               </view>
             </view>
           </view>
         </view>
       </view>
-
+      
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+      
       <view class="section">
         <view class="section-title">本政策如何更新</view>
         <view class="section-content">
-          <view>星云小卫保留不时更新或修改本政策的权利。如果我们的隐私政策变更，我们会将最新版隐私政策发布在这里。如果我们对隐私政策做出了重大变更，我们还可能会通过不同渠道向您发送变更通知。</view>
+          <view>云卫家保留不时更新或修改本政策的权利。如果我们的隐私政策变更，我们会将最新版隐私政策发布在这里。如果我们对隐私政策做出了重大变更，我们还可能会通过不同渠道向您发送变更通知。</view>
         </view>
       </view>
 
       <view class="section">
         <view class="section-title">第一条 总则</view>
         <view class="section-content">
-          <view>1、本服务协议（以下简称"本协议"）是深圳市星云智慧物联科技有限公司（以下简称"服务提供方"）与"一卡通"持卡用户（以下简称"用户"或"您")就"人脸服务"（以下简称"本服务"）的使用等相关事项所订立的有效合约。</view>
+          <view>1、本服务协议（以下简称"本协议"）是深圳市越凡物联科技有限公司（以下简称"服务提供方"）与"一卡通"持卡用户（以下简称"用户"或"您")就"人脸服务"（以下简称"本服务"）的使用等相关事项所订立的有效合约。</view>
           <view>2、在接受本协议之前，请您仔细阅读本协议的全部内容，如果您不同意本协议的任意内容，或者无法准确理解条款的解释，请不要进行后续操作。您通过网络页面点击确认或以其他方式选择接受本协议，即表示您与服务提供方已达成协议并同意接受本协议的全部约定内容。</view>
         </view>
       </view>
@@ -375,8 +281,8 @@
       <view class="section">
         <view class="section-title">更新日期</view>
         <view class="section-content">
-          <view>更新日期：2024年3月19日</view>
-          <view>生效日期：2024年3月19日</view>
+          <view>更新日期：2026年9月3日</view>
+          <view>生效日期：2026年9月3日</view>
         </view>
       </view>
     </view>
@@ -394,9 +300,13 @@ onLoad(() => {
 </script>
 
 <style lang="scss">
+page {
+  background-color: #F5F6FC;
+}
+
 .container {
-  padding: 30rpx;
-  background-color: #fff;
+  padding: 24rpx;
+  background-color: transparent;
   min-height: 100vh;
   
   .title {
@@ -404,23 +314,31 @@ onLoad(() => {
     font-weight: bold;
     text-align: center;
     margin-bottom: 40rpx;
-    color: #333;
+    color: #232838;
   }
   
+  /* 正文白卡排版 */
   .content {
+    background: #FFFFFF;
+    border-radius: 24rpx;
+    padding: 10rpx 30rpx 30rpx;
+    box-shadow: 0 6rpx 24rpx rgba(74, 108, 247, 0.07);
     .section {
       margin-bottom: 40rpx;
       
       .section-title {
         font-size: 32rpx;
         font-weight: bold;
-        color: #333;
+        color: #3B5BEF;
+        padding-left: 18rpx;
+        border-left: 8rpx solid #4A6CF7;
+        line-height: 1.5;
         margin-bottom: 20rpx;
       }
       
       .section-content {
         font-size: 28rpx;
-        color: #666;
+        color: #5A6072;
         line-height: 1.8;
         text-align: justify;
         
@@ -429,7 +347,7 @@ onLoad(() => {
         }
 
         a {
-          color: #007AFF;
+          color: #4A6CF7;
           text-decoration: none;
           
           &:hover {
@@ -449,18 +367,18 @@ onLoad(() => {
     }
     
     .sdk-table {
-      border: 1px solid #eee;
+      border: 1px solid #E8ECFB;
       border-radius: 8rpx;
       
       .table-header {
         display: flex;
-        background: #f8f8f8;
+        background: #EEF1FB;
         font-weight: bold;
         
         .th {
           flex: 1;
           padding: 20rpx;
-          border-right: 1px solid #eee;
+          border-right: 1px solid #E8ECFB;
           font-size: 24rpx;
           
           &:last-child {
@@ -471,12 +389,12 @@ onLoad(() => {
       
       .table-row {
         display: flex;
-        border-top: 1px solid #eee;
+        border-top: 1px solid #E8ECFB;
         
         .td {
           flex: 1;
           padding: 20rpx;
-          border-right: 1px solid #eee;
+          border-right: 1px solid #E8ECFB;
           font-size: 24rpx;
           word-break: break-all;
           

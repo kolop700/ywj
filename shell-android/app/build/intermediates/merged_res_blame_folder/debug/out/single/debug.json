@@ -1,0 +1,14 @@
+[
+    {
+        "merged": "com.yefiot.cloudguard.app-merged_res-54:/xml_file_paths.xml.flat",
+        "source": "com.yefiot.cloudguard.app-main-56:/xml/file_paths.xml"
+    },
+    {
+        "merged": "com.yefiot.cloudguard.app-merged_res-54:/xml_network_security_config.xml.flat",
+        "source": "com.yefiot.cloudguard.app-main-56:/xml/network_security_config.xml"
+    },
+    {
+        "merged": "com.yefiot.cloudguard.app-merged_res-54:/drawable_ic_launcher.xml.flat",
+        "source": "com.yefiot.cloudguard.app-main-56:/drawable/ic_launcher.xml"
+    }
+]

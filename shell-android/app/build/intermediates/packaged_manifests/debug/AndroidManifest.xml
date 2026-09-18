@@ -1,0 +1,1098 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.yefiot.community"
+    android:versionCode="100"
+    android:versionName="1.0.0" >
+
+    <uses-sdk
+        android:minSdkVersion="24"
+        android:targetSdkVersion="34" />
+
+    <!-- ==================== 网络 ==================== -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+
+    <!-- ==================== 蓝牙（核心：开门） ==================== -->
+    <!-- Android 12 以下 -->
+    <uses-permission
+        android:name="android.permission.BLUETOOTH"
+        android:maxSdkVersion="30" />
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_ADMIN"
+        android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- Android 12+ (API 31+) -->
+    <!--
+         绝不能加 neverForLocation！官方文档明确：带该标志时系统会把部分 BLE beacon 类广播
+         从扫描结果中静默过滤。实测：普通设备全部可见，唯独门锁永远收不到（2257 次上报 0 命中）；
+         原版（DCloud）未使用该标志，可正常搜到门锁。去掉后 Android 12+ 需依赖下方
+         ACCESS_FINE_LOCATION 运行时授权，BleManager.scanPermissions() 已在扫描前申请。
+    -->
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+
+    <!-- ==================== 相机 / 存储（扫码 / 相册 / 头像） ==================== -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
+    <!-- Android 13+ 读取媒体 -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <!-- Android 10+ 保存图片到相册（MediaStore 分区存储无需权限，保留兼容） -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
+    <!-- ==================== App 内更新（下载 + 安装 APK） ==================== -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.bluetooth_le"
+        android:required="false" />
+
+    <!-- Android 11+ 包可见性：微信 -->
+    <queries>
+        <package android:name="com.tencent.mm" />
+
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+
+            <category android:name="android.intent.category.BROWSABLE" />
+
+            <data android:scheme="https" />
+        </intent>
+
+        <package android:name="com.google.android.gms" />
+        <package android:name="com.android.vending" />
+        <package android:name="com.android.creator" />
+        <package android:name="com.mdid.msa" />
+        <package android:name="com.samsung.android.deviceidservice" />
+        <package android:name="com.coolpad.deviceidsupport" />
+        <package android:name="com.heytap.openid" />
+        <package android:name="com.huawei.hwid" />
+        <package android:name="com.huawei.hwid.tv" />
+        <package android:name="com.huawei.hms" />
+        <package android:name="com.asus.msa.SupplementaryDID" />
+        <package android:name="com.zui.deviceidservice" />
+        <package android:name="com.qiku.id" />
+        <package android:name="com.eg.android.AlipayGphone" /> <!-- 支付宝 -->
+        <package android:name="com.jingdong.app.mall" /> <!-- 京东 -->
+        <package android:name="com.taobao.idlefish" /> <!-- 闲鱼 -->
+        <package android:name="me.ele" /> <!-- 饿了么 -->
+        <package android:name="com.taobao.taobao" /> <!-- 淘宝 -->
+        <package android:name="com.xunmeng.pinduoduo" /> <!-- 拼多多 -->
+        <package android:name="com.achievo.vipshop" /> <!-- 唯品会 -->
+        <package android:name="com.smile.gifmaker" /> <!-- 快手 -->
+        <package android:name="com.ss.android.ugc.aweme" /> <!-- 抖音 -->
+        <package android:name="com.sdu.didi.psnger" /> <!-- 滴滴出行 -->
+        <package android:name="com.sankuai.meituan" /> <!-- 美团 -->
+        <package android:name="com.UCMobile" /> <!-- UC浏览器 -->
+        <package android:name="com.baidu.searchbox" /> <!-- 百度 -->
+        <package android:name="com.quark.browser" /> <!-- 夸克 -->
+        <package android:name="com.autonavi.minimap" /> <!-- 高德地图 -->
+        <package android:name="ctrip.android.view" /> <!-- 携程 -->
+        <package android:name="com.sankuai.meituan.takeoutnew" /> <!-- 美团外卖 -->
+        <package android:name="com.ss.android.ugc.aweme.lite" /> <!-- 抖音极速版 -->
+        <package android:name="com.kuaishou.nebula" /> <!-- 快手极速版 -->
+        <package android:name="com.cainiao.wireless" /> <!-- 菜鸟裹裹 -->
+        <package android:name="com.taobao.trip" /> <!-- 飞猪 -->
+        <package android:name="com.baidu.searchbox.lite" /> <!-- 百度极速版 -->
+        <package android:name="com.aliyun.tongyi" /> <!-- 通义千问 -->
+        <package android:name="com.jd.jrapp" /> <!-- 京东金融 -->
+        <package android:name="com.cubic.autohome" /> <!-- 汽车之家 -->
+        <package android:name="com.xingin.xhs" />
+
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+
+            <data android:scheme="http" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+
+            <data android:scheme="https" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+
+            <category android:name="android.intent.category.BROWSABLE" />
+
+            <data android:scheme="http" />
+        </intent>
+    </queries>
+
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
+    <uses-permission android:name="oplus.permission.settings.LAUNCH_FOR_EXPORT" />
+    <uses-permission android:name="freemme.permission.msa.SECURITY_ACCESS" />
+    <uses-permission android:name="freemme.permission.msa" />
+    <uses-permission android:name="com.asus.msa.SupplementaryDID.ACCESS" />
+    <uses-permission android:name="com.yefiot.community.download.PRIVATE_BROADCAST_PERMISSION" />
+
+    <permission
+        android:name="com.yefiot.community.download.PRIVATE_BROADCAST_PERMISSION"
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" /> <!-- 头条额外需要 -->
+    <uses-permission android:name="android.permission.GET_TASKS" />
+
+    <permission
+        android:name="com.yefiot.community.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="com.yefiot.community.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+
+    <uses-feature
+        android:name="android.hardware.camera.front"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.flash"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.screen.landscape"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.wifi"
+        android:required="false" />
+
+    <application
+        android:name="com.yefiot.cloudguard.ShellApp"
+        android:allowBackup="true"
+        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+        android:debuggable="true"
+        android:extractNativeLibs="false"
+        android:hardwareAccelerated="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:largeHeap="true"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:roundIcon="@drawable/ic_launcher"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.CloudGuard"
+        android:usesCleartextTraffic="false" >
+
+        <!-- 主容器：WebView + JS 桥接 -->
+        <activity
+            android:name="com.yefiot.cloudguard.MainActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden|screenLayout|smallestScreenSize|uiMode"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- 扫码页（ZXing CaptureActivity 自带布局） -->
+        <activity
+            android:name="com.yefiot.cloudguard.scan.ScanActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.CloudGuard.Scan" />
+
+        <!-- 微信分享回调入口（必须位于 应用包名.wxapi 下） -->
+        <activity
+            android:name="com.yefiot.cloudguard.wxapi.WXEntryActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:taskAffinity="com.yefiot.community"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
+        <!-- FileProvider：APK 安装 / 图片分享 -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.yefiot.community.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true" >
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+        <activity
+            android:name="com.smartdigimkt.china.activity.TransparentActivity"
+            android:exported="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+        <activity
+            android:name="com.smartdigimkt.dlopt.activity.ApkConfirmDialogActivity"
+            android:exported="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+
+        <provider
+            android:name="com.smartdigimkt.dlopt.common.ApkFileProvider"
+            android:authorities="com.yefiot.community.sdm.fileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true" >
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/sdm_file_paths" />
+        </provider>
+
+        <receiver
+            android:name="com.smartdigimkt.dlopt.common.NotificationBroadcastReceiver"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="sdm_action_notification_click" />
+                <!-- cancel 路径改为动态注册，避免 app 被 kill 后划通知冷启动宿主进程 -->
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name="com.smartdigimkt.dlopt.common.service.ApkDownloadService"
+            android:exported="false" />
+
+        <activity
+            android:name="com.smartdigimkt.sdk.basead.ui.ATLandscapeActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|screenLayout"
+            android:exported="false"
+            android:launchMode="standard"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+        <activity
+            android:name="com.smartdigimkt.sdk.basead.ui.ATPortraitActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|screenLayout"
+            android:exported="false"
+            android:launchMode="standard"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+        <activity
+            android:name="com.smartdigimkt.sdk.basead.ui.ATLandscapeTranslucentActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|screenLayout"
+            android:exported="false"
+            android:launchMode="standard"
+            android:theme="@style/sdm_myoffer_half_screen" />
+        <activity
+            android:name="com.smartdigimkt.sdk.basead.ui.ATPortraitTranslucentActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|screenLayout"
+            android:exported="false"
+            android:launchMode="standard"
+            android:theme="@style/sdm_myoffer_half_screen" />
+        <activity
+            android:name="com.smartdigimkt.sdk.basead.ui.web.WebLandPageActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|screenLayout"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:theme="@android:style/Theme.Light.NoTitleBar"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name="com.smartdigimkt.sdk.basead.ui.RewardExitConfirmDialogActivity"
+            android:exported="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+
+        <provider
+            android:name="com.smartdigimkt.sdk.api.SDMInitializationProvider"
+            android:authorities="com.yefiot.community.sdm.initatprovider"
+            android:exported="false" />
+
+        <activity
+            android:name="com.anythink.core.activity.AnyThinkGdprAuthActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|screenLayout"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+
+        <provider
+            android:name="com.anythink.core.api.ATInitializationProvider"
+            android:authorities="com.yefiot.community.anythink.initatprovider"
+            android:exported="false" />
+
+        <activity
+            android:name="com.anythink.core.common.inner.ui.ATLandscapeActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|screenLayout"
+            android:exported="false"
+            android:launchMode="standard"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+        <activity
+            android:name="com.anythink.core.common.inner.ui.ATPortraitActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|screenLayout"
+            android:exported="false"
+            android:launchMode="standard"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+        <activity
+            android:name="com.anythink.core.common.inner.ui.ATLandscapeTranslucentActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|screenLayout"
+            android:exported="false"
+            android:launchMode="standard"
+            android:theme="@style/anythink_myoffer_half_screen" />
+        <activity
+            android:name="com.anythink.core.common.inner.ui.ATPortraitTranslucentActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|screenLayout"
+            android:exported="false"
+            android:launchMode="standard"
+            android:theme="@style/anythink_myoffer_half_screen" />
+        <activity
+            android:name="com.anythink.core.common.inner.ui.activity.ATMixSplashActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:exported="false"
+            android:launchMode="standard"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+        <activity
+            android:name="com.anythink.core.basead.ui.web.WebLandPageActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|screenLayout"
+            android:exported="false"
+            android:launchMode="standard"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+
+        <provider
+            android:name="com.ltmb.ltsdk.core.view.core.LtmbFileProvider"
+            android:authorities="com.yefiot.community.ltmbFileProvider"
+            android:enabled="true"
+            android:exported="false"
+            android:grantUriPermissions="true" >
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/ltmb_provider_paths" />
+        </provider>
+        <provider
+            android:name="com.ltmb.ltsdk.core.service.LtmbContentProvider"
+            android:authorities="com.yefiot.community.ltsdk.core.contentProvider"
+            android:enabled="true"
+            android:exported="false" />
+
+        <receiver
+            android:name="com.ltmb.ltsdk.core.receiver.ApkDownloadCancelReceiver"
+            android:exported="false" />
+
+        <activity
+            android:name="com.ltmb.ltsdk.core.view.LitemizeCommentDetailsActivity"
+            android:enabled="true"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name="com.ltmb.ltsdk.core.view.ad.LTAdRewardVideoActivity"
+            android:enabled="true"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name="com.ltmb.ltsdk.core.view.ad.LTAdInterstitialActivity"
+            android:enabled="true"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:screenOrientation="portrait"
+            android:theme="@style/ltmb_transparent_activity_theme" />
+        <activity
+            android:name="com.ltmb.ltadsdk.adx.ad.interstitial.AdxInterstitialActivity"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
+            android:name="com.ltmb.ltadsdk.adx.ad.interstitial.AdxInterstitialLandscapeActivity"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
+            android:name="com.ltmb.ltadsdk.adx.ad.reward.AdxRewardVideoActivity"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.ltmb.ltadsdk.adx.dialog.AdDownloadDetailDialog"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+            android:exported="false"
+            android:hardwareAccelerated="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
+            android:name="com.ltmb.ltadsdk.adx.ui.activity.AdxDpActivity"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
+        <provider
+            android:name="com.ltmb.ltadsdk.adx.provider.AdxFileProvider"
+            android:authorities="com.yefiot.community.sysdkFileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true" >
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
+
+        <service
+            android:name="com.ltmb.ltadsdk.core.download.SYDownloadService"
+            android:exported="false"
+            android:process=":dldprocess" />
+
+        <receiver
+            android:name="com.ltmb.ltadsdk.core.download.SYDownloadNotificationReceiver"
+            android:exported="false" />
+
+        <activity
+            android:name="com.ltmb.ltadsdk.core.permission.AdPermissionActivity"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
+            android:name="com.ltmb.ltadsdk.plugin.activity.StubActivity"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Light.NoTitleBar" />
+        <activity
+            android:name="com.ltmb.ltadsdk.plugin.activity.StubSingleTaskActivity"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Light.NoTitleBar" />
+        <activity
+            android:name="com.ltmb.ltadsdk.plugin.activity.StubLandscapeActivity"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.Light.NoTitleBar" />
+        <activity
+            android:name="com.ltmb.ltadsdk.plugin.activity.StubSingleTopActivity"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Light.NoTitleBar" />
+        <activity
+            android:name="com.ltmb.ltadsdk.plugin.activity.StubSingleInstanceActivity"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Light.NoTitleBar" />
+        <activity
+            android:name="com.ltmb.ltadsdk.plugin.activity.StubTranslucentActivity"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
+            android:name="com.ltmb.ltadsdk.plugin.activity.StubTranslucentLandscapeActivity"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
+            android:name="com.ltmb.ltadsdk.ui.activity.AdLPageActivity"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.ltmb.ltadsdk.ui.dialog.AdComplianceDialog"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.zm.adxsdk.core.activity.WfNoTitleActivity"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|navigation"
+            android:multiprocess="true"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.NoTitleBar" />
+        <activity
+            android:name="com.zm.adxsdk.core.activity.WfTranslucentNoTitleActivity"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|navigation"
+            android:multiprocess="true"
+            android:screenOrientation="behind"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
+        <service android:name="com.zm.adxsdk.core.service.WfProxyService1" />
+        <service android:name="com.zm.adxsdk.core.service.WfProxyService2" />
+        <service android:name="com.zm.adxsdk.core.service.WfProxyService3" />
+        <service android:name="com.zm.adxsdk.core.service.WfProxyService4" />
+        <service android:name="com.zm.adxsdk.core.service.WfProxyService5" />
+
+        <provider
+            android:name="com.zm.adxsdk.WfFileProvider"
+            android:authorities="com.yefiot.community.zm.adx.WfFileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true" >
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/wf_sdk_file_paths" />
+        </provider>
+        <provider
+            android:name="com.zm.fda.FobProvider"
+            android:authorities="com.yefiot.community.FobProvider"
+            android:exported="false" />
+
+        <activity
+            android:name="com.ltmb.ltsdk.core.kat.web.WebActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" >
+        </activity>
+        <activity
+            android:name="com.ltmb.ltsdk.core.kat.web.TrampolineActivity"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name="com.ltmb.ltsdk.core.zl.adsdk.ltmbzlact.LTMBZLMActivity"
+            android:multiprocess="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:windowSoftInputMode="adjustUnspecified" />
+        <activity
+            android:name="com.ltmb.ltsdk.core.zl.adsdk.ltmbzlact.LTMBZLDActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|keyboardHidden|screenLayout|uiMode|keyboard|navigation"
+            android:multiprocess="true"
+            android:windowSoftInputMode="adjustUnspecified" />
+
+        <provider
+            android:name="com.ltmb.ltsdk.core.zl.adsdk.ltmbzlctt.LTMBZLProvider"
+            android:authorities="com.yefiot.community.XfpFileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true" >
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/ltmbzlad_file_paths" />
+        </provider>
+
+        <service
+            android:name="com.ltmb.ltsdk.core.by.downloads.AriaDownloadService"
+            android:enabled="true"
+            android:exported="false" /> <!-- 7.0系统兼容性：使用FileProvider生成content:// Uri来替代file:// Uri -->
+        <provider
+            android:name="com.ltmb.ltsdk.core.by.core.widget.LTAdFileProvider"
+            android:authorities="com.yefiot.community.ltmb_ad_by_fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true" >
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/ltmb_ad_by_file_paths" />
+        </provider>
+
+        <receiver android:name="com.ltmb.ltsdk.core.by.downloads.NotificationClickReceiver" />
+
+        <activity
+            android:name="com.ltmb.ltsdk.core.by.activity.WebViewActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:exported="true"
+            android:theme="@android:style/Theme.NoTitleBar"
+            android:windowSoftInputMode="stateHidden" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.ltmb.ltsdk.core.by.activity.AskDialogActivity"
+            android:configChanges="keyboard|keyboardHidden|screenSize"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:theme="@style/ltmb_ad_by_TransActivity"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name="com.ltmb.ltsdk.core.by.activity.PortraitRewardActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name="com.ltmb.ltsdk.core.by.activity.LandscapeRewardActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name="com.ltmb.ltsdk.core.by.activity.InterstitialLandscapeActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:theme="@style/ltmb_ad_by_TransActivity"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name="com.ltmb.ltsdk.core.by.activity.InterstitialPortraitActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:theme="@style/ltmb_ad_by_TransActivity"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name="com.ltmb.ltsdk.core.by.activity.TextInfActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name="com.ltmb.ltsdk.core.by.activity.DownloadTransitionActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:exported="false"
+            android:theme="@android:style/Theme.NoTitleBar"
+            android:windowSoftInputMode="stateHidden" /> <!-- android:theme="@android:style/Theme.Translucent" -->
+        <meta-data
+            android:name="poly-gamma.origin.publisher-id"
+            android:value="c9506752-be94-4ac4-80b4-d2ad15fdc9bf" />
+        <meta-data
+            android:name="poly-gamma.origin.region"
+            android:value="cn" />
+
+        <activity
+            android:name="com.ltmb.ltsdk.core.mt.ad.utils.LTAdOpenJdDplinkActivity"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+        <activity
+            android:name="com.ltmb.ltsdk.core.mt.ad.view.dialog.LTAdDownloadHoldDialogActivity"
+            android:configChanges="keyboardHidden|orientation|keyboard|smallestScreenSize|screenSize|screenLayout"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:theme="@style/ltmb_ad_dialogTheme" />
+        <activity
+            android:name="com.ltmb.ltsdk.core.mt.ad.view.dialog.LTAdDownloadSecondConfirmActivity"
+            android:configChanges="keyboardHidden|orientation|keyboard|smallestScreenSize|screenSize|screenLayout"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:theme="@style/ltmb_ad_dialogTheme" />
+        <activity
+            android:name="com.ltmb.ltsdk.core.mt.ad.reward.LTAdRewardVideoActivity"
+            android:configChanges="keyboardHidden|orientation|keyboard|smallestScreenSize|screenSize|screenLayout"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:launchMode="singleTask"
+            android:theme="@android:style/Theme.NoTitleBar" />
+        <activity
+            android:name="com.ltmb.ltsdk.core.mt.ad.view.web.VLionWebViewActivity"
+            android:configChanges="keyboardHidden|orientation|keyboard|smallestScreenSize|screenSize|screenLayout"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:launchMode="singleTask"
+            android:theme="@android:style/Theme.NoTitleBar" />
+        <activity
+            android:name="com.ltmb.ltsdk.core.mt.ad.interstitial.LTAdCustomInterstitialActivity"
+            android:configChanges="keyboardHidden|orientation|keyboard|smallestScreenSize|screenSize|screenLayout"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:launchMode="singleTask"
+            android:theme="@style/ltmb_ad_dialogTheme" />
+        <activity
+            android:name="com.ltmb.ltsdk.core.mt.render.CusInterActivity"
+            android:configChanges="keyboardHidden|orientation|keyboard|smallestScreenSize|screenSize|screenLayout"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:launchMode="singleTask"
+            android:theme="@style/ltmb_ad_dialogTheme" />
+
+        <provider
+            android:name="com.ltmb.ltsdk.core.mt.ad.utils.install.LTAdProvider"
+            android:authorities="com.yefiot.community.ltmb.mt.provider"
+            android:exported="false"
+            android:grantUriPermissions="true" >
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/ltmb_ad_file_provider" />
+        </provider>
+        <provider
+            android:name="com.ltmb.ltsdk.gt.api.HbyFileProvider"
+            android:authorities="com.yefiot.community.hbyprovider"
+            android:exported="false"
+            android:grantUriPermissions="true" >
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/ltmb_ad_provider_paths" />
+        </provider>
+
+        <activity
+            android:name="com.ltmb.ltsdk.gt.api.base.activity.AdActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:hardwareAccelerated="true"
+            android:launchMode="standard"
+            android:screenOrientation="portrait"
+            android:theme="@style/ltmb_ad_transparent_style" />
+        <activity
+            android:name="com.ltmb.ltsdk.gt.api.base.activity.FeedBackAct"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:theme="@style/ltmb_ad_transparent_style" />
+
+        <service
+            android:name="com.ltmb.ltsdk.gt.api.base.services.ApkDownloadService"
+            android:exported="false" />
+
+        <activity
+            android:name="com.ltmb.ltsdk.art.activity.LtInterstitialActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:exported="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+        <activity
+            android:name="com.ltmb.ltsdk.art.activity.LtDownloadDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name="com.ltmb.ltsdk.art.activity.LtOpenDeepLinkActivity"
+            android:configChanges="smallestScreenSize|screenSize|screenLayout|orientation|keyboardHidden"
+            android:exported="false"
+            android:theme="@style/InstitialTranspant" />
+        <activity
+            android:name="com.ltmb.ltsdk.art.activity.LtRewardVideoPlayerActivity"
+            android:configChanges="orientation|screenSize"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:screenOrientation="behind"
+            android:theme="@style/LtFullScreen" />
+        <activity
+            android:name="com.ltmb.ltsdk.art.activity.LtRewardH5Activity"
+            android:configChanges="orientation|screenSize"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:screenOrientation="behind"
+            android:theme="@style/LtFullScreen" />
+        <activity
+            android:name="com.ltmb.ltsdk.art.activity.LtWebviewActivity"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name="com.ltmb.ltsdk.art.ad.view.DownLoadDialogActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:exported="false"
+            android:theme="@style/MyTranslucentTheme" />
+        <activity
+            android:name="com.ltmb.ltsdk.art.activity.LtAlertDialogActivity"
+            android:exported="false"
+            android:theme="@style/LtDownloadDialog" />
+        <activity
+            android:name="com.ltmb.ltsdk.art.activity.LtDetailActivity"
+            android:configChanges="orientation|screenSize"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" /> <!-- <receiver android:name=".core.utils.DownloadWorker$InstallReceiver" -->
+        <!-- android:exported="false" -->
+        <!-- > -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="com.ltmb.ltsdk.art.INSTALL_APK_START" /> -->
+        <!-- </intent-filter> -->
+        <!-- </receiver> -->
+        <provider
+            android:name="com.ltmb.ltsdk.art.core.service.LtLifeCycleContent"
+            android:authorities="com.yefiot.community.MsLifeCycleContent"
+            android:exported="false" />
+
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
+
+        <activity
+            android:name="com.ltmb.ltsdk.core.fy.ptgapi.activity.PtgWebActivity"
+            android:configChanges="keyboardHidden|navigation|orientation|screenSize"
+            android:exported="false"
+            android:launchMode="standard"
+            android:theme="@android:style/Theme.Light.NoTitleBar"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name="com.ltmb.ltsdk.core.fy.ptgapi.activity.PtgRewardVideoPortraitActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize|navigation"
+            android:exported="false"
+            android:launchMode="standard"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.NoTitleBar"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name="com.ltmb.ltsdk.core.fy.ptgapi.activity.PtgRewardVideoLandscapeActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize|navigation"
+            android:exported="false"
+            android:launchMode="standard"
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.NoTitleBar"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name="com.ltmb.ltsdk.core.fy.ptgapi.activity.PtgInteractionPortraitActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize|navigation"
+            android:exported="false"
+            android:launchMode="standard"
+            android:screenOrientation="portrait"
+            android:theme="@style/lt_style_activity_dialog"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name="com.ltmb.ltsdk.core.fy.ptgapi.activity.PtgInteractionLandscapeActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize|navigation"
+            android:exported="false"
+            android:launchMode="standard"
+            android:screenOrientation="landscape"
+            android:theme="@style/lt_style_activity_dialog"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+
+        <service
+            android:name="com.ltmb.ltsdk.core.fy.ptgapi.download.DownloadService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" >
+            <intent-filter>
+                <action android:name="com.yefiot.community.ptg.action.download.cancel" />
+            </intent-filter>
+        </service>
+
+        <activity
+            android:name="com.ltmb.ltsdk.core.fy.ptgapi.activity.PtgLaunchActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize|navigation"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <!--
+            为什么是 Theme.Translucent.NoTitleBar 而不是历史的 .Fullscreen 版本？
+
+            荣耀 system_server 的 ZrHung.AppEyeTransparentWindow 看门狗 fault 判定公式：
+                isFault = (TRANSLUCENT == false)  AND  (ZEROPIXEL == true)
+            两项同时命中、且 PtgLaunchActivity 在前台超过约 5 秒未关闭，就会被
+            ZRHungService.killTarget 直接 force-stop 整个进程
+            （用户感知：开屏卡住几秒后退桌面；Bugly/EUP 都抓不到）。
+
+            两个字段的来源：
+              · TRANSLUCENT 来自 fullscreen flag。.Fullscreen 主题 → false（命中 fault 第一项）
+              · ZEROPIXEL  来自窗口尺寸。LaunchManger.initView 的 1×1  → true（命中 fault 第二项）
+
+            打破其中**任意一项**即可避免 fault；本次修复同时打破两项做"双保险"：
+              · 这里去掉 .Fullscreen → TRANSLUCENT=true ✅
+              · LaunchManger.initView 里 alpha=0（保留 1×1 是可选的——见 LaunchManger 注释）
+
+            注：实测过 .Fullscreen + 1×1 + alpha=0 仍会被杀，证实 ZrHung 不读
+            LayoutParams.alpha；alpha=0 的作用主要是"用户视觉无感"+ 防御未来算法变更，
+            真正破 ZrHung 的关键是去掉 .Fullscreen（让 TRANSLUCENT=true）这一项。
+        -->
+        <provider
+            android:name="com.ltmb.ltsdk.core.fy.adsdk.lib.provider.PtgFileProvider"
+            android:authorities="com.yefiot.community.fileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true" >
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/lt_core_file_path" />
+        </provider>
+
+        <activity
+            android:name="com.ltmb.ltsdk.core.tp.china.activity.TransparentActivity"
+            android:exported="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+        <activity
+            android:name="com.ltmb.ltsdk.core.tp.dlopt.activity.ApkConfirmDialogActivity"
+            android:exported="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+
+        <provider
+            android:name="com.ltmb.ltsdk.core.tp.dlopt.common.ApkFileProvider"
+            android:authorities="com.yefiot.community.lmb.fileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true" >
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/lmb_file_paths" />
+        </provider>
+
+        <receiver
+            android:name="com.ltmb.ltsdk.core.tp.dlopt.common.NotificationBroadcastReceiver"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="lmb_action_notification_click" />
+                <!-- cancel 路径改为动态注册，避免 app 被 kill 后划通知冷启动宿主进程 -->
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name="com.ltmb.ltsdk.core.tp.dlopt.common.service.ApkDownloadService"
+            android:exported="false" />
+
+        <activity
+            android:name="com.ltmb.ltsdk.core.tp.sdk.basead.ui.ATLandscapeActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|screenLayout"
+            android:exported="false"
+            android:launchMode="standard"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+        <activity
+            android:name="com.ltmb.ltsdk.core.tp.sdk.basead.ui.ATPortraitActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|screenLayout"
+            android:exported="false"
+            android:launchMode="standard"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+        <activity
+            android:name="com.ltmb.ltsdk.core.tp.sdk.basead.ui.ATLandscapeTranslucentActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|screenLayout"
+            android:exported="false"
+            android:launchMode="standard"
+            android:theme="@style/lmb_myoffer_half_screen" />
+        <activity
+            android:name="com.ltmb.ltsdk.core.tp.sdk.basead.ui.ATPortraitTranslucentActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|screenLayout"
+            android:exported="false"
+            android:launchMode="standard"
+            android:theme="@style/lmb_myoffer_half_screen" />
+        <activity
+            android:name="com.ltmb.ltsdk.core.tp.sdk.basead.ui.web.WebLandPageActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|screenLayout"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:theme="@android:style/Theme.Light.NoTitleBar"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name="com.ltmb.ltsdk.core.tp.sdk.basead.ui.RewardExitConfirmDialogActivity"
+            android:exported="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+
+        <provider
+            android:name="com.ltmb.ltsdk.core.tp.sdk.api.LMBInitializationProvider"
+            android:authorities="com.yefiot.community.lmb.initatprovider"
+            android:exported="false" />
+        <provider
+            android:name="com.ltmb.ltsdk.core.blk.api.AFFileProvider"
+            android:authorities="com.yefiot.community.ltmbafprovider"
+            android:exported="false"
+            android:grantUriPermissions="true" >
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/ltmb_ad_blk_provider_paths" />
+        </provider>
+
+        <activity
+            android:name="com.ltmb.ltsdk.core.blk.base.activity.AdActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:screenOrientation="behind"
+            android:theme="@android:style/Theme.Holo.Light.DarkActionBar" />
+        <activity
+            android:name="com.ltmb.ltsdk.core.blk.base.activity.PortraitTransparentAdActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:screenOrientation="sensorPortrait"
+            android:theme="@style/ltmb_ad_blk_transparent_style" />
+        <activity
+            android:name="com.ltmb.ltsdk.core.blk.base.activity.LandTransparentAdActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:screenOrientation="landscape"
+            android:theme="@style/ltmb_ad_blk_transparent_style" />
+        <activity
+            android:name="com.ltmb.ltsdk.core.blk.base.activity.AdxActivity"
+            android:configChanges="screenSize|screenLayout|keyboardHidden"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
+            android:name="com.ltmb.ltsdk.core.blk.base.view.AdDownloadDetailDialog"
+            android:configChanges="screenSize|screenLayout|keyboardHidden"
+            android:exported="false"
+            android:hardwareAccelerated="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
+            android:name="com.ltmb.ltsdk.core.blk.base.fb.FBActivity"
+            android:configChanges="screenSize|screenLayout|keyboardHidden"
+            android:exported="false"
+            android:hardwareAccelerated="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
+            android:name="com.ltmb.ltsdk.core.qy.w.LTAdQYWebActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.ltmb.ltsdk.core.qy.w.LTAdQYActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:screenOrientation="portrait" />
+
+        <service
+            android:name="com.ltmb.ltsdk.core.qy.download.DownloadService"
+            android:exported="false"
+            android:launchMode="singleInstance"
+            android:process=":download" >
+            <intent-filter>
+                <action android:name="com.ltmb.ltsdk.core.qy.download.DOWNLOAD_SERVICE" />
+            </intent-filter>
+        </service>
+
+        <activity
+            android:name="com.ltmb.ltsdk.core.qy.w.LTAdQYRewardVideoPortraitActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+
+        <provider
+            android:name="com.ltmb.ltsdk.core.qy.fp.LTAdQYFileProvider"
+            android:authorities="com.yefiot.community.LTAdQYFileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true" >
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/ltmb_ad_qy_paths" />
+        </provider>
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="com.yefiot.community.androidx-startup"
+            android:exported="false" >
+            <meta-data
+                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+                android:value="androidx.startup" />
+            <meta-data
+                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+                android:value="androidx.startup" />
+            <meta-data
+                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+                android:value="androidx.startup" />
+        </provider>
+
+        <receiver
+            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+            android:directBootAware="false"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.DUMP" >
+            <intent-filter>
+                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+            </intent-filter>
+        </receiver>
+
+        <activity
+            android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:clearTaskOnLaunch="true"
+            android:screenOrientation="sensorLandscape"
+            android:stateNotNeeded="true"
+            android:theme="@style/zxing_CaptureTheme"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+    </application>
+
+</manifest>

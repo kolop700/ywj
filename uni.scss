@@ -1,4 +1,11 @@
 @import '@/uni_modules/uview-plus/theme.scss';
+
+/* ====== 云卫家品牌定制：覆盖 uview-plus 主色 ====== */
+$u-primary: #4a6cf7;
+$u-primary-dark: #3f4ee8;
+$u-primary-disabled: #b9c4fa;
+$u-primary-light: #edf0fe;
+/* ====== 云卫家品牌定制 end ====== */
 /**
  * 这里是uni-app内置的常用样式变量
  *
@@ -78,6 +85,18 @@ $uni-font-size-paragraph:15px;
 
 page {
 	/* Color 可以自定义相关配色 */
+	/* ====== 云卫家品牌定制 ====== */
+	--pageBg: #f5f6fc;
+	--brand: #4a6cf7;
+	--brand-deep: #3b5bef;
+	--brand-dark: #3f4ee8;
+	--brand-2: #8b5cf6;
+	--brand-soft: #edf0fe;
+	--brand-disabled: #b9c4fa;
+	--brand-grad: linear-gradient(135deg, #4a6cf7 0%, #8b5cf6 100%);
+	--brand-grad-deep: linear-gradient(135deg, #3b5bef 0%, #7b4df0 100%);
+	--brand-soft-grad: linear-gradient(135deg, #e5ebff 0%, #f0e9ff 100%);
+	/* ====== 云卫家品牌定制 end ====== */
 	/* var属性兼容性 --> https://www.caniuse.com/#feat=css-variables */
 	/* 标准色 */
 	--red: #e54d42;
@@ -134,7 +153,7 @@ page {
 	--grayShadow: rgba(114, 130, 138, 0.2);
 	--blackShadow: rgba(26, 26, 26, 0.2);
 
-	background-color: var(--white);
+	background-color: var(--pageBg);
 	font-size: 28rpx;
 	color: var(--black);
 	font-family: Helvetica Neue, Helvetica, sans-serif;

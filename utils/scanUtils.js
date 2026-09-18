@@ -2,6 +2,13 @@
  * 扫码工具类
  */
 
+// #ifdef H5
+// H5 原生壳桥接：uni-app 编译 H5 时会把 uni.scanCode(...) 静态改写成内置的
+// 「H5 占位实现」（method 'uni.scanCode' not supported），window.uni 上的 shim 覆盖不到，
+// 因此壳内扫码必须直接经 NativeApp 调用原生摄像扫码。
+import { isNativeShell, NativeApp } from '@/utils/h5-native-bridge'
+// #endif
+
 /**
  * 二维码格式验证正则
  */
@@ -9,7 +16,8 @@ const QR_REGEX = {
   YEFIOT: /^https:\/\/qrapp\.yefiot\.com\/qr\/yf\?c=.+$/,
   SVR: /^https:\/\/svr\.yefiot\.com\/xy\?c=.+$/,
   NEW_FORMAT: /^http:\/\/xy\.yefiot\.com\/public\/dl\/\?c=.+$/,
-  YT_FORMAT: /^https:\/\/svr\.yefiot\.com\/yt\?c=.+$/
+  YT_FORMAT: /^https:\/\/svr\.yefiot\.com\/yt\?c=.+$/,
+  YEFIOT_PUBLIC: /^https?:\/\/xy\.yefiot\.com\/public\/yefiot\/\?c=.+$/
 }
 
 const scanUtils = {
@@ -170,6 +178,39 @@ const scanUtils = {
       scanType = ['qrCode']
     } = options
 
+    // #ifdef H5
+    // 原生壳内：直接走桥接扫码（Android ZXing / iOS AVFoundation）
+    if (isNativeShell) {
+      try {
+        const data = await NativeApp.scanQRCode({ onlyFromCamera, scanType })
+        const raw = (data && data.result) || ''
+        if (!this.validateQRFormat(raw)) {
+          console.log('匹配失败:', raw)
+          uni.showToast({
+            title: '无效的二维码格式',
+            icon: 'none',
+            duration: 2000
+          })
+          return ''
+        }
+        console.log('匹配成功:', raw)
+        const paramMatch = raw.match(/[?&]c=([^&]+)/)
+        return paramMatch ? paramMatch[1] : ''
+      } catch (error) {
+        console.error('扫码失败:', error)
+        const msg = (error && (error.msg || error.errMsg || error.message)) || ''
+        // 用户主动取消不提示失败
+        if (msg.indexOf('cancel') === -1) {
+          uni.showToast({
+            title: '扫描失败',
+            icon: 'none'
+          })
+        }
+        return ''
+      }
+    }
+    // #endif
+
     return new Promise((resolve, reject) => {
       uni.scanCode({
         onlyFromCamera,
@@ -178,10 +219,11 @@ const scanUtils = {
           console.log('扫码结果:', res)
           
           // 验证二维码格式
-          if (QR_REGEX.YEFIOT.test(res.result) || QR_REGEX.SVR.test(res.result) || QR_REGEX.NEW_FORMAT.test(res.result) || QR_REGEX.YT_FORMAT.test(res.result)) {
+          if (QR_REGEX.YEFIOT.test(res.result) || QR_REGEX.SVR.test(res.result) || QR_REGEX.NEW_FORMAT.test(res.result) || QR_REGEX.YT_FORMAT.test(res.result) || QR_REGEX.YEFIOT_PUBLIC.test(res.result)) {
             console.log('匹配成功:', res.result);
-            // 提取参数 c 的值
-            const codeParam = res.result.split('c=')[1]
+            // 提取参数 c 的值（兼容其它参数或编码值）
+            const paramMatch = res.result.match(/[?&]c=([^&]+)/)
+            const codeParam = paramMatch ? paramMatch[1] : ''
             resolve(codeParam)
           } else {
             console.log('匹配失败:', res.result);
@@ -212,7 +254,7 @@ const scanUtils = {
    * @returns {boolean} 是否为有效格式
    */
   validateQRFormat(qrString) {
-    return QR_REGEX.YEFIOT.test(qrString) || QR_REGEX.SVR.test(qrString) || QR_REGEX.NEW_FORMAT.test(qrString) || QR_REGEX.YT_FORMAT.test(qrString)
+    return QR_REGEX.YEFIOT.test(qrString) || QR_REGEX.SVR.test(qrString) || QR_REGEX.NEW_FORMAT.test(qrString) || QR_REGEX.YT_FORMAT.test(qrString) || QR_REGEX.YEFIOT_PUBLIC.test(qrString)
   },
 
   /**

@@ -90,7 +90,8 @@ class VisitorPasswordUtils {
         data: {
           openid: "0",
           qrcode: params.deviceNumber,
-          sn: params.sn
+          sn: params.sn,
+          opencode: '369'
         }
       })
       

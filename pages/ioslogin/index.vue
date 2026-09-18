@@ -1,5 +1,5 @@
 <template>
-  <view class="container">
+  <view class="container" :class="{ 'has-ad': bannerAdId }">
     <!-- 登录logo -->
     <view class="login-view">
       <image class="logo" src="/static/logo.png" mode="aspectFit"></image>
@@ -32,18 +32,12 @@
       <button class="register-btn" @click="goToRegister">注册</button>
     </view>
 
-    <!-- 底部广告区域 -->
-    <view class="ad-section">
-      <view class="divider"></view>
+    <!-- 底部横幅广告（Taku）：常驻页面底部（fixed，不随滚动移动） -->
+    <view class="ad-section" v-if="bannerAdId">
+      <view class="ad-divider"></view>
       <view class="ad-view">
-        <ad 
-          v-if="bannerAdId"
-          :adpid="bannerAdId" 
-          @load="onAdLoad" 
-          @close="onAdClose" 
-          @error="onAdError">
-        </ad>
-      </view> 
+        <taku-banner :placement-id="bannerAdId"></taku-banner>
+      </view>
     </view>
 
     <!-- 提示信息弹窗 -->
@@ -54,41 +48,25 @@
 </template>
 
 <script setup>
-import { ref, getCurrentInstance } from 'vue'
+import { ref, getCurrentInstance, computed } from 'vue'
 import { onLoad } from "@dcloudio/uni-app"
 
 const { proxy } = getCurrentInstance()
 const adStore = proxy.$store.ad.useAdStore()
+
+// 横幅广告位 ID（Taku placementId，空/全关时不展示；随 adType 自动响应更新）
+const bannerAdId = computed(() => adStore.getBannerAdId())
+
 const form = ref({
   user_account: '',
   password: ''
 })
 const msgType = ref('')
 const messageText = ref('')
-const isAdLoaded = ref(false) // 控制广告加载状态
-const bannerAdId = ref('') // 横幅广告 ID
 
 onLoad((params) => {
   console.log(params)
-  bannerAdId.value = adStore.getBannerAdId() // 获取横幅广告 ID
-  console.log('bannerAdId', bannerAdId)
 })
-
-// 广告相关的事件处理函数
-const onAdLoad = (e) => {
-  console.log('广告加载成功', e)
-  isAdLoaded.value = true
-}
-
-const onAdClose = (e) => {
-  console.log('广告关闭', e)
-  isAdLoaded.value = false
-}
-
-const onAdError = (e) => {
-  console.error('广告加载失败', e)
-  isAdLoaded.value = false
-}
 
 const handleLogin = async () => {
   console.log(form.value)
@@ -158,6 +136,11 @@ const goToForgotPassword = () => {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+
+  /* 有横幅广告时预留底部空间，避免内容被悬浮横幅遮挡 */
+  &.has-ad {
+    padding-bottom: 220rpx;
+  }
 }
 
 .login-view {
@@ -243,28 +226,30 @@ const goToForgotPassword = () => {
   }
 }
 
+/* ===== 底部横幅广告（Taku）：常驻页面底部 ===== */
 .ad-section {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
   width: 100%;
-  height: 225rpx;
-  flex: none;
   box-sizing: border-box;
-  margin-top: 20rpx;
+  background: #ffffff;
+  box-shadow: 0 -6rpx 20rpx rgba(31, 48, 152, 0.08);
 
-  .divider {
+  .ad-divider {
     height: 2rpx;
-    background: #EEEEEE;
+    background: #eeeeee;
   }
 
   .ad-view {
-    height: 220rpx;
     display: flex;
     justify-content: center;
     align-items: center;
-    
-    ad {
-      width: 100%;
-      height: 220rpx;
-    }
+    min-height: 120rpx;
+    padding: 8rpx 0;
   }
 }
+
 </style> 

@@ -1,0 +1,74 @@
+// ============================================================
+// TakuAdsNativePlugin - Android 库工程构建脚本
+// 说明：
+//  1) 本工程结构遵循 DCloud uni-app 原生插件（本地插件）android 目录规范：
+//     插件依赖的 aar 放在 android/ 根目录（60 个），libs/ 仅放 jar/so（gson.jar）；
+//     云打包时由 DCloud 打包机编译集成。
+//  2) 【关键】本文件不再声明 buildscript classpath（AGP 版本）：
+//     云端打包机使用其自带 gradle/AGP 版本（子工程形式注入），
+//     写死 AGP 7.4.2 会与打包机 gradle 版本冲突导致插件编译失败、
+//     进而出现“制作成功但基座不含插件”的问题。本地独立调试时请在
+//     父工程/Android Studio 工程中配置 AGP。
+//  3) Taku 官方 SDK 发布包（release_folder）集成规则见：
+//     https://help.takuad.com/docs/Y1jCCK  "1.2 集成中国内地SDK"
+// ============================================================
+
+apply plugin: 'com.android.library'
+
+repositories {
+    google()
+    mavenCentral()
+}
+
+android {
+    // Taku 官方要求 compileSdkVersion 最低 28；与打包机兼容取值 30
+    compileSdkVersion 30
+
+    defaultConfig {
+        // Litemize SDK 硬性要求：minSdkVersion >= 24（否则 manifest 合并失败）
+        minSdkVersion 24
+        targetSdkVersion 30
+        consumerProguardFiles 'proguard-rules.pro'
+        // Litemize 文档要求：配置架构支持
+        ndk {
+            abiFilters 'armeabi-v7a', 'arm64-v8a'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+}
+
+dependencies {
+    // ========== 本地依赖 ==========
+    // libs/ 下的 jar（gson-2.8.4 等）
+    // 注：不重复声明 gson 远程坐标（2.8.4 与 Litemize 要求的 2.8.6 API 兼容），
+    //     避免与本地 jar 出现 duplicate class。
+    api fileTree(include: ['*.jar'], dir: 'libs')
+    // android/ 根目录下的 aar（Taku 核心：anythink_core + anythink_common_util）
+    // 渠道 aar 已按需精简；恢复渠道：将备份目录（桌面 taku_aar_backup）
+    // 中的 aar 拷回本目录即可。
+    api fileTree(include: ['*.aar'], dir: './')
+
+    // ========== Taku 官方标注的必要依赖 ==========
+    api "com.android.support:appcompat-v7:28.0.0"
+
+    // ========== Litemize（自定义广告平台）依赖：已全本地化 ==========
+    // 来源：Litemize《SDK 集成》文档 v3.4.1
+    // 18 个 aar（core-3.4.1 + 5 个 adapter-* + 12 个 core-sdk-libs-*）
+    // 已直接放入本目录，由上方 fileTree(include: ['*.aar'], dir: './')
+    // 统一引入；不再声明远程坐标、不依赖打包机访问私有仓库。
+    // 升级 SDK：用新版本 aar 覆盖本目录同名文件即可。
+
+    // 以下为 Litemize 文档要求的公共库（走 Google/MavenCentral，
+    // 属云打包机基础依赖通道，保持远程声明以自动解析传递依赖）：
+    api "com.github.bumptech.glide:glide:4.13.0"
+    api "com.squareup.okhttp3:okhttp:4.9.0"
+    api 'androidx.cardview:cardview:1.0.0'
+}

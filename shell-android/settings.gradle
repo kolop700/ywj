@@ -1,0 +1,28 @@
+pluginManagement {
+    repositories {
+        // 国内网络下 google()/gradlePluginPortal() 直连不可达，
+        // 故阿里云镜像优先，官方源作为兜底。
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+// 依赖仓库：AGP 8.x 下必须在此声明，
+// 否则 :app 的第三方依赖（androidx / material / zxing / glide 等）无法解析，构建直接失败。
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+    repositories {
+        // 同上：镜像优先，避免解析 androidx/material 时卡在 dl.google.com
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.name = 'CloudGuardShell'
+include ':app'

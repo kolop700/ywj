@@ -1,0 +1,91 @@
+# CloudGuard iOS 壳工程（XcodeGen 规格）
+#
+# 用法：
+#   1) 安装 XcodeGen：brew install xcodegen
+#   2) 在本目录执行：xcodegen generate   （生成 CloudGuard.xcodeproj）
+#   3) 打开 CloudGuard.xcodeproj，按需设置签名 Team 后编译运行
+#
+# H5 产物同步：仓库根目录执行 `npm run sync:h5`（会把 H5 构建产物写入 CloudGuard/WebApp）。
+name: CloudGuard
+options:
+  bundleIdPrefix: com.yefiot
+  createIntermediateGroups: true
+  deploymentTarget:
+    iOS: "14.0"
+
+settings:
+  base:
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "100"
+    SWIFT_VERSION: "5.0"
+    ENABLE_BITCODE: "NO"
+    CLANG_ENABLE_MODULES: "YES"
+    # AppIcon：CloudGuard/Assets.xcassets/AppIcon.appiconset（1024 无 alpha，App Store 要求）
+    ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+
+targets:
+  CloudGuard:
+    type: application
+    platform: iOS
+    deploymentTarget: "14.0"
+    sources:
+      # 源码（排除 WebApp，改为下方文件夹引用）
+      - path: CloudGuard
+        excludes:
+          - "WebApp"
+          - "WebApp/**"
+      # 文件夹引用：整体保留目录结构拷贝进 App Bundle（blue folder）
+      - path: CloudGuard/WebApp
+        type: folder
+    settings:
+      base:
+        # Bundle ID 必须与 weijia-2.mobileprovision / App Store Connect 一致（2026-09-04 签发，App Store 分发）
+        PRODUCT_BUNDLE_IDENTIFIER: com.yefiot.communityios
+        INFOPLIST_FILE: CloudGuard/Info.plist
+        GENERATE_INFOPLIST_FILE: "NO"
+        TARGETED_DEVICE_FAMILY: "1"
+        CODE_SIGN_STYLE: Automatic
+        # 开发团队：Shenzhen Yefiot IoT Tech,.LTD（Team ID 与描述文件一致，Mac 上打开工程即自动选中）
+        DEVELOPMENT_TEAM: "737647MFYB"
+    dependencies:
+      - sdk: CoreBluetooth.framework
+      - sdk: AVFoundation.framework
+      - sdk: Photos.framework
+      - sdk: PhotosUI.framework
+      - sdk: WebKit.framework
+      # StoreKit：VIP 苹果内购（CloudGuard/Pay/PayBridge.swift）
+      - sdk: StoreKit.framework
+      # ---- 微信 OpenSDK（可选：拉起微信小程序需要；放入框架后取消注释，再执行 xcodegen generate）----
+      # 放置位置：shell-ios/Vendor/WechatOpenSDK/（官方 SDK 解包后的 WechatOpenSDK.xcframework）
+      # 说明：MiniProgramBridge.swift 以 #if canImport(WechatOpenSDK) 自动切换真实/桩实现；
+      #      Info.plist 的微信回跳 scheme 已填 wx4c80533df6184dda（wx + 开放平台 AppId，见 iOS编译接入说明.md）。
+      # - framework: Vendor/WechatOpenSDK/WechatOpenSDK.xcframework
+      #   embed: true
+      # 微信 SDK 依赖的系统库（如报缺符号时逐行取消注释）：
+      # - sdk: libz.tbd
+      # - sdk: libsqlite3.tbd
+      # - sdk: libc++.tbd
+      # - sdk: Security.framework
+      # - sdk: CoreTelephony.framework
+      # - sdk: SystemConfiguration.framework
+      # - sdk: CFNetwork.framework
+      # ---- Taku 广告 SDK（可选：放入框架文件后取消注释，再执行 xcodegen generate）----
+      # 放置位置：shell-ios/Vendor/（把 Taku 下载包中的 Framework 目录整体放入，保留文件名）
+      # 说明：AnyThinkSDK.framework 为主包，Adapter 为各广告平台适配器（至少放 1 个）；
+      #       AdBridge.swift 以 #if canImport(AnyThinkSDK) 自动切换真实/桩实现。
+      # - framework: Vendor/AnyThinkSDK/AnyThinkSDK.framework
+      #   embed: true
+      # - framework: Vendor/AnyThinkSDK/AnyThinkGDTAdapter.framework
+      #   embed: true
+      # - framework: Vendor/AnyThinkSDK/AnyThinkPangleAdapter.framework
+      #   embed: true
+
+schemes:
+  CloudGuard:
+    build:
+      targets:
+        CloudGuard: all
+    run:
+      config: Debug
+    archive:
+      config: Release

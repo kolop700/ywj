@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- 允许 HTTP 明文流量（2026-09 排查横幅广告无填充后放开）：
+         依据 1：Taku/Litemize 官方 aar 自带模板即为全局允许——
+                 core-3.4.1.aar -> res/xml/ltmb_ad_jz_network_security_config.xml
+                 adapter-topon-2.2.0.aar -> res/xml/network_security_config.xml
+                 内容均为 <base-config cleartextTrafficPermitted="true" />；
+         依据 2：LTSdk 运行日志提示 "SDK secure 配置为 SECURE_ALL，但当前 App
+                 不允许 HTTP 明文流量"，要求 Manifest 或本文件允许明文；
+         依据 3：core-sdk-libs-14-4.7.5 / core-sdk-libs-9-4.2.56 的 aar Manifest
+                 自带 android:usesCleartextTraffic="true"（此前被本工程 tools:replace 压制）。
+         影响：全局允许明文请求（含广告 SDK 素材 / 上报 / 竞价链路）。 -->
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

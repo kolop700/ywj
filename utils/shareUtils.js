@@ -25,6 +25,11 @@ class ShareUtils {
         // #ifdef MP-WEIXIN
         resolve(element.result)
         // #endif
+
+        // #ifdef H5
+        // H5 原生壳：u-qrcode 的 result 为 data URL，直接返回供保存/分享
+        resolve(element && element.result ? element.result : '')
+        // #endif
       } catch (error) {
         reject(error)
       }
@@ -72,6 +77,25 @@ class ShareUtils {
         menus: ['shareAppMessage', 'shareTimeline']
       })
       resolve()
+      // #endif
+
+      // #ifdef H5
+      uni.share({
+        provider: 'weixin',
+        scene: 'WXSceneSession',
+        type: 2,
+        imageUrl: options.imageUrl,
+        title: options.title,
+        summary: options.summary,
+        success: (res) => resolve(res),
+        fail: (err) => {
+          uni.showToast({
+            title: '分享失败',
+            icon: 'none'
+          })
+          reject(err)
+        }
+      })
       // #endif
     })
   }

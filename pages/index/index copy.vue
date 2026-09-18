@@ -59,20 +59,6 @@
         </view>
       </view>
     </view>
-    <!-- 底部广告区域 - 固定高度 -->
-    <view class="ad-section">
-      <view class="divider"></view>
-      <view class="ad-view">
-        <ad 
-          v-if="bannerAdId"
-          :adpid="bannerAdId" 
-          @load="onAdLoad" 
-          @close="onAdClose" 
-          @error="onAdError">
-        </ad>
-      </view> 
-    </view>
-
     <!-- 远程开门弹框 -->
     <uni-popup ref="popup" type="center" :mask-click="true" @change="onPopupChange">
       <view class="device-popup">
@@ -142,15 +128,12 @@ const { proxy } = getCurrentInstance()
 const userStore = proxy.$store.user.useUserStore()
 const deviceStore = proxy.$store.device.useDeviceStore()
 const agreementStore = proxy.$store.agreement.useAgreementStore()
-const adStore = proxy.$store.ad.useAdStore()
 const deviceApi = proxy.$api.device
 import scanUtils from '@/utils/scanUtils'
 import checkVersion from '@/pages/lq-upgrade/checkVersion.js'
 // 使用 storeToRefs 获取需要的状态
 const { avatarUrl, userName, userId } = storeToRefs(userStore)
 const { deviceList } = storeToRefs(deviceStore)
-const isAdLoaded = ref(false) // 控制广告加载状态
-const bannerAdId = ref('') // 横幅广告 ID
 // 菜单列表
 const menuList = ref([
   {
@@ -217,8 +200,6 @@ const checkAppUpdate = () => {
 // 页面加载时检查登录状态和版本更新
 onLoad(() => {
   checkAppUpdate() // 检查版本更新
-  bannerAdId.value = adStore.getBannerAdId() // 获取横幅广告 ID
-  console.log('bannerAdId' ,bannerAdId)
 })
 
 // 在组件挂载后检查首次打开状态
@@ -419,21 +400,6 @@ const handleDisagree = () => {
   })
 }
 
-// 广告相关的事件处理函数
-const onAdLoad = (e) => {
-  console.log('广告加载成功', e)
-  isAdLoaded.value = true
-}
-
-const onAdClose = (e) => {
-  console.log('广告关闭', e)
-  isAdLoaded.value = false
-}
-
-const onAdError = (e) => {
-  console.error('广告加载失败', e)
-  isAdLoaded.value = false
-}
 </script>
 
 <style lang="scss">
@@ -575,31 +541,6 @@ const onAdError = (e) => {
   }
 }
 
-.ad-section {
-  height: 225rpx;
-  flex: none;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-
-  .divider {
-    height: 2rpx;
-    background: #EEEEEE;
-    margin: 0;
-  }
-
-  .ad-view {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    
-    ad {
-      width: 100%;
-      height: 220rpx;
-    }
-  }
-}
 
 .device-popup {
   width: 85vw;

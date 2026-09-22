@@ -1,0 +1,30 @@
+# 云卫家 iOS 壳（CloudGuard）CocoaPods 配置
+#
+# 用途：集成 Taku 聚合 SDK（AnyThinkiOS）与莱特摩比（Litemize）iOS SDK 及其 Taku 适配器
+#       （广告整体走 Taku 聚合，莱特摩比在 Taku 后台按「自定义广告平台」接入，JS/H5/AdBridge 层零改动）。
+#
+# 构建顺序（重要，顺序不能颠倒）：
+#   cd shell-ios
+#   xcodegen generate        # 1. 生成 CloudGuard.xcodeproj（每次改 project.yml 后都要重跑）
+#   pod install              # 2. 集成 Pods，生成 CloudGuard.xcworkspace
+#   open CloudGuard.xcworkspace   # 3. 用 workspace 编译（不要开 xcodeproj）
+#   （scripts/build-ios.sh 已按此顺序升级，Mac 上直接跑脚本即可）
+#
+# 说明：
+# - Taku 聚合主包（AnyThinkiOS）与必要的酷映 Adx 适配器均已发布到 CocoaPods 官方源
+#   （2026-09 经 trunk 核实），统一走 pod 集成，无需再手动下载 framework 放 Vendor；
+# - 莱特摩比（Litemize）在 Taku 后台按「自定义广告平台」接入，由 LitemobTakuAdapter 提供适配器；
+# - -ObjC 链接标志已在 project.yml 配置（莱特摩比部署文档硬性要求，pod 方式同样需要）；
+# - 版本取自 Taku 下载中心生成代码与莱特摩比《iOS集成手册》，勿随意升级。
+
+platform :ios, '15.0'
+
+target 'CloudGuard' do
+  # Taku 聚合 SDK（Taku 下载中心生成代码，2026-09-22 同步）
+  pod 'AnyThinkiOS', '6.5.73'                                    # 聚合 SDK 主包
+  pod 'AnyThinkMediationAdxSmartdigimktCNAdapter', '6.5.78.2.0' # 酷映 Adx SDK（necessary）
+
+  # 莱特摩比（Litemize）：Taku「自定义广告平台」接入
+  pod 'LitemobAd', '1.5.9'           # 莱特摩比 SDK 主包
+  pod 'LitemobTakuAdapter', '1.1.3'  # 莱特摩比 Taku 适配器
+end

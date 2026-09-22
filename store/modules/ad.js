@@ -10,7 +10,7 @@ import TakuAds from '@/common/taku-sdk' // 预加载横幅（提前竞价）
 //   test.*      → 联调阶段使用，配合 setTestMode(true) 生效（Taku 后台可建测试广告位）
 // 值为空字符串时，对应广告形式不会加载与展示（页面自动隐藏），属正常状态。
 // 说明：Taku 广告位与旧 uni-ad 的 adpid 完全独立，不可沿用旧值。
-// 2026-09 已填入 Android 5 个广告位（后台应用 a6aa0d3c3c058d）
+// 2026-09 已填入 Android 5 个广告位（后台应用 a6aa0d3c3c058d）与 iOS 5 个广告位（后台应用 a6aa8bfd99036e）
 const AD_IDS = {
   android: {
     banner: 'b6aa0d4e967667', // Android 横幅（Banner）
@@ -20,10 +20,11 @@ const AD_IDS = {
     splash: 'b6aa0d4ea33cec' // Android 开屏
   },
   ios: {
-    banner: '', // iOS 横幅（Banner）
-    interstitial: '', // iOS 插屏
-    rewardedVideo: '', // iOS 激励视频
-    splash: '' // iOS 开屏
+    banner: 'b1hlb1u6665oe8', // iOS 横幅（Banner）
+    interstitial: 'b1hlb1u6665l9h', // iOS 插屏
+    rewardedVideo: 'b1hlb1u6665rse', // iOS 激励视频
+    informationflow: 'b1hlb1u6666055', // iOS 原生信息流
+    splash: 'b1hlb1u6665et6' // iOS 开屏
   },
   test: {
     banner: '', // 测试横幅

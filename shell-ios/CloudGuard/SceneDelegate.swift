@@ -21,4 +21,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let url = URLContexts.first?.url else { return }
         MiniProgramBridge.handleOpenURL(url)
     }
+
+    /// 微信经 Universal Link 回跳（配置 Associated Domains 后走此路径；未集成 SDK 时静默忽略）
+    func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
+        MiniProgramBridge.handleOpenUniversalLink(userActivity)
+    }
 }

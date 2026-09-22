@@ -1,0 +1,81 @@
+name: iOS 云构建（TestFlight）
+
+# 用途：无 Mac 环境时，在 GitHub 云端 macOS 主机构建 iOS 包并上传 TestFlight / App Store Connect。
+# 触发：Actions 页面手动运行（workflow_dispatch），或推送 v* 标签。
+#
+# ===== 首次使用前，在仓库 Settings → Secrets and variables → Actions 配置以下 Secrets =====
+#   BUILD_CERT_BASE64       签名证书 p12 的 base64（本仓库文件：证书/yunweijia证书(1).p12）
+#   BUILD_CERT_PASSWORD     p12 的导出密码
+#   BUILD_PROVISION_BASE64  描述文件 base64（本仓库文件：证书/weijia-2.mobileprovision）
+#   KEYCHAIN_PASSWORD       临时钥匙串密码（任意字符串，仅本次构建内使用）
+#   ASC_KEY_ID              App Store Connect API Key 的 Key ID
+#   ASC_ISSUER_ID           App Store Connect API 的 Issuer ID
+#   ASC_KEY_BASE64          API Key（.p8 文件）的 base64
+#
+# 生成 base64（Windows PowerShell 示例，输出复制到对应 Secret）：
+#   [Convert]::ToBase64String([IO.File]::ReadAllBytes("证书\yunweijia证书(1).p12")) | Set-Clipboard
+#   [Convert]::ToBase64String([IO.File]::ReadAllBytes("证书\weijia-2.mobileprovision")) | Set-Clipboard
+#   API Key 生成路径：App Store Connect → 用户与访问 → 集成 → App Store Connect API（角色：App 管理）
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-ios:
+    # 必须 Xcode 26+（含 iOS 26 SDK，2026-04-28 起 App Store 上传硬性要求）。
+    # macos-latest 会自动跟随 GitHub 最新镜像；如需固定版本可改为 macos-26。
+    runs-on: macos-latest
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 环境信息（确认 Xcode ≥ 26）
+        run: xcodebuild -version
+
+      - name: 安装 xcodegen
+        run: brew install xcodegen
+
+      - name: 导入签名证书与描述文件
+        env:
+          BUILD_CERT_BASE64: ${{ secrets.BUILD_CERT_BASE64 }}
+          BUILD_CERT_PASSWORD: ${{ secrets.BUILD_CERT_PASSWORD }}
+          BUILD_PROVISION_BASE64: ${{ secrets.BUILD_PROVISION_BASE64 }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          set -eo pipefail
+          security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          echo "$BUILD_CERT_BASE64" | base64 --decode > /tmp/cert.p12
+          security import /tmp/cert.p12 -k build.keychain -P "$BUILD_CERT_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" build.keychain
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "$BUILD_PROVISION_BASE64" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
+          rm -f /tmp/cert.p12
+
+      - name: 写入 App Store Connect API Key
+        env:
+          ASC_KEY_BASE64: ${{ secrets.ASC_KEY_BASE64 }}
+        run: |
+          echo "$ASC_KEY_BASE64" | base64 --decode > "$RUNNER_TEMP/asc_key.p8"
+
+      - name: 构建并上传（xcodegen → archive → 直传 App Store Connect）
+        env:
+          ASC_KEY_PATH: ${{ runner.temp }}/asc_key.p8
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: bash scripts/build-ios.sh upload
+
+      - name: 保存构建产物（如本地导出失败便于排查）
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: CloudGuard-build
+          path: |
+            shell-ios/build/ipa
+            shell-ios/build/CloudGuard.xcarchive/Info.plist
+          if-no-files-found: warn

@@ -31,17 +31,17 @@ import { createAdBridgeAdapter } from '@/utils/h5-native-bridge'
 // #endif
 
 // ============ 配置（Taku 后台注册后填入） ============
-// 2026-09 已填入 Android 应用凭据（后台-应用管理）。
+// 2026-09 已填入 Android 与 iOS 应用凭据（后台-应用管理）。
 // 双端 AppId/AppKey 不同，而 H5 壳产物双端共用：此处按平台分组存放，运行时自动取当前平台。
-// iOS 凭据待 Taku 后台创建 iOS 应用后填入 ios 分组（并同步 store/modules/ad.js 的 AD_IDS.ios 广告位）。
+// 广告位（placementId）同步维护于 store/modules/ad.js 的 AD_IDS 双端分组。
 export const TAKU_CONFIG = {
   android: {
     appId: 'a6aa0d3c3c058d', // Taku AppId（后台-应用管理 Android 应用）
     appKey: 'a3da697cd42cf7198faa304f28b82ca0f' // Taku AppKey
   },
   ios: {
-    appId: '', // 待填：Taku 后台 iOS 应用 AppId
-    appKey: '' // 待填：Taku 后台 iOS 应用 AppKey
+    appId: 'a6aa8bfd99036e', // Taku AppId（后台-应用管理 iOS 应用）
+    appKey: 'a73d0435050ee307dbd23af426e423200' // Taku AppKey
   }
 }
 

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  CloudGuard 权限文件（entitlements）
+  - com.apple.developer.associated-domains：微信 Universal Link 回跳（拉起小程序后微信经
+    https://xy.yefiot.com/app/ 返回本 App）。
+  - 前置条件：苹果开发者后台 → Identifiers → App ID（com.yefiot.communityios）→ 勾选
+    Associated Domains 能力，否则自动签名会报「Provisioning profile doesn't include
+    the com.apple.developer.associated-domains entitlement」。
+    经自动签名（Xcode / -allowProvisioningUpdates）时描述文件会自动更新；若 CI 使用手动
+    导入的描述文件（Secrets BUILD_PROVISION_BASE64），需重新生成并替换。
+  - 暂不启用（先跑通冒烟构建）时：注释掉 project.yml 中 CODE_SIGN_ENTITLEMENTS 一行即可。
+-->
+<plist version="1.0">
+<dict>
+    <key>com.apple.developer.associated-domains</key>
+    <array>
+        <string>applinks:xy.yefiot.com</string>
+    </array>
+</dict>
+</plist>

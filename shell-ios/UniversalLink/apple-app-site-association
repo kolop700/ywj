@@ -1,0 +1,11 @@
+{
+    "applinks": {
+        "apps": [],
+        "details": [
+            {
+                "appID": "737647MFYB.com.yefiot.communityios",
+                "paths": ["/app/*"]
+            }
+        ]
+    }
+}

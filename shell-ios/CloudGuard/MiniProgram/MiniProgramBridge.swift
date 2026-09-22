@@ -7,12 +7,19 @@ import WechatOpenSDK
 
 /// 拉起微信小程序桥接（miniprogram.launch，对应 Android MiniProgramBridge）。
 ///
-/// - 依赖：WechatOpenSDK（放 shell-ios/Vendor/ 并在 project.yml 打开依赖，见 iOS编译接入说明.md）；
+/// - 依赖：WechatOpenSDK（已放置 shell-ios/Vendor/WechatOpenSDK/，project.yml 已启用依赖，见 iOS编译接入说明.md）；
 ///   未集成时以 #if canImport(WechatOpenSDK) 自动编译为桩实现（调用返回明确错误提示）。
 /// - 前置：微信开放平台「移动应用」（appId）与目标小程序绑定同一开放平台账号，否则 send 直接失败。
 /// - 回跳：拉起小程序后由微信经 wx{appId}:// 回跳本 App → SceneDelegate/AppDelegate 转发 handleOpenURL。
 /// - 本桥 resolveOk 语义为「拉起指令已发出」，不等待用户操作结果（无需回包）。
 final class MiniProgramBridge: NSObject {
+
+    /// 微信开放平台「移动应用」配置的 Universal Link（与开放平台后台、AASA 文件三处一致）。
+    /// 说明：2.0.8 起 SDK 仅提供 registerApp(_:universalLink:)，universalLink 须为合法 https 串；
+    ///      当前域名 xy.yefiot.com 为项目自有服务器（AASA 部署文件见 shell-ios/UniversalLink/，
+    ///      服务器路径 /var/www/html/.well-known/apple-app-site-association）。
+    ///      如开放平台后台修改了 UL，请同步修改此处或经 H5 参数 universalLink 传入。
+    private static let defaultUniversalLink = "https://xy.yefiot.com/app/"
 
     private let channel: JsChannel
 
@@ -38,8 +45,10 @@ final class MiniProgramBridge: NSObject {
 
         #if canImport(WechatOpenSDK)
         // 注册 AppId（回跳 URL 解析依赖；重复调用无副作用）
-        // 注：如所用 SDK 版本要求 Universal Link，可改用 WXApi.registerApp(appId, universalLink: "https://…/")
-        WXApi.registerApp(appId)
+        // 2.0.8 起仅提供 registerApp(_:universalLink:) 双参数版本（Universal Link 需与开放平台后台一致，
+        // 未配置真实 UL 时占位值不影响拉起小程序；可经 H5 参数 universalLink 传入覆盖）
+        let universalLink = params["universalLink"] as? String ?? Self.defaultUniversalLink
+        WXApi.registerApp(appId, universalLink: universalLink)
 
         let req = WXLaunchMiniProgramReq()
         req.userName = userName
@@ -62,6 +71,16 @@ final class MiniProgramBridge: NSObject {
     static func handleOpenURL(_ url: URL) -> Bool {
         #if canImport(WechatOpenSDK)
         return WXApi.handleOpen(url, delegate: callbackDelegate)
+        #else
+        return false
+        #endif
+    }
+
+    /// 处理微信经 Universal Link 回跳（SceneDelegate scene(_:continue:) / AppDelegate 转发）；返回是否已消费
+    @discardableResult
+    static func handleOpenUniversalLink(_ userActivity: NSUserActivity) -> Bool {
+        #if canImport(WechatOpenSDK)
+        return WXApi.handleOpenUniversalLink(userActivity, delegate: callbackDelegate)
         #else
         return false
         #endif

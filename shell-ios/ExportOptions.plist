@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  云卫家 iOS 壳：ipa 导出配置（供 scripts/build-ios.sh 与 CI 使用）
+
+  - method：app-store-connect（Xcode 15.4+ / 26 的取值；老版 Xcode 若报错改为 app-store）
+  - teamID：Shenzhen Yefiot IoT Tech,.LTD（737647MFYB，与 project.yml / 描述文件一致）
+  - signingStyle：automatic（自动签名；CI 中配合 xcodebuild -allowProvisioningUpdates 使用）
+  - destination：export（导出 ipa 到本地目录）；
+    上传 App Store Connect 时由 build-ios.sh 生成临时副本将 export 改为 upload，
+    本文件保留导出模式，便于本地先验证再上传。
+-->
+<plist version="1.0">
+<dict>
+    <key>method</key>
+    <string>app-store-connect</string>
+    <key>teamID</key>
+    <string>737647MFYB</string>
+    <key>signingStyle</key>
+    <string>automatic</string>
+    <key>destination</key>
+    <string>export</string>
+    <key>uploadSymbols</key>
+    <true/>
+    <key>stripSwiftSymbols</key>
+    <true/>
+    <key>manageAppVersionAndBuildNumber</key>
+    <false/>
+</dict>
+</plist>

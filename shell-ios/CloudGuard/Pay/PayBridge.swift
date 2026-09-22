@@ -1,7 +1,7 @@
 import Foundation
 import StoreKit
 
-/// 支付桥接（pay.* / iOS，StoreKit 1，兼容 iOS 14）。
+/// 支付桥接（pay.* / iOS，StoreKit 1）。
 ///
 /// 链路：JS 调 pay.iap → SKProductsRequest 拉商品 → SKMutablePayment
 ///      （applicationUsername = orderNo，用于对账）→ 系统购买弹窗 → 用户操作

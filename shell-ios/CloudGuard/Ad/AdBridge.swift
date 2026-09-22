@@ -4,13 +4,15 @@ import CryptoKit
 
 #if canImport(AnyThinkSDK)
 import AnyThinkSDK
+import AppTrackingTransparency
 #endif
 
 /// 广告桥接（ad.* / iOS）。
 ///
 /// 双形态实现（编译期自动选择）：
 ///   1) `#if canImport(AnyThinkSDK)`（Taku iOS SDK 已集成）——真实实现：
-///      - ad.init：ATAPI 初始化 + customData(user_type + user_id哈希) 下发（幂等，可重复调用）；
+///      - ad.init：ATT 授权（未决定时弹窗，回调完成/超时后放行，保证后续广告请求携带 IDFA）
+///        + ATAPI 初始化 + customData(user_type + user_id哈希) 下发（幂等，可重复调用）；
 ///      - ad.setUserType：UserDefaults 持久化 + 运行时更新 customData（对后续广告请求生效）；
 ///      - 激励视频 / 插屏 / 开屏 / 横幅：load + show 全套，结果经 ad.onEvent 异步下发；
 ///      - rect 说明：JS 以 CSS px 上报，WKWebView 中 CSS px 与 pt 1:1，无需 dpr 换算
@@ -103,7 +105,10 @@ final class AdBridge: NSObject {
         // customData 在 start 前设置，保证初始化后的首个广告请求即携带分组信息
         applyCustomData()
         if sdkStarted {
-            channel.resolve(callbackId, 0, ["msg": "already inited"])
+            // 已初始化（幂等，允许重复调用）：仍补一次 ATT 授权检查（未决定时才弹窗）
+            requestTrackingIfNeeded { [weak self] in
+                self?.channel.resolve(callbackId, 0, ["msg": "already inited"])
+            }
             return
         }
 #if DEBUG
@@ -114,7 +119,11 @@ final class AdBridge: NSObject {
             // 初始化幂等（可重复调用）；本方法由 H5 在隐私同意后触发，不在启动路径调用
             try ATAPI.sharedInstance().start(withAppID: appId, appKey: appKey)
             sdkStarted = true
-            channel.resolve(callbackId, 0, ["msg": "success"])
+            // 本方法由 H5 在「用户已同意隐私政策」后触发，此刻请求 ATT 授权；
+            // 弹窗处理完成后才放行 ad.init，保证 H5 后续 load 的广告请求携带 IDFA。
+            requestTrackingIfNeeded { [weak self] in
+                self?.channel.resolve(callbackId, 0, ["msg": "success"])
+            }
         } catch {
             channel.resolveErr(callbackId, "ATSDK init failed: \(error.localizedDescription)")
         }
@@ -122,6 +131,34 @@ final class AdBridge: NSObject {
         channel.resolveErr(callbackId, "iOS ad sdk not integrated")
 #endif
     }
+
+#if canImport(AnyThinkSDK)
+
+    /// 请求 ATT 授权（App Tracking Transparency，iOS 14.5+ 首启弹窗获取 IDFA）。
+    /// - 仅状态为 .notDetermined 时弹窗；已允许/已拒绝直接放行；
+    /// - iOS 15+ 仅在 App 处于 active 时调用才会弹窗且必回调（inactive 调用不弹也不回调），
+    ///   故加 5 秒兜底：超时后照常放行（本次 IDFA 不可用，广告效果可能略降，下次 ad.init 可再尝试）；
+    /// - 统一主线程执行（弹窗 API 要求），完成分支经主队列串行化，无竞态。
+    private func requestTrackingIfNeeded(_ done: @escaping () -> Void) {
+        DispatchQueue.main.async {
+            guard ATTrackingManager.trackingAuthorizationStatus == .notDetermined else {
+                done()
+                return
+            }
+            var finished = false
+            let finishOnce = {
+                guard !finished else { return }
+                finished = true
+                done()
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 5, execute: finishOnce)
+            ATTrackingManager.requestTrackingAuthorization { _ in
+                DispatchQueue.main.async(execute: finishOnce)
+            }
+        }
+    }
+
+#endif
 
     private func setUserType(params: [String: Any], callbackId: String?) {
         let t = (params["userType"] as? String == "vip") ? "vip" : "normal"

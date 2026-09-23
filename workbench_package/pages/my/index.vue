@@ -54,8 +54,7 @@
         </view>
       </view>
 
-            <!-- 绑定微信视频通话授权入口（暂时隐藏，需要恢复时取消下面注释即可） -->
-      <!--
+      <!-- 绑定微信视频通话授权入口（2026-09-23 按需求恢复展示） -->
       <view class="menu-item" @tap="handleBindWechat">
         <view class="menu-icon icon-green">
           <up-icon name="weixin-fill" size="22" color="#07C160"></up-icon>
@@ -67,7 +66,6 @@
           <image src="/static/icons/icon_right.png" mode="aspectFit"></image>
         </view>
       </view>
-      -->
     </view>
 
     <!-- 菜单组二：其他 -->
@@ -383,7 +381,7 @@ const handleBindWechat = () => {
               console.log('找到微信服务，准备打开小程序')
               weixinService.launchMiniProgram({
                 id: "gh_67863dc191ba",  // ywjxcx（精简版）小程序原始 ID
-                path: `pages/voipbind/voipbind?${query}`, // 小程序页面路径，带参数（注意：ywjxcx 精简版已删除 voipbind 页，恢复该入口前需先确认目标页面）
+                path: `pages/voipbind/voipbind?${query}`, // 小程序页面路径，带参数（注：ywjxcx 精简版曾删除 voipbind 页；2026-09-23 恢复本入口，若跳转异常先核对小程序端 voipbind 页是否已恢复）
                 type: 0,          // 0-正式版；1-测试版；2-体验版
               })
             } else {
@@ -405,6 +403,38 @@ const handleBindWechat = () => {
       } else {
         console.log('用户取消跳转')
       }
+    }
+  })
+  // #endif
+
+  // #ifdef H5
+  // H5 壳（云卫家 App 主链路）：经原生桥拉起微信小程序视频通话绑定页
+  uni.showModal({
+    title: '绑定微信',
+    content: '是否跳转到微信小程序进行绑定？',
+    success: (res) => {
+      if (!res.confirm) return
+      const encryptedAccount = encrypt(userStore.userAcct)
+      const encryptedPassword = encrypt(userStore.userPassword)
+      if (!encryptedAccount || !encryptedPassword) {
+        uni.showToast({
+          title: '数据加密失败',
+          icon: 'none'
+        })
+        return
+      }
+      const query = `account=${encodeURIComponent(encryptedAccount)}&password=${encodeURIComponent(encryptedPassword)}&timestamp=${Date.now()}`
+      NativeApp.launchMiniProgram({
+        appId: WX_MINI_PROGRAM.appId,
+        userName: WX_MINI_PROGRAM.userName,
+        path: `pages/voipbind/voipbind?${query}`,
+        type: WX_MINI_PROGRAM.type
+      }).catch((err) => {
+        uni.showToast({
+          title: (err && (err.msg || err.errMsg)) || '打开小程序失败',
+          icon: 'none'
+        })
+      })
     }
   })
   // #endif

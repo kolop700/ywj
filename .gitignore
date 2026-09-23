@@ -31,3 +31,13 @@ shell-android/keystore.properties
 # iOS 签名凭据（p12 私钥 / 描述文件，禁止入库，仅保留在本机 证书/ 目录）
 *.p12
 *.mobileprovision
+
+# iOS 构建产物与依赖（xcodegen / pod install 生成，本地与 CI 每次自动重建，不入库；
+# 注：shell-ios/Podfile.lock 建议入库以锁定依赖版本）
+shell-ios/build/
+shell-ios/Pods/
+shell-ios/CloudGuard.xcodeproj/
+shell-ios/CloudGuard.xcworkspace/
+
+# 本地临时调试脚本（下划线前缀惯例：一次性工具脚本，不入库；已入库文件不受影响）
+scripts/_*

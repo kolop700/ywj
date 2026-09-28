@@ -56,13 +56,14 @@ final class MiniProgramBridge: NSObject {
         let type = params["type"] as? Int ?? 0
         req.miniProgramType = WXMiniProgramType(rawValue: UInt(type)) ?? .release
 
-        // 2.0.8 起旧的 send: 已移除，统一用 sendReq:completion:（同步上下文用 completion 版；
-        // 单参 sendReq(_:) 会被自动导入为 async 版本，同步函数内直接调用会编译报错）
-        WXApi.sendReq(req) { success in
+        // 说明：ObjC 的 sendReq:completion: 经 Swift 导入时 "Req" 被剪枝（与参数类型 BaseReq 尾部同名），
+        // 导入名即 send(_:completion:)；调用旧名 sendReq 会被编译器报 renamed 错误。
+        // 闭包为 escaping（SDK 持有至发送完成），捕获 self 须显式并加 weak 防长期持有泄漏。
+        WXApi.send(req) { [weak self] success in
             if success {
-                channel.resolveOk(callbackId)
+                self?.channel.resolveOk(callbackId)
             } else {
-                channel.resolveErr(callbackId, "send failed（微信未安装，或开放平台未关联小程序）")
+                self?.channel.resolveErr(callbackId, "send failed（微信未安装，或开放平台未关联小程序）")
             }
         }
         #else

@@ -250,9 +250,11 @@ final class AdBridge: NSObject {
             return
         }
         let config = ATShowConfig(scene: params["sceneId"] as? String ?? "", showCustomExt: "")
+        // 注：ObjC 参数标签 inViewController: 经 Swift 导入剪枝为 in:
+        // （"ViewController" 与参数类型 UIViewController 尾部同名），showInterstitial/showSplash 同理。
         ATAdManager.shared().showRewardedVideo(withPlacementID: placementId,
                                                config: config,
-                                               inViewController: vc,
+                                               in: vc,
                                                delegate: self)
         channel.resolveOk(callbackId)
     }
@@ -287,7 +289,7 @@ final class AdBridge: NSObject {
         let config = ATShowConfig(scene: params["sceneId"] as? String ?? "", showCustomExt: "")
         ATAdManager.shared().showInterstitial(withPlacementID: placementId,
                                               showConfig: config,
-                                              inViewController: vc,
+                                              in: vc,
                                               delegate: self,
                                               nativeMixViewBlock: nil)
         channel.resolveOk(callbackId)
@@ -330,7 +332,7 @@ final class AdBridge: NSObject {
         ATAdManager.shared().showSplash(withPlacementID: placementId,
                                         config: config,
                                         window: window,
-                                        inViewController: host,
+                                        in: host,
                                         extra: extra,
                                         delegate: self)
         channel.resolveOk(callbackId)
@@ -467,9 +469,11 @@ final class AdBridge: NSObject {
 
 // MARK: - Taku 回调（事件 -> ad.onEvent）
 //
-// 说明：delegate 方法签名严格按 AnyThinkSDK 6.5.73 framework Headers 的 Swift 导入形态实现
-// （placementID / extra / error 均为 IUO），不再使用显式 @objc(selector)：
-// Xcode 26 对 @objc 协议一致性按「导入后的 Swift 签名」严格校验，
+// 说明：delegate 方法签名严格按 AnyThinkSDK 6.5.73 framework Headers 的 Swift 导入形态实现：
+// - ATAdLoadingDelegate.h 无 NS_ASSUME_NONNULL，参数导入为 IUO（String! / Error!）；
+// - 其余 4 个协议头在 NS_ASSUME_NONNULL 区域内，参数为非可选
+//   （onRewardedSuccessRetry 的 extra 为显式 _Nullable）；
+// 不再使用显式 @objc(selector)：Xcode 26 对 @objc 协议一致性按「导入后的 Swift 签名」严格校验，
 // 旧的「显式 selector + NSDictionary?」写法会报 does not conform to protocol。
 
 /// error 的 NSError 错误码（-1 兜底）
@@ -501,97 +505,97 @@ extension AdBridge: ATAdLoadingDelegate, ATRewardedVideoDelegate, ATInterstitial
 
     // ---- 激励视频（ATRewardedVideoDelegate） ----
 
-    func rewardedVideoDidRewardSuccess(forPlacemenID placementID: String!, extra: [AnyHashable: Any]!) {
+    func rewardedVideoDidRewardSuccess(forPlacemenID placementID: String, extra: [AnyHashable: Any]) {
         emitEvent(placementId: placementID, event: "onReward", code: 0, msg: "")
     }
 
     // 二次激励回调（「再看一个」重播奖励，头文件拼写即 PlacemenID）：预留，暂不重复下发 onReward
-    func onRewardedSuccessRetry(forPlacemenID placementID: String!, extra: [AnyHashable: Any]!) {}
+    func onRewardedSuccessRetry(forPlacemenID placementID: String, extra: [AnyHashable: Any]?) {}
 
-    func rewardedVideoDidStartPlaying(forPlacementID placementID: String!, extra: [AnyHashable: Any]!) {
+    func rewardedVideoDidStartPlaying(forPlacementID placementID: String, extra: [AnyHashable: Any]) {
         emitEvent(placementId: placementID, event: "onAdPlayStart", code: 0, msg: "")
     }
 
-    func rewardedVideoDidEndPlaying(forPlacementID placementID: String!, extra: [AnyHashable: Any]!) {
+    func rewardedVideoDidEndPlaying(forPlacementID placementID: String, extra: [AnyHashable: Any]) {
         emitEvent(placementId: placementID, event: "onAdPlayEnd", code: 0, msg: "")
     }
 
-    func rewardedVideoDidFailToPlay(forPlacementID placementID: String!, error: Error!, extra: [AnyHashable: Any]!) {
+    func rewardedVideoDidFailToPlay(forPlacementID placementID: String, error: Error, extra: [AnyHashable: Any]) {
         emitEvent(placementId: placementID, event: "onAdFailed", code: errCode(error), msg: errMsg(error))
     }
 
-    func rewardedVideoDidClose(forPlacementID placementID: String!, rewarded: Bool, extra: [AnyHashable: Any]!) {
+    func rewardedVideoDidClose(forPlacementID placementID: String, rewarded: Bool, extra: [AnyHashable: Any]) {
         emitEvent(placementId: placementID, event: "onAdClosed", code: 0, msg: rewarded ? "rewarded" : "")
     }
 
-    func rewardedVideoDidClick(forPlacementID placementID: String!, extra: [AnyHashable: Any]!) {
+    func rewardedVideoDidClick(forPlacementID placementID: String, extra: [AnyHashable: Any]) {
         emitEvent(placementId: placementID, event: "onAdClicked", code: 0, msg: "")
     }
 
     // ---- 插屏（ATInterstitialDelegate） ----
 
-    func interstitialDidShow(forPlacementID placementID: String!, extra: [AnyHashable: Any]!) {
+    func interstitialDidShow(forPlacementID placementID: String, extra: [AnyHashable: Any]) {
         emitEvent(placementId: placementID, event: "onAdShow", code: 0, msg: "")
     }
 
-    func interstitialFailedToShow(forPlacementID placementID: String!, error: Error!, extra: [AnyHashable: Any]!) {
+    func interstitialFailedToShow(forPlacementID placementID: String, error: Error, extra: [AnyHashable: Any]) {
         emitEvent(placementId: placementID, event: "onAdFailed", code: errCode(error), msg: errMsg(error))
     }
 
-    func interstitialDidStartPlayingVideo(forPlacementID placementID: String!, extra: [AnyHashable: Any]!) {
+    func interstitialDidStartPlayingVideo(forPlacementID placementID: String, extra: [AnyHashable: Any]) {
         emitEvent(placementId: placementID, event: "onAdPlayStart", code: 0, msg: "")
     }
 
-    func interstitialDidEndPlayingVideo(forPlacementID placementID: String!, extra: [AnyHashable: Any]!) {
+    func interstitialDidEndPlayingVideo(forPlacementID placementID: String, extra: [AnyHashable: Any]) {
         emitEvent(placementId: placementID, event: "onAdPlayEnd", code: 0, msg: "")
     }
 
-    func interstitialDidClose(forPlacementID placementID: String!, extra: [AnyHashable: Any]!) {
+    func interstitialDidClose(forPlacementID placementID: String, extra: [AnyHashable: Any]) {
         emitEvent(placementId: placementID, event: "onAdClosed", code: 0, msg: "")
     }
 
-    func interstitialDidClick(forPlacementID placementID: String!, extra: [AnyHashable: Any]!) {
+    func interstitialDidClick(forPlacementID placementID: String, extra: [AnyHashable: Any]) {
         emitEvent(placementId: placementID, event: "onAdClicked", code: 0, msg: "")
     }
 
     // ---- 开屏（ATSplashDelegate） ----
 
-    func splashDidShow(forPlacementID placementID: String!, extra: [AnyHashable: Any]!) {
+    func splashDidShow(forPlacementID placementID: String, extra: [AnyHashable: Any]) {
         emitEvent(placementId: placementID, event: "onAdShow", code: 0, msg: "")
     }
 
-    func splashDidClick(forPlacementID placementID: String!, extra: [AnyHashable: Any]!) {
+    func splashDidClick(forPlacementID placementID: String, extra: [AnyHashable: Any]) {
         emitEvent(placementId: placementID, event: "onAdClicked", code: 0, msg: "")
     }
 
-    func splashDidClose(forPlacementID placementID: String!, extra: [AnyHashable: Any]!) {
+    func splashDidClose(forPlacementID placementID: String, extra: [AnyHashable: Any]) {
         emitEvent(placementId: placementID, event: "onAdClosed", code: 0, msg: "")
     }
 
-    func didFinishLoadingSplashAD(withPlacementID placementID: String!, isTimeout: Bool) {
+    func didFinishLoadingSplashAD(withPlacementID placementID: String, isTimeout: Bool) {
         // isTimeout=true 表示加载完成但已超时（仍视为加载成功，展示窗口由 JS 控制）
         emitEvent(placementId: placementID, event: "onAdLoaded", code: 0, msg: isTimeout ? "timeout" : "")
     }
 
-    func didTimeoutLoadingSplashAD(withPlacementID placementID: String!) {
+    func didTimeoutLoadingSplashAD(withPlacementID placementID: String) {
         emitEvent(placementId: placementID, event: "onAdFailed", code: -1, msg: "splash load timeout")
     }
 
-    func splashDidShowFailed(forPlacementID placementID: String!, error: Error!, extra: [AnyHashable: Any]!) {
+    func splashDidShowFailed(forPlacementID placementID: String, error: Error, extra: [AnyHashable: Any]) {
         emitEvent(placementId: placementID, event: "onAdFailed", code: errCode(error), msg: errMsg(error))
     }
 
     // ---- 横幅（ATBannerDelegate） ----
 
-    func bannerView(_ bannerView: ATBannerView, didShowAdWithPlacementID placementID: String!, extra: [AnyHashable: Any]!) {
+    func bannerView(_ bannerView: ATBannerView, didShowAdWithPlacementID placementID: String, extra: [AnyHashable: Any]) {
         emitEvent(placementId: placementID, event: "onAdShow", code: 0, msg: "")
     }
 
-    func bannerView(_ bannerView: ATBannerView, didClickWithPlacementID placementID: String!, extra: [AnyHashable: Any]!) {
+    func bannerView(_ bannerView: ATBannerView, didClickWithPlacementID placementID: String, extra: [AnyHashable: Any]) {
         emitEvent(placementId: placementID, event: "onAdClicked", code: 0, msg: "")
     }
 
-    func bannerView(_ bannerView: ATBannerView, didTapCloseButtonWithPlacementID placementID: String!, extra: [AnyHashable: Any]!) {
+    func bannerView(_ bannerView: ATBannerView, didTapCloseButtonWithPlacementID placementID: String, extra: [AnyHashable: Any]) {
         // 用户点击横幅关闭按钮：移除对应悬浮视图
         for (key, view) in bannerViews where view === bannerView {
             view.removeFromSuperview()

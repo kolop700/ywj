@@ -67,7 +67,9 @@ jobs:
           security import /tmp/cert.p12 -k build.keychain -P "$BUILD_CERT_PASSWORD" -T /usr/bin/codesign
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" build.keychain
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          echo "$BUILD_PROVISION_BASE64" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
+          # 描述文件以 UUID 命名写入（weijia / UUID 9a8bbf33-3c54-42b6-9467-641ae8e5caa0）：
+          # 手动签名下 xcodebuild 通过标准 UUID 文件名可靠索引到该描述文件
+          echo "$BUILD_PROVISION_BASE64" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/9a8bbf33-3c54-42b6-9467-641ae8e5caa0.mobileprovision
           rm -f /tmp/cert.p12
 
       - name: 写入 App Store Connect API Key

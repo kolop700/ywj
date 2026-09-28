@@ -47,7 +47,12 @@ targets:
         INFOPLIST_FILE: CloudGuard/Info.plist
         GENERATE_INFOPLIST_FILE: "NO"
         TARGETED_DEVICE_FAMILY: "1"
-        CODE_SIGN_STYLE: Automatic
+        # 手动签名（2026-09-28 起）：CI 直接使用已导入的 Apple Distribution 证书 + weijia 描述文件，
+        # archive 阶段不再与 Apple 服务器交互（修复自动签名下 GatherProvisioningInputs 长时间卡住 / 401 失败）；
+        # API Key 仅在 exportArchive 上传 TestFlight 时使用。
+        # 描述文件 weijia：UUID 9a8bbf33-3c54-42b6-9467-641ae8e5caa0（App Store 分发，2027-09-04 到期）。
+        CODE_SIGN_STYLE: Manual
+        PROVISIONING_PROFILE_SPECIFIER: weijia
         # 开发团队：Shenzhen Yefiot IoT Tech,.LTD（Team ID 与描述文件一致，Mac 上打开工程即自动选中）
         DEVELOPMENT_TEAM: "737647MFYB"
         # Universal Link（微信回跳，配 applinks:xy.yefiot.com，见 CloudGuard/CloudGuard.entitlements）：

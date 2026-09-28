@@ -59,15 +59,16 @@ if [ -n "${ASC_KEY_PATH:-}" ] && [ -n "${ASC_KEY_ID:-}" ] && [ -n "${ASC_ISSUER_
 fi
 
 # 4) 归档（Release）
+# 手动签名模式（2026-09-28 起）：archive 直接使用 CI 已导入的证书 + weijia 描述文件，
+# 不传 -allowProvisioningUpdates / 认证参数，避免与 Apple 服务器交互
+# （自动签名下曾出现 GatherProvisioningInputs 长时间卡住与 401 失败）。API Key 仅用于第 5 步上传。
 rm -rf build/CloudGuard.xcarchive build/ipa
 xcodebuild archive \
   ${BUILD_TARGET_ARGS[@]+"${BUILD_TARGET_ARGS[@]}"} \
   -scheme CloudGuard \
   -configuration Release \
   -destination 'generic/platform=iOS' \
-  -archivePath build/CloudGuard.xcarchive \
-  -allowProvisioningUpdates \
-  ${AUTH_ARGS[@]+"${AUTH_ARGS[@]}"}
+  -archivePath build/CloudGuard.xcarchive
 
 # 5) 导出 ipa（upload 模式：生成临时 plist 将 destination 改为 upload 直传）
 OPTS="ExportOptions.plist"

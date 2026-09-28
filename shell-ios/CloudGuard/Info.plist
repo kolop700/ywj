@@ -590,5 +590,11 @@
 		<key>NSAllowsArbitraryLoadsInWebContent</key>
 		<true/>
 	</dict>
+
+	<!-- ==================== 出口合规（Export Compliance） ==================== -->
+	<!-- App 仅使用操作系统标准加密（HTTPS/TLS 等），不含非豁免加密算法（如自研/专有加密）；
+	     声明后上传/TestFlight 不再要求回答 ASC 出口合规问卷（每次新构建省一步）。 -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>

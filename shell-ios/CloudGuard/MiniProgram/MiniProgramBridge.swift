@@ -48,7 +48,7 @@ final class MiniProgramBridge: NSObject {
         // 2.0.8 起仅提供 registerApp(_:universalLink:) 双参数版本（Universal Link 需与开放平台后台一致，
         // 未配置真实 UL 时占位值不影响拉起小程序；可经 H5 参数 universalLink 传入覆盖）
         let universalLink = params["universalLink"] as? String ?? Self.defaultUniversalLink
-        WXApi.registerApp(appId, universalLink: universalLink)
+        _ = WXApi.registerApp(appId, universalLink: universalLink)
 
         let req = WXLaunchMiniProgramReq()
         req.userName = userName
@@ -56,10 +56,14 @@ final class MiniProgramBridge: NSObject {
         let type = params["type"] as? Int ?? 0
         req.miniProgramType = WXMiniProgramType(rawValue: UInt(type)) ?? .release
 
-        if WXApi.send(req) {
-            channel.resolveOk(callbackId)
-        } else {
-            channel.resolveErr(callbackId, "send failed（微信未安装，或开放平台未关联小程序）")
+        // 2.0.8 起旧的 send: 已移除，统一用 sendReq:completion:（同步上下文用 completion 版；
+        // 单参 sendReq(_:) 会被自动导入为 async 版本，同步函数内直接调用会编译报错）
+        WXApi.sendReq(req) { success in
+            if success {
+                channel.resolveOk(callbackId)
+            } else {
+                channel.resolveErr(callbackId, "send failed（微信未安装，或开放平台未关联小程序）")
+            }
         }
         #else
         channel.resolveErr(callbackId, "未集成微信 SDK（WechatOpenSDK）：按 shell-ios/iOS编译接入说明.md 添加依赖后可用")

@@ -78,8 +78,13 @@ targets:
       # ---- 微信 OpenSDK 2.0.8（已放置 Vendor/WechatOpenSDK/ 并启用）----
       # 说明：MiniProgramBridge.swift 以 #if canImport(WechatOpenSDK) 自动切换真实/桩实现；
       #      Info.plist 的微信回跳 scheme 已填 wx4c80533df6184dda（wx + 开放平台 AppId，见 iOS编译接入说明.md）。
-      #      静态库（Do Not Embed，仅链接；XCFramework 含 arm64 真机 + arm64/x86_64 模拟器切片）。
+      #      静态库：仅链接、不嵌入。xcodegen 对 application target 的 framework 依赖默认 embed: true，
+      #      必须显式 embed: false——否则静态库会被拷进 App/Frameworks，归档时触发 Xcode
+      #      "Injecting stub binary into codeless framework"（注入空 stub 动态库）补救流程，
+      #      显著拖慢/停顿归档签名阶段（日志长时间无新行的疑因）。
+      #      XCFramework 含 arm64 真机 + arm64/x86_64 模拟器切片。
       - framework: Vendor/WechatOpenSDK/WechatOpenSDK.xcframework
+        embed: false
       # 微信 SDK 依赖的系统库
       - sdk: libz.tbd
       - sdk: libsqlite3.tbd

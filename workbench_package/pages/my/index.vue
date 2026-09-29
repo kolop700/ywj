@@ -87,8 +87,8 @@
         </view>
       </view>
 
-      <!-- 会员中心入口 -->
-      <view class="menu-item" @tap="handleVip">
+      <!-- 会员中心入口（提审期间由 SHOW_VIP_ENTRY 开关隐藏，避免审核暴露支付相关入口） -->
+      <view class="menu-item" v-if="SHOW_VIP_ENTRY" @tap="handleVip">
         <view class="menu-icon icon-gold">
           <up-icon name="star-fill" size="22" color="#F5A623"></up-icon>
         </view>
@@ -154,6 +154,9 @@ const WX_MINI_PROGRAM = {
   path: 'manageModule/pages/adminLogin/adminLogin?fromApp=1',
   type: 0 // 0-正式版；1-开发版；2-体验版
 }
+
+// 【提审开关】会员中心入口：true=显示；false=隐藏（App Store 审核期间置 false，规避支付入口合规问询；恢复时改回 true）
+const SHOW_VIP_ENTRY = false
 
 // VIP 会员状态（真实状态由 utils/vipUtils 同步，服务端为准）
 const vipActive = ref(isVip())
@@ -492,8 +495,9 @@ const handleOpenAppSettings = () => {
   // #endif
 }
 
-// 会员中心
+// 会员中心（开关关闭时不响应，双保险）
 const handleVip = () => {
+  if (!SHOW_VIP_ENTRY) return
   uni.navigateTo({
     url: '/user_package/pages/vip/index'
   })

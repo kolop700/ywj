@@ -117,6 +117,7 @@ const deviceStore = proxy.$store.device.useDeviceStore()
 const agreementStore = proxy.$store.agreement.useAgreementStore()
 const deviceApi = proxy.$api.device
 import scanUtils from '@/utils/scanUtils'
+import checkVersion from '@/pages/lq-upgrade/checkVersion.js'
 // 原生壳桥接（仅 H5）：用于「不同意协议」时退出应用
 // #ifdef H5
 import { isNativeShell, NativeApp } from '@/utils/h5-native-bridge'
@@ -180,11 +181,32 @@ const menuList = ref([
   },
 ])
 
+// 检查版本更新（对比后端最新版本，发现新版本时引导升级：Android 下载安装 / iOS 跳 App Store）
+const checkAppUpdate = () => {
+  const userApi = proxy.$api.user
+  userApi.getAppVersion().then(res => {
+    if (res.code === '0' && res.data && res.data.length > 0) {
+      const versionInfo = res.data[0]
+      checkVersion({
+        name: versionInfo.ver_name,         // 版本名称
+        code: parseInt(versionInfo.ver_no), // 版本号
+        content: versionInfo.ver_des,       // 更新内容
+        url: versionInfo.ver_link,          // 下载链接
+        forceUpdate: versionInfo.ver_forced_update === '1'  // 是否强制更新
+      })
+    }
+  }).catch(err => {
+    console.error('获取版本信息失败:', err)
+  })
+}
+
 // 页面加载时检查登录状态
 onLoad(() => {
   console.log('onLoad', userStore)
   // 首页静默登录：未登录时 login() 会 reject('无登录数据')，此处吞掉避免未捕获拒绝
   userStore.login({ showLoading: false }).catch(() => {})
+  // 检查版本更新（不阻塞登录流程）
+  checkAppUpdate()
 })
 
 // 在组件挂载后检查首次打开状态

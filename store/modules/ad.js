@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { useAdControlStore, AD_CONTROL_TYPES } from './adControl' // 引入广告控制模块
+import { useAdControlStore } from './adControl' // 引入广告控制模块
 import TakuAds from '@/common/taku-sdk' // 预加载横幅（提前竞价）
 
 // Taku（塔酷）广告位配置
@@ -47,8 +47,8 @@ export const useAdStore = defineStore('ad', () => {
   // 获取广告位ID（按当前平台与广告控制类型返回，未配置/全关返回空串）
   const getAdId = (type) => {
     const adControlStore = useAdControlStore() // 使用广告控制 store
-    // 广告类型为 NONE（全关）时不返回任何广告位
-    if (adControlStore.adType === AD_CONTROL_TYPES.NONE) {
+    // App 内广告全关（'0' 都不显示 / '04' 只保留开屏）时不返回任何广告位
+    if (adControlStore.isAdsDisabled) {
       return ''
     }
     const platform = isTestMode.value ? 'test' : getPlatform()
@@ -68,8 +68,10 @@ export const useAdStore = defineStore('ad', () => {
   const getInformationFlowAdId = () => getAdId('informationflow')
 
   // 获取开屏广告位ID
-  // 说明：开屏展示于冷启动瞬间，此时房间级广告控制（adType）尚未赋值（恒为默认 NONE），
-  // 故开屏不受 adType 约束——只要平台广告位已配置即返回（未配置返回空串，自动跳过展示）。
+  // 说明：开屏展示于冷启动瞬间，此时房间级广告控制（adType）尚未赋值——是否展示由
+  // App.vue 的 loadSplashAd() 决定（VIP 用户跳过；上次登录算出的广告类型缓存为 '0'
+  // 「都不显示」时同样跳过，'04'「只显示开屏」则保留）。此处只要平台广告位已配置
+  // 即返回（未配置返回空串，自动跳过展示）。
   const getSplashAdId = () => {
     const platform = isTestMode.value ? 'test' : getPlatform()
     return AD_IDS[platform]?.splash || ''

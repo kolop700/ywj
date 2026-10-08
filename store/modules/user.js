@@ -3,7 +3,7 @@ import { ref, computed } from 'vue'
 import userApi from '@/api/user/user'
 import deviceApi from '@/api/device/device' // 引入设备API
 import { useDeviceStore } from './device'
-import { useAdControlStore } from './adControl' // 引入广告控制 store
+import { useAdControlStore, AD_CONTROL_STORAGE_KEY } from './adControl' // 引入广告控制 store（含广告类型缓存键）
 import { useAdStore } from './ad' // 引入广告 store（横幅预加载）
 import { applyVipAdControl, syncVipStatus, clearVip } from '@/utils/vipUtils' // 【VIP 免广告】VIP 状态同步与广告拦截（见 utils/vipUtils.js）
 
@@ -11,7 +11,7 @@ export const useUserStore = defineStore('user', () => {
   const userInfo = ref({})
   const user_id = ref('')
   const maxExpireDate = ref('') // 最大过期日期
-  const adType = ref('') // 广告类型（'0'全关/'1'仅横幅/'11'横幅+激励/'13'横幅+插屏）
+  const adType = ref('') // 广告类型（'0'全关含开屏/'04'仅开屏/'1'仅横幅/'11'横幅+激励/'13'横幅+插屏）
   
   // 基础图片URL
   const BASE_IMG_URL = 'https://xy.yefiot.com/yefiot/v1/'
@@ -117,10 +117,11 @@ export const useUserStore = defineStore('user', () => {
 
         // 定义广告类型优先级
         const adPriority = {
-          '11': 4, // banner + 激励 最高优先级
-          '13': 3, // banner + 插屏
-          '1': 2,  // 只显示 banner
-          '0': 1   // 不显示任何广告 最低优先级
+          '11': 5, // banner + 激励 最高优先级
+          '13': 4, // banner + 插屏
+          '1': 3,  // 只显示 banner
+          '04': 2, // 只显示开屏（比 '0' 宽松：保留开屏）
+          '0': 1   // 不显示任何广告（含开屏） 最低优先级
         }
 
         // 从所有房间中找出优先级最高的广告类型
@@ -135,6 +136,13 @@ export const useUserStore = defineStore('user', () => {
         // 存储选择的广告类型
         adType.value = selectedAd
 
+        // 缓存广告类型（供下次冷启动 App.vue 判断开屏：'0' 都不显示时跳过开屏）
+        try {
+          uni.setStorageSync(AD_CONTROL_STORAGE_KEY, selectedAd)
+        } catch (e) {
+          console.error('[广告] 广告类型缓存写入失败', e)
+        }
+
         // 【VIP 免广告】VIP 用户广告全关（applyVipAdControl 内部置 NONE 并返回 true）；
         // 非 VIP（或 VIP 开关关闭）按房间计算值正常设置并预热横幅。
         if (applyVipAdControl()) {
@@ -146,6 +154,13 @@ export const useUserStore = defineStore('user', () => {
 
           // 广告类型确定后：预热横幅（提前竞价，用户进入页面时可直接复用展示）
           useAdStore().preloadBanner()
+        }
+      } else {
+        // 无房间（无 ad_prod_app 配置依据）：清除广告类型缓存，开屏按默认展示
+        try {
+          uni.removeStorageSync(AD_CONTROL_STORAGE_KEY)
+        } catch (e) {
+          console.error('[广告] 广告类型缓存清除失败', e)
         }
       }
       console.log("更新房间列表", res)
@@ -194,6 +209,12 @@ export const useUserStore = defineStore('user', () => {
     user_id.value = ''
     // 【VIP 免广告】清除会员状态（user_type → normal，防止 VIP 状态残留到下一个账号）
     clearVip()
+    // 【广告类型缓存】清除房间广告类型缓存（防止上一账号的 '0'（都不显示）影响下一账号冷启动开屏）
+    try {
+      uni.removeStorageSync(AD_CONTROL_STORAGE_KEY)
+    } catch (e) {
+      console.error('[广告] 广告类型缓存清除失败', e)
+    }
     // 清空设备列表
     const deviceStore = useDeviceStore()
     deviceStore.clearDeviceList()
@@ -266,7 +287,6 @@ export const useUserStore = defineStore('user', () => {
     userCardA,
     userCardB,
     setUserAccount,  // 导出设置账号方法
-    setUserPassword,  // 导出设置密码方法
     adType
   }
 }) 

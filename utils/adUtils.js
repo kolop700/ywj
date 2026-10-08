@@ -6,6 +6,7 @@ import { useAdControlStore } from '../store/modules/adControl'
  * 广告管理器（Taku 版）
  * 保留 uni-ad 时代的展示策略：后端房间 ad_prod_app → adType → 激励/插屏选择、
  * 激励失败降级插屏、每日 15 次上限与最小间隔限制；
+ * App 内广告全关（'0' 都不显示 / '04' 只保留开屏）时统一不加载不展示；
  * 底层广告实例由 uni.createRewardedVideoAd/createInterstitialAd 替换为 TakuAds（Taku 聚合 SDK）。
  */
 class AdManager {
@@ -134,7 +135,7 @@ class AdManager {
   shouldLoad(type) {
     if (!this.adControlStore) return false
     if (!TakuAds.isReady()) return false
-    if (this.adControlStore.adType === this.adControlStore.AD_CONTROL_TYPES.NONE) return false
+    if (this.adControlStore.isAdsDisabled) return false
     const id = type === 'rewarded'
       ? this.adStore.getRewardedVideoAdId()
       : this.adStore.getInterstitialAdId()
@@ -285,7 +286,7 @@ class AdManager {
       return false
     }
 
-    if (this.adControlStore.adType === this.adControlStore.AD_CONTROL_TYPES.NONE) {
+    if (this.adControlStore.isAdsDisabled) {
       console.log('广告功能已关闭，当前广告类型:', this.adControlStore.adType)
       return false
     }

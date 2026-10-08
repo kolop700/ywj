@@ -53,8 +53,8 @@ android {
         applicationId "com.yefiot.community"
         minSdk 24
         targetSdk 34
-        versionCode 100
-        versionName "1.0.0"
+        versionCode 126
+        versionName "1.0.26"
 
         // Taku/Litemize 要求：仅支持 32/64 位 arm
         ndk {

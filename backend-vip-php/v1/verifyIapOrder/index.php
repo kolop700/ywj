@@ -12,8 +12,8 @@
  *   2. 调苹果 verifyReceipt（生产 → status=21007 自动重试沙箱；bundle_id 归属校验）；
  *   3. 从收据中挑出与订单商品（vip_products.ios_iap_id）匹配的交易凭证，
  *      校验 transaction_id 未被其他已支付订单占用（防同一凭证重复入账）；
- *   4. 幂等入账：置 paid（status 0→1 原子更新）+ 会员顺延；
- *      顺延幂等键为 t_vip_user.last_order_no（同单重复请求不重复加时长）。
+ *   4. 幂等入账：置 paid（status 0→1 原子更新）+ vip_grant_order_member 确保顺延；
+ *      入账幂等键为 t_vip_order.granted_at 原子标记（同单重复请求不重复加时长）。
  * =====================================================================
  */
 require_once __DIR__ . '/../vip/_lib.php';
@@ -34,30 +34,12 @@ if ((string)$order['user_id'] !== $user_id) vip_out_error('订单不属于当前
 if ((string)$order['pay_type'] !== 'iap') vip_out_error('订单支付方式不是 iap');
 if ($order['status'] == 2) vip_out_error('订单已关闭');
 
-/**
- * 确保会员入账（幂等）：
- *   t_vip_user.last_order_no 已为本单 → 视作已入账，直接返回当前到期时间；
- *   否则执行顺延。用于补偿「置 paid 成功但顺延失败」的中间态（重试本接口可自愈）。
- * @return string vip_expire_date
- */
-function vip_iap_ensure_grant($order)
-{
-    $user_id = (string)$order['user_id'];
-    $order_no = (string)$order['out_trade_no'];
-    $member = vip_get_member($user_id);
-    if ($member && (string)$member['last_order_no'] === $order_no) {
-        return (string)$member['vip_expire_date'];
-    }
-    $newExpire = vip_grant_months($user_id, $order['months'], 'iap', $order_no);
-    if ($newExpire === false) {
+// ---------- 已支付：幂等返回（并自愈「置 paid 成功但入账失败」的中间态） ----------
+if ($order['status'] == 1) {
+    $expire = vip_grant_order_member($order_no);
+    if ($expire === false) {
         vip_out_error('会员入账失败，请稍后重试');
     }
-    return $newExpire;
-}
-
-// ---------- 已支付：幂等返回（并补偿「置 paid 成功但顺延失败」的中间态） ----------
-if ($order['status'] == 1) {
-    $expire = vip_iap_ensure_grant($order);
     vip_out(array(array('status' => 'paid', 'vip_expire_date' => $expire)));
 }
 
@@ -101,6 +83,9 @@ if (vip_mark_order_paid($order_no, $tx['transaction_id'])) {
     }
 }
 
-// ---------- 会员顺延（幂等） ----------
-$expire = vip_iap_ensure_grant($order);
+// ---------- 会员顺延（granted_at 原子幂等，重试可自愈） ----------
+$expire = vip_grant_order_member($order_no);
+if ($expire === false) {
+    vip_out_error('会员入账失败，请稍后重试');
+}
 vip_out(array(array('status' => 'paid', 'vip_expire_date' => $expire)));

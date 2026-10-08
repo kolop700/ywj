@@ -8,7 +8,8 @@
  * 依赖：v1/config.php（部署机 DB 常量：DB_HOST/DB_USERNAME/DB_PASSWORD/DB_NAME）
  *      v1/log.php（log_r 日志，写 /var/log/yefiot/）
  *
- * 数据表：t_vip_user（会员表）、t_vip_order（订单表），建表脚本见 install.sql
+ * 数据表：t_vip_order（订单表，见 install.sql）；会员到期时间复用现有
+ *          t_app_user.user_ad_end 字段（与登录接口 ad_show 体系打通，不建新会员表）
  * =====================================================================
  */
 
@@ -61,25 +62,29 @@ function vip_db()
     return $db;
 }
 
-// ==================== 会员（t_vip_user） ====================
+// ==================== 会员（复用 t_app_user.user_ad_end） ====================
 
-/** 查询会员记录，返回 array|null */
+/**
+ * 查询会员信息（读 t_app_user.user_ad_end；t_app_user.user_id 为 int 主键）。
+ * 返回字段名保持 vip_expire_date，兼容上层接口契约。
+ * @return array|null
+ */
 function vip_get_member($user_id)
 {
+    $uid = intval($user_id);
+    if ($uid <= 0) return null;
     $db = vip_db();
-    $stmt = $db->prepare('SELECT user_id, vip_expire_date, source, last_order_no FROM t_vip_user WHERE user_id = ? LIMIT 1');
+    $stmt = $db->prepare('SELECT user_id, user_ad_end FROM t_app_user WHERE user_id = ? LIMIT 1');
     if (!$stmt) { $db->close(); return null; }
-    $stmt->bind_param('s', $user_id);
+    $stmt->bind_param('i', $uid);
     if (!$stmt->execute()) { $stmt->close(); $db->close(); return null; }
     $stmt->store_result();
-    $stmt->bind_result($uid, $expire, $source, $lastOrder);
+    $stmt->bind_result($dbUid, $expire);
     $row = null;
     if ($stmt->fetch()) {
         $row = array(
-            'user_id' => $uid,
-            'vip_expire_date' => $expire,
-            'source' => $source,
-            'last_order_no' => $lastOrder
+            'user_id' => $dbUid,
+            'vip_expire_date' => $expire
         );
     }
     $stmt->close();
@@ -95,59 +100,109 @@ function vip_is_active($row)
 }
 
 /**
- * 会员时长顺延（未过期从原到期时间顺延，已过期从当前时间起算）。
- * 幂等由调用方保证（订单先原子置 paid 成功后才允许调用本函数）。
- * @return string|false 新到期时间 'Y-m-d H:i:s'，失败 false
+ * 确保订单的会员时长已入账（原子 + 幂等，单事务完成，t_vip_order.granted_at 为入账标记）：
+ *   1. 事务内 FOR UPDATE 锁订单行：仅 status=1（已支付）且 granted_at IS NULL（未入账）才继续；
+ *   2. 锁用户行（t_app_user）计算新到期时间并写回 user_ad_end，同时置订单 granted_at=NOW()；
+ *   3. 提交（任一步失败/中断自动回滚，无「已标记未入账」中间态）；
+ *   4. 已入账/未支付：不修改任何数据，返回当前会员到期时间（重复调用无副作用）。
+ * 顺延规则：未过期从原到期时间顺延，已过期从当前时间起算。
+ * 微信/支付宝回调、IAP 校验、主动查单补偿统一调用本函数，入账幂等只此一处。
+ * @return string|false 会员到期时间 'Y-m-d H:i:s'；false=入账失败（调用方应允许重试）
  */
-function vip_grant_months($user_id, $months, $source, $order_no)
+function vip_grant_order_member($order_no)
 {
-    $months = intval($months);
-    if ($months <= 0) return false;
     $db = vip_db();
-    $ok = false;
-    $newExpire = '';
-    if ($db->begin_transaction()) {
-        $stmt = $db->prepare('SELECT vip_expire_date FROM t_vip_user WHERE user_id = ? FOR UPDATE');
-        if ($stmt) {
-            $stmt->bind_param('s', $user_id);
-            if ($stmt->execute()) {
-                $stmt->store_result();
-                $stmt->bind_result($curExpire);
-                $base = time();
-                if ($stmt->fetch() && !empty($curExpire)) {
-                    $cur = strtotime($curExpire);
-                    if ($cur > $base) $base = $cur; // 未过期：从原到期时间顺延
-                }
-                $stmt->close();
-                $newExpire = date('Y-m-d H:i:s', strtotime('+' . $months . ' months', $base));
-                // INSERT ... ON DUPLICATE KEY UPDATE：无记录则新建，有记录则更新
-                $stmt = $db->prepare(
-                    'INSERT INTO t_vip_user (user_id, vip_expire_date, source, last_order_no) VALUES (?, ?, ?, ?)
-                     ON DUPLICATE KEY UPDATE vip_expire_date = VALUES(vip_expire_date), source = VALUES(source), last_order_no = VALUES(last_order_no)'
+    if (!$db->begin_transaction()) { $db->close(); return false; }
+
+    // 1) 锁订单行（锁保持到提交/回滚），读入账所需快照
+    $order = null;
+    $stmt = $db->prepare('SELECT user_id, months, pay_type, status, granted_at FROM t_vip_order WHERE out_trade_no = ? FOR UPDATE');
+    if ($stmt) {
+        $stmt->bind_param('s', $order_no);
+        if ($stmt->execute()) {
+            $stmt->store_result();
+            $stmt->bind_result($rUserId, $rMonths, $rPayType, $rStatus, $rGrantedAt);
+            if ($stmt->fetch()) {
+                $order = array(
+                    'user_id' => $rUserId,
+                    'months' => $rMonths,
+                    'pay_type' => $rPayType,
+                    'status' => $rStatus,
+                    'granted_at' => $rGrantedAt
                 );
-                if ($stmt) {
-                    $stmt->bind_param('ssss', $user_id, $newExpire, $source, $order_no);
-                    $ok = $stmt->execute();
-                    $stmt->close();
-                }
-            } else {
-                $stmt->close();
             }
         }
-        if ($ok) {
-            $db->commit();
+        $stmt->close();
+    }
+    if (!$order) {
+        $db->rollback();
+        $db->close();
+        return false;
+    }
+
+    $uid = intval($order['user_id']);
+    $months = intval($order['months']);
+    if ($uid <= 0 || $months <= 0) {
+        $db->rollback();
+        $db->close();
+        log_r('vip_grant_order_member bad order data order=' . $order_no);
+        return false;
+    }
+
+    // 2) 已入账或非已支付：不修改，返回当前会员到期时间
+    if (intval($order['status']) !== 1 || !empty($order['granted_at'])) {
+        $db->rollback();
+        $db->close();
+        $member = vip_get_member((string)$order['user_id']);
+        return ($member && !empty($member['vip_expire_date'])) ? (string)$member['vip_expire_date'] : '';
+    }
+
+    // 3) 锁用户行，计算顺延后的新到期时间
+    $base = time();
+    $stmt = $db->prepare('SELECT user_ad_end FROM t_app_user WHERE user_id = ? FOR UPDATE');
+    if ($stmt) {
+        $stmt->bind_param('i', $uid);
+        if ($stmt->execute()) {
+            $stmt->store_result();
+            $stmt->bind_result($curExpire);
+            if ($stmt->fetch() && !empty($curExpire)) {
+                $cur = strtotime($curExpire);
+                if ($cur > $base) $base = $cur; // 未过期：从原到期时间顺延
+            }
+        }
+        $stmt->close();
+    }
+    $newExpire = date('Y-m-d H:i:s', strtotime('+' . $months . ' months', $base));
+
+    // 4) 写回会员到期时间（复用 t_app_user.user_ad_end）+ 置入账标记，同事务提交
+    $ok = false;
+    $stmt = $db->prepare('UPDATE t_app_user SET user_ad_end = ? WHERE user_id = ?');
+    if ($stmt) {
+        $stmt->bind_param('si', $newExpire, $uid);
+        $ok = $stmt->execute() && $stmt->affected_rows > 0;
+        $stmt->close();
+    }
+    if ($ok) {
+        $stmt = $db->prepare('UPDATE t_vip_order SET granted_at = NOW() WHERE out_trade_no = ?');
+        if ($stmt) {
+            $stmt->bind_param('s', $order_no);
+            $ok = $stmt->execute() && $stmt->affected_rows > 0;
+            $stmt->close();
         } else {
-            $db->rollback();
-            $newExpire = '';
+            $ok = false;
         }
     }
-    $db->close();
+
     if ($ok) {
-        log_r("vip_grant ok user=$user_id months=$months expire=$newExpire order=$order_no");
+        $db->commit();
+        log_r('vip_grant_order_member granted order=' . $order_no . ' user=' . $uid . ' months=' . $months . ' source=' . $order['pay_type'] . ' expire=' . $newExpire);
     } else {
-        log_r("vip_grant fail user=$user_id months=$months order=$order_no");
+        $db->rollback();
+        $newExpire = false;
+        log_r('vip_grant_order_member fail order=' . $order_no . ' user=' . $uid . ' months=' . $months);
     }
-    return $ok ? $newExpire : false;
+    $db->close();
+    return $newExpire;
 }
 
 // ==================== 订单（t_vip_order） ====================
@@ -233,8 +288,9 @@ function vip_get_order($order_no)
 /**
  * 订单置为已支付（原子 + 幂等）：
  *   仅当 status=0（待支付）时更新为 1（已支付），affected_rows=1 表示本次首次置成功。
- *   重复回调/重复请求时返回 false，调用方据此决定是否执行 vip_grant_months。
- * @return bool true = 本次首次置成功（应执行会员顺延）
+ *   重复回调/重复请求时返回 false（仅用于记录日志）；会员入账幂等由
+ *   vip_grant_order_member 的 granted_at 原子标记独立保证，两处不耦合。
+ * @return bool true = 本次首次置成功
  */
 function vip_mark_order_paid($order_no, $transaction_id = '')
 {

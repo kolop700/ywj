@@ -53,10 +53,9 @@ export function getPayChannels(platform) {
   if (platform === 'ios') {
     return [{ type: 'iap', label: 'Apple 内购' }]
   }
-  return [
-    { type: 'wechat', label: '微信支付' },
-    { type: 'alipay', label: '支付宝' }
-  ]
+  // 当前仅开放微信支付；支付宝入口暂不展示（后端 createVipOrder 已内置未配置降级，
+  // 后续开通：填 vip_pay_config.php 支付宝配置 + 在此加回 alipay 项即可）
+  return [{ type: 'wechat', label: '微信支付' }]
 }
 
 /**

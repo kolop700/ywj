@@ -6,9 +6,10 @@
  * 请求：POST JSON {"user_id":"123","order_no":"VIP20250101120000123456"}
  * 返回：{"code":"0","data":[{"status":"paid|pending|failed","vip_expire_date":"..."}]}
  * 说明：
- *   - status=0（待支付）时向微信/支付宝主动查询补偿掉单，确认已支付则幂等置 paid+顺延会员
+ *   - status=0（待支付）时向微信/支付宝主动查询补偿掉单，确认已支付则幂等置 paid 并确保入账
  *   - 待支付超过 2 小时自动关单（status=2 → failed）
- *   - 已支付时 vip_expire_date 取会员表最新到期时间（保证回调先到/后到都返回正确值）
+ *   - 已支付时 vip_expire_date 取会员最新到期时间（保证回调先到/后到都返回正确值），
+ *     并顺带执行 vip_grant_order_member 自愈「置 paid 后入账失败」的中间态
  * =====================================================================
  */
 require_once __DIR__ . '/../vip/_lib.php';
@@ -33,6 +34,8 @@ function vip_query_expire($user_id)
 
 // ---------- 已支付 ----------
 if ($order['status'] == 1) {
+    // 自愈：若此前「置 paid 成功但入账失败」，此处补偿顺延（granted_at 原子幂等，重复调用无副作用）
+    vip_grant_order_member($order_no);
     vip_out(array(array('status' => 'paid', 'vip_expire_date' => vip_query_expire($user_id))));
 }
 
@@ -63,11 +66,11 @@ if ($order['pay_type'] === 'wechat') {
 }
 
 if ($paidTxId !== '') {
-    // 幂等：仅首次置 paid 成功者执行会员顺延（回调已置过则不再顺延）
+    // 幂等：仅首次置 paid 成功者记录日志；入账统一走 granted_at 原子标记（重复调用无副作用）
     if (vip_mark_order_paid($order_no, $paidTxId)) {
-        vip_grant_months($user_id, $order['months'], $order['pay_type'], $order_no);
         log_r('vip queryVipOrder channel-paid order=' . $order_no . ' tx=' . $paidTxId);
     }
+    vip_grant_order_member($order_no);
     vip_out(array(array('status' => 'paid', 'vip_expire_date' => vip_query_expire($user_id))));
 }
 

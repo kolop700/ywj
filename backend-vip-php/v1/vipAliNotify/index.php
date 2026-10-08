@@ -6,8 +6,9 @@
  * 配置点：无需在支付宝后台单独配置——notify_url 已在下单接口（orderStr）中携带，
  *        值为 https://xy.yefiot.com/yefiot/v1/vipAliNotify/
  * 处理流程：form-urlencoded 解析 → 验签（支付宝公钥 RSA2）→ app_id 校验
- *          → trade_status 校验 → 金额校验 → 幂等置 paid（affected_rows=1 才顺延会员）
- * 幂等性：同一订单重复通知不会重复加时长（vip_mark_order_paid 原子判断）
+ *          → trade_status 校验 → 金额校验 → 幂等置 paid → 确保入账 vip_grant_order_member
+ * 幂等性：重复通知不会重复加时长（置 paid + granted_at 入账标记双层原子判断）；
+ *         顺延失败应答 fail，支付宝重试时自动补偿入账
  * 应答：纯文本 'success' = 支付宝停止重试；'fail' = 触发重试
  * =====================================================================
  */
@@ -66,12 +67,17 @@ if (isset($data['total_amount']) && abs(floatval($data['total_amount']) - intval
 }
 
 $txId = isset($data['trade_no']) ? (string)$data['trade_no'] : '';
-// 幂等：仅首次置 paid 成功者执行会员顺延；重复通知直接应答 success
+// 置 paid（幂等）：重复通知时返回 false，仅用于日志区分
 if (vip_mark_order_paid($order_no, $txId)) {
-    vip_grant_months($order['user_id'], $order['months'], 'alipay', $order_no);
     log_r('vipAliNotify paid ok order=' . $order_no . ' tx=' . $txId);
 } else {
     log_r('vipAliNotify duplicate order=' . $order_no);
+}
+// 确保会员入账（granted_at 原子幂等；顺延失败应答 fail，让支付宝重试补偿）
+$expire = vip_grant_order_member($order_no);
+if ($expire === false) {
+    echo 'fail';
+    exit;
 }
 
 echo 'success';

@@ -60,6 +60,9 @@
 <script setup>
 import { ref, onMounted, getCurrentInstance } from 'vue'
 import { storeToRefs } from 'pinia'
+// #ifdef H5
+import { isNativeShell, NativeApp } from '@/utils/h5-native-bridge'
+// #endif
 
 const { proxy } = getCurrentInstance()
 const userStore = proxy.$store.user.useUserStore()
@@ -68,17 +71,29 @@ const { userType } = storeToRefs(userStore)
 const appVersion = ref('')
 
 // 初始化版本号
-const initVersion = () => {
+const initVersion = async () => {
   // #ifdef APP-PLUS
   appVersion.value = plus.runtime.version
   // #endif
-  
+
   // #ifdef MP-WEIXIN
   const accountInfo = uni.getAccountInfoSync()
   appVersion.value = accountInfo.miniProgram.version
   // #endif
-  
-  // 如果以上都不匹配，设置默认版本
+
+  // #ifdef H5
+  // H5 原生壳：通过桥接读取真实 versionName
+  if (!appVersion.value && isNativeShell) {
+    try {
+      const info = await NativeApp.getInfo()
+      appVersion.value = info.version || ''
+    } catch (e) {
+      console.warn('[about] 桥接读取版本号失败', e)
+    }
+  }
+  // #endif
+
+  // 兜底
   if (!appVersion.value) {
     const systemInfo = uni.getSystemInfoSync()
     appVersion.value = systemInfo.appVersion || '1.0.0'

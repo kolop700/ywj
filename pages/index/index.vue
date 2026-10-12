@@ -118,6 +118,7 @@ const agreementStore = proxy.$store.agreement.useAgreementStore()
 const deviceApi = proxy.$api.device
 import scanUtils from '@/utils/scanUtils'
 import checkVersion from '@/pages/lq-upgrade/checkVersion.js'
+import { checkIosStoreUpdate } from '@/utils/iosStoreUpdate.js'
 // 原生壳桥接（仅 H5）：用于「不同意协议」时退出应用
 // #ifdef H5
 import { isNativeShell, NativeApp } from '@/utils/h5-native-bridge'
@@ -181,8 +182,14 @@ const menuList = ref([
   },
 ])
 
-// 检查版本更新（对比后端最新版本，发现新版本时引导升级：Android 下载安装 / iOS 跳 App Store）
+// 检查版本更新（Android 对比后端 t_ver 下载安装；iOS 直接查 App Store 最新版，零维护）
 const checkAppUpdate = () => {
+  // iOS 不走后端版本接口（构建号体系与 Android 不可比），直接对比商店版本
+  const sysInfo = uni.getSystemInfoSync()
+  if (String(sysInfo.platform || '').toLowerCase() === 'ios' || String(sysInfo.osName || '') === 'ios') {
+    checkIosStoreUpdate()
+    return
+  }
   const userApi = proxy.$api.user
   userApi.getAppVersion().then(res => {
     if (res.code === '0' && res.data && res.data.length > 0) {

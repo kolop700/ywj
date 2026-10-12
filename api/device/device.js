@@ -15,7 +15,7 @@ export default {
       method: 'post',
       data: {
         door_mac: "1", // 品牌数据隔离：云卫家对应 t_doorphone.appid=1，后台按此字段过滤设备
-        app_phone_mac: "", // 旧字段，后端已不读取，保留兼容
+        app_phone_mac: "", 
         user_id
       },
       ...defaultOptions,

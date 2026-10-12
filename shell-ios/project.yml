@@ -16,9 +16,10 @@ options:
 
 settings:
   base:
-    # marketing 版本（CFBundleShortVersionString）：须高于 App Store Connect 已批准版本（当前 1.0.26），
-    # 否则上传被拒（错误码 90062/90186/90478：train 已关闭 / 版本必须高于已批准版本）。
-    MARKETING_VERSION: "1.0.27"
+    # marketing 版本（CFBundleShortVersionString）：自 1.4 起改用「1.4/1.5…」风格，
+    # 必须与 App Store Connect 的「版本」字段填同一个值（App 内更新检查直接对比 itunes lookup 返回的商店版本，
+    # 两边口径不一致会导致反复误弹/不弹）。须高于已批准版本（当前 1.3）。
+    MARKETING_VERSION: "1.4"
     # build number：CI 构建时由 scripts/build-ios.sh 动态覆盖为 1000+run_number（保证递增不减）；
     # 此静态值供本地归档使用，须始终大于 App Store Connect 已上传的历史值（历史上传过 100）。
     CURRENT_PROJECT_VERSION: "127"

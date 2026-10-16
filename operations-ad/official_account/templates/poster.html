@@ -1,0 +1,45 @@
+{% extends "wx_base.html" %}
+
+{% block title %}{{title}}{% endblock %}
+
+{% block head %}
+    {{ super() }}
+    <script src="https://js.cdn.aliyun.dcloud.net.cn/dev/uni-app/uni.webview.1.5.2.js" charset="utf-8"></script>
+{% endblock head %}
+
+{% block body %}
+    {{content|safe}}
+    <script>
+        document.addEventListener('UniAppJSBridgeReady', function() {
+            var links = document.querySelectorAll('a');
+            for (var i=0;i<links.length;i++){
+                var link = links[i];
+                link.addEventListener('click', function(evt) {
+                    var target = evt.target;
+                    var href = target.getAttribute('href');
+                    if (href.startsWith('uni:')){
+                        evt.preventDefault();
+                        var [prefix, action, path] = href.split(':');
+                        if (action == 'navigateTo') {
+                            uni.navigateTo({
+                                url: path
+                            });
+                        } else if (action == 'redirectTo') {
+                            uni.redirectTo({
+                                url: path
+                            });
+                        } else if (action == 'switchTab') {
+                            uni.switchTab({
+                                url: path
+                            });
+                        } else if (action == 'navigateBack'){
+                            uni.navigateBack({
+                              delta: path || 1
+                            });
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+{% endblock body %}

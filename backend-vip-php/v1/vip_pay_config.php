@@ -8,7 +8,7 @@
  * =====================================================================
  * 上线前必须填写（留空 = 未开通，对应支付方式会直接返回错误）：
  *   wechat.app_id        微信开放平台「移动应用」AppId（注意：不是小程序 appid）
- *                        移动应用需关联商户号 1612795620，且包名/签名与 APK 一致
+ *                        移动应用需关联商户号 1001639761，且包名/签名与 APK 一致
  *   alipay.app_id        支付宝开放平台移动应用 AppId（已签约 APP 支付）
  *   alipay.private_key   应用私钥 RSA2（PEM 文件路径 或 裸密钥内容均可）
  *   alipay.alipay_public_key  支付宝公钥（用于回调验签，不是应用公钥）
@@ -26,10 +26,20 @@ return array(
     'wechat' => array(
         // 微信开放平台移动应用 AppId（已填：与小程序 appid 不同；须关联商户号并使用同一开放平台账号）
         'app_id' => 'wx4c80533df6184dda',
-        // 商户号：复用现有（小程序支付同一商户号）
-        'mch_id' => '1612795620',
-        // 商户 API v2 密钥：复用现有（wxpay/WeixinPay.php 同款）
-        'api_key' => 'Yefiot2021LosdsucitWoloicRoizniH'
+        // 商户号：越凡物联商户号（2026-10-16 由 1612795620 改为此号）
+        // ⚠️ 需在新商户号下重新关联 appid（否则下单报"appid与商户号不匹配"）：
+        //   - 小程序 wxcdc46554970d5e77（JSAPI 支付，商户平台→产品中心→AppID账号管理 关联）
+        //   - 移动应用 wx4c80533df6184dda（APP 支付，同上）
+        'mch_id' => '1001639761',
+        // 商户 API v2 密钥：2022 年商户平台已重设 key（payfeeYefiotAccess 等在用同款）；
+        // 旧 key ...2021...H 会报"签名错误"（2026-10-14 修复）
+        'api_key' => 'Yefiot2022LosdsucitWoloicRoizniW',
+        // ---------- 小程序 JSAPI 支付（App 跳小程序开 VIP，2026-10-15 新增） ----------
+        // ywjxcx 云卫家壳小程序 appid（越凡可视门禁；需在本商户号 1001639761 下关联）
+        'mini_app_id' => 'wxcdc46554970d5e77',
+        // createVipMiniOrder 防刷签名密钥：与小程序 appvip.js 内嵌值一致
+        // sign = MD5(user_id + openid + timestamp + sign_secret)，时间戳 5 分钟有效
+        'sign_secret' => 'YfMiniVip2026k7Qm3Xd9Zr5Tn8Wc'
     ),
 
     // ---------- 支付宝 App 支付（RSA2，手写签名不引 SDK） ----------

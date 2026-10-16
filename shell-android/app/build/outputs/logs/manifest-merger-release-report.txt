@@ -1,20 +1,20 @@
 -- Merging decision tree log ---
 provider#androidx.core.content.FileProvider
-INJECTED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:99:9-107:20
+INJECTED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:101:9-109:20
 	android:grantUriPermissions
-		ADDED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:103:13-47
+		ADDED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:105:13-47
 	android:authorities
 		INJECTED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml
-		ADDED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:101:13-64
+		ADDED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:103:13-64
 	android:exported
-		ADDED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:102:13-37
+		ADDED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:104:13-37
 	android:name
-		ADDED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:100:13-62
+		ADDED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:102:13-62
 manifest
-ADDED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:2:1-110:12
-INJECTED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:2:1-110:12
-INJECTED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:2:1-110:12
-INJECTED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:2:1-110:12
+ADDED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:2:1-112:12
+INJECTED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:2:1-112:12
+INJECTED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:2:1-112:12
+INJECTED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:2:1-112:12
 MERGED from [adapter-beizi-2.1.7.aar] C:\Users\Administrator\Desktop\ywj\.toolchain\gradle-home\caches\transforms-3\8458696ecdf0f4a8e17019adf33abd2b\transformed\jetified-adapter-beizi-2.1.7\AndroidManifest.xml:2:1-7:12
 MERGED from [adapter-gromore-2.2.1.aar] C:\Users\Administrator\Desktop\ywj\.toolchain\gradle-home\caches\transforms-3\e8076266c326b7e07e120cc5ad50e3da\transformed\jetified-adapter-gromore-2.2.1\AndroidManifest.xml:2:1-7:12
 MERGED from [adapter-qc-2.1.1.aar] C:\Users\Administrator\Desktop\ywj\.toolchain\gradle-home\caches\transforms-3\63b2b78bab2320485bb89a1ad16f60d7\transformed\jetified-adapter-qc-2.1.1\AndroidManifest.xml:2:1-7:12
@@ -413,8 +413,8 @@ MERGED from [alipaysdk-android-15.8.42.aar] C:\Users\Administrator\Desktop\ywj\.
 	android:name
 		ADDED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:52:18-60
 application
-ADDED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:55:5-108:19
-INJECTED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:55:5-108:19
+ADDED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:55:5-110:19
+INJECTED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:55:5-110:19
 MERGED from [adapter-topon-2.2.0.aar] C:\Users\Administrator\Desktop\ywj\.toolchain\gradle-home\caches\transforms-3\fb701242c869f00aa740816a8ff6329e\transformed\jetified-adapter-topon-2.2.0\AndroidManifest.xml:7:5-8:19
 MERGED from [adapter-topon-2.2.0.aar] C:\Users\Administrator\Desktop\ywj\.toolchain\gradle-home\caches\transforms-3\fb701242c869f00aa740816a8ff6329e\transformed\jetified-adapter-topon-2.2.0\AndroidManifest.xml:7:5-8:19
 MERGED from [anythink_adx_sdk_kuying_6.5.77_necessary.aar] C:\Users\Administrator\Desktop\ywj\.toolchain\gradle-home\caches\transforms-3\8037256a526fe7104518bde1aef0864b\transformed\jetified-anythink_adx_sdk_kuying_6.5.77_necessary\AndroidManifest.xml:26:5-100:19
@@ -541,24 +541,24 @@ ADDED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\Android
 		ADDED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:88:13-57
 	android:name
 		ADDED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:85:13-46
-activity#com.yefiot.cloudguard.wxapi.WXEntryActivity
-ADDED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:91:9-96:75
+activity#com.yefiot.community.wxapi.WXEntryActivity
+ADDED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:93:9-98:75
 	android:launchMode
-		ADDED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:95:13-44
+		ADDED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:97:13-44
 	android:exported
-		ADDED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:93:13-36
+		ADDED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:95:13-36
 	android:theme
-		ADDED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:96:13-72
+		ADDED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:98:13-72
 	android:taskAffinity
-		ADDED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:94:13-56
+		ADDED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:96:13-56
 	android:name
-		ADDED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:92:13-50
+		ADDED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:94:13-70
 meta-data#android.support.FILE_PROVIDER_PATHS
-ADDED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:104:13-106:54
+ADDED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:106:13-108:54
 	android:resource
-		ADDED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:106:17-51
+		ADDED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:108:17-51
 	android:name
-		ADDED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:105:17-67
+		ADDED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml:107:17-67
 uses-sdk
 INJECTED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from C:\Users\Administrator\Desktop\ywj\shell-android\app\src\main\AndroidManifest.xml

@@ -19,33 +19,23 @@
 
 return array(
     array(
-        'product_id'     => 'vip_month_1',
-        'title'          => '月度会员',
-        'desc'           => '30 天免广告特权',
-        'months'         => 1,
-        'price'          => 600,        // 6.00 元
-        'original_price' => 800,        // 8.00 元
-        'recommend'      => 0,
-        'ios_iap_id'     => 'com.yefiot.community.vip.month1'
-    ),
-    array(
-        'product_id'     => 'vip_month_3',
-        'title'          => '季度会员',
-        'desc'           => '90 天免广告特权',
-        'months'         => 3,
-        'price'          => 1500,       // 15.00 元
-        'original_price' => 2400,       // 24.00 元
+        'product_id'     => 'vip_month_6',
+        'title'          => '半年免广告',
+        'desc'           => '180 天免广告特权',
+        'months'         => 6,
+        'price'          => 1500,       // 15.00 元（正式价）
+        'original_price' => 3600,       // 36.00 元
         'recommend'      => 1,
-        'ios_iap_id'     => 'com.yefiot.community.vip.month3'
+        'ios_iap_id'     => ''          // 已放弃 IAP（改小程序开通），字段保留占位
     ),
     array(
         'product_id'     => 'vip_month_12',
-        'title'          => '年度会员',
+        'title'          => '年度免广告',
         'desc'           => '365 天免广告特权',
         'months'         => 12,
-        'price'          => 4800,       // 48.00 元
-        'original_price' => 9600,       // 96.00 元
+        'price'          => 2500,       // 25.00 元
+        'original_price' => 7200,       // 72.00 元
         'recommend'      => 0,
-        'ios_iap_id'     => 'com.yefiot.community.vip.month12'
+        'ios_iap_id'     => ''
     )
 );

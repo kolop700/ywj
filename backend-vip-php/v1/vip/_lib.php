@@ -315,6 +315,8 @@ function vip_mark_order_closed($order_no)
     $db = vip_db();
     $stmt = $db->prepare('UPDATE t_vip_order SET status = 2 WHERE out_trade_no = ? AND status = 0');
     if ($stmt) {
+        // 修复：原实现漏 bind_param，带占位符的 execute 从未生效（关单静默失败）
+        $stmt->bind_param('s', $order_no);
         $stmt->execute();
         $stmt->close();
     }
@@ -462,6 +464,52 @@ function vip_wechat_app_params($prepayId, $config)
         'timestamp' => (string)time()
     );
     $params['sign'] = vip_wechat_sign($params, $config['api_key']);
+    return $params;
+}
+
+/**
+ * 微信统一下单（trade_type=JSAPI，小程序支付拉起用）→ 成功返回 prepay_id，失败 false
+ * 说明：app_id 使用小程序 appid（mini_app_id），openid 必须是该小程序 appid 下的用户 openid；
+ *      商户号/密钥与 App 支付同一个（取自 vip_pay_config.php 的 mch_id），回调也沿用 vipWxNotify
+ */
+function vip_wechat_unifiedorder_jsapi($order, $config, $openid)
+{
+    if (empty($config['mini_app_id']) || empty($openid)) return false;
+    $params = array(
+        'appid' => $config['mini_app_id'],
+        'mch_id' => $config['mch_id'],
+        'nonce_str' => md5(uniqid('', true)),
+        'body' => $order['title'],
+        'out_trade_no' => $order['out_trade_no'],
+        'total_fee' => intval($order['amount']), // 单位：分
+        'spbill_create_ip' => isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '127.0.0.1',
+        'notify_url' => rtrim(vip_pay_config('notify_base'), '/') . '/vipWxNotify/',
+        'trade_type' => 'JSAPI',
+        'openid' => $openid
+    );
+    $params['sign'] = vip_wechat_sign($params, $config['api_key']);
+    $resp = vip_http_post('https://api.mch.weixin.qq.com/pay/unifiedorder', vip_wechat_array_to_xml($params), 'application/xml; charset=utf-8');
+    if (!$resp) return false;
+    $r = vip_wechat_xml_to_array($resp);
+    if (empty($r['prepay_id'])) {
+        log_r('vip wechat unifiedorder jsapi fail: ' . $resp);
+        return false;
+    }
+    return $r['prepay_id'];
+}
+
+/** 组装小程序 wx.requestPayment 调起参数（appId/timeStamp/nonceStr/package/signType/paySign） */
+function vip_wechat_jsapi_params($prepayId, $config)
+{
+    $params = array(
+        'appId' => $config['mini_app_id'],
+        'timeStamp' => (string)time(),
+        'nonceStr' => md5(uniqid('', true)),
+        'package' => 'prepay_id=' . $prepayId,
+        'signType' => 'MD5'
+    );
+    // JSAPI 调起签名与 APP 二次签名同规则（ksort k=v&...&key=APIKEY 后 MD5），vip_wechat_sign 直接可用
+    $params['paySign'] = vip_wechat_sign($params, $config['api_key']);
     return $params;
 }
 

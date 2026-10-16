@@ -44,11 +44,18 @@ export const useAdStore = defineStore('ad', () => {
     return platform === 'android' || platform === 'ios' ? platform : 'android'
   }
 
-  // 获取广告位ID（按当前平台与广告控制类型返回，未配置/全关返回空串）
+  // 获取广告位ID（按当前平台与独立广告开关返回，未配置/对应开关关闭返回空串）
   const getAdId = (type) => {
     const adControlStore = useAdControlStore() // 使用广告控制 store
-    // App 内广告全关（'0' 都不显示 / '04' 只保留开屏）时不返回任何广告位
-    if (adControlStore.isAdsDisabled) {
+    // 按类型查各自的独立开关（2026-10 起运营端四开关单独控制；开屏不走本函数，见 App.vue）
+    const switchMap = {
+      banner: 'showBanner',
+      informationflow: 'showBanner', // 信息流随横幅开关
+      rewardedVideo: 'showRewarded',
+      interstitial: 'showInterstitial'
+    }
+    const sw = switchMap[type]
+    if (sw && !adControlStore[sw]) {
       return ''
     }
     const platform = isTestMode.value ? 'test' : getPlatform()

@@ -1,0 +1,21 @@
+import { defineConfig } from 'vite'
+import uni from '@dcloudio/vite-plugin-uni'
+import AutoImport from 'unplugin-auto-import/vite'
+const path = require('path')
+
+// 云卫家 H5 构建配置：
+//   publicPath/路由 base 由 manifest.json 的 h5.router.base('/ad/') 决定，这里不再设置 vite.base，避免覆盖。
+export default defineConfig({
+	plugins: [
+		uni(),
+		AutoImport({
+			imports: ['vue', 'vue-router']
+		})
+	],
+	resolve: {
+		alias: {
+			// HBuilderX 工程里 "common/xxx" 裸路径写法，vite 需显式指向项目内 common 目录
+			common: path.resolve(__dirname, 'common')
+		}
+	}
+})

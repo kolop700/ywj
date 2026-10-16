@@ -119,6 +119,7 @@ const deviceApi = proxy.$api.device
 import scanUtils from '@/utils/scanUtils'
 import checkVersion from '@/pages/lq-upgrade/checkVersion.js'
 import { checkIosStoreUpdate } from '@/utils/iosStoreUpdate.js'
+import { encrypt } from '@/utils/aesUtils'
 // 原生壳桥接（仅 H5）：用于「不同意协议」时退出应用
 // #ifdef H5
 import { isNativeShell, NativeApp } from '@/utils/h5-native-bridge'
@@ -180,7 +181,57 @@ const menuList = ref([
     url: '/workbench_package/pages/face-upload/index',
     needLogin: true
   },
+  {
+    // 【免广告】直接拉起小程序 VIP 开通页（不进会员页）；iOS 提审期由下方开关隐藏
+    name: "免广告",
+    icon: "star-fill",
+    bg: "#FFF4DE",
+    color: "#F5A623",
+    action: 'adfree',
+    needLogin: true
+  },
 ])
+
+// 【提审开关】iOS 审核期间隐藏「免广告」入口（提审前置 false，过审后改回 true；Android 不受影响）
+const SHOW_AD_FREE_ENTRY = true
+
+// 云卫家小程序（ywjxcx）拉起配置：与 user_package/pages/vip/index.vue 一致
+// appId：微信开放平台「移动应用」AppId（App 与小程序 wxcdc46554970d5e77 同属一个开放平台账号）
+const MINI_PROGRAM = {
+  appId: 'wx4c80533df6184dda',
+  userName: 'gh_67863dc191ba',
+  // 【正式】0=正式版；联调时曾改为 2=体验版
+  type: 0
+}
+
+// 拉起小程序免广告开通页：uid/pid 混淆加密传递（默认选中半年档，小程序内可切年度档）
+const openAdFreeMini = () => {
+  // #ifdef H5
+  const uid = encrypt(String(userStore.userId))
+  const pid = encrypt('vip_month_6')
+  if (!uid || !pid) {
+    uni.showToast({ title: '参数生成失败，请重试', icon: 'none' })
+    return
+  }
+  const query = `uid=${encodeURIComponent(uid)}&pid=${encodeURIComponent(pid)}&ts=${Date.now()}`
+  NativeApp.launchMiniProgram({
+    appId: MINI_PROGRAM.appId,
+    userName: MINI_PROGRAM.userName,
+    path: `userMode/pages/appvip/appvip?${query}`,
+    type: MINI_PROGRAM.type
+  }).catch((err) => {
+    console.warn('[首页] 拉起小程序失败', err)
+    uni.showToast({
+      title: (err && (err.msg || err.errMsg)) || '打开微信小程序失败，请安装微信后重试',
+      icon: 'none',
+      duration: 2500
+    })
+  })
+  // #endif
+  // #ifndef H5
+  uni.showToast({ title: '请在云卫家 App 内开通', icon: 'none' })
+  // #endif
+}
 
 // 检查版本更新（Android 对比后端 t_ver 下载安装；iOS 直接查 App Store 最新版，零维护）
 const checkAppUpdate = () => {
@@ -214,6 +265,13 @@ onLoad(() => {
   userStore.login({ showLoading: false }).catch(() => {})
   // 检查版本更新（不阻塞登录流程）
   checkAppUpdate()
+  // 【提审开关】iOS 关闭时移除「免广告」入口（Android 不隐藏）
+  if (!SHOW_AD_FREE_ENTRY) {
+    const plat = String(uni.getSystemInfoSync().platform || '').toLowerCase()
+    if (plat === 'ios') {
+      menuList.value = menuList.value.filter((m) => m.action !== 'adfree')
+    }
+  }
 })
 
 // 在组件挂载后检查首次打开状态
@@ -239,6 +297,11 @@ const handleGridItemClick = (item) => {
   // #endif
   
   if (item.needLogin && !userStore.checkLogin()) {
+    return
+  }
+  // 【免广告】特殊动作：直接拉起小程序开通页，不走页面跳转
+  if (item.action === 'adfree') {
+    openAdFreeMini()
     return
   }
   if (item.url) {

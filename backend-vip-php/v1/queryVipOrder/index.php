@@ -46,8 +46,12 @@ if ($order['status'] == 2) {
 
 // ---------- 待支付：主动查询渠道补偿掉单 ----------
 $paidTxId = '';
-if ($order['pay_type'] === 'wechat') {
+if ($order['pay_type'] === 'wechat' || $order['pay_type'] === 'wechat_mini') {
     $config = vip_pay_config('wechat');
+    // JSAPI 小程序单必须用小程序 appid 查单（微信按 appid+商户号+订单号 定位订单）
+    if ($order['pay_type'] === 'wechat_mini' && !empty($config['mini_app_id'])) {
+        $config['app_id'] = $config['mini_app_id'];
+    }
     if (!empty($config['app_id']) && !empty($config['mch_id']) && !empty($config['api_key'])) {
         $r = vip_wechat_order_query($order_no, $config);
         if (is_array($r) && isset($r['trade_state']) && strtoupper($r['trade_state']) === 'SUCCESS') {

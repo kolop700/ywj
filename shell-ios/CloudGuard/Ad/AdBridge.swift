@@ -13,7 +13,9 @@ import AppTrackingTransparency
 ///   1) `#if canImport(AnyThinkSDK)`（Taku iOS SDK 已集成）——真实实现：
 ///      - ad.init：ATT 授权（未决定时弹窗，回调完成/超时后放行，保证后续广告请求携带 IDFA）
 ///        + ATAPI 初始化 + customData(user_type + user_id哈希) 下发（幂等，可重复调用）；
-///      - ad.setUserType：UserDefaults 持久化 + 运行时更新 customData（对后续广告请求生效）；
+///      - ad.setUserType：UserDefaults 持久化 + 运行时更新 customData；
+///        【VIP 免广告-代码级】user_type=vip 时所有 load/show 入口直接拒绝（不向 Taku 发起任何请求，
+///        不依赖 Taku 后台流量分组），customData 仅作后台统计对账；切 vip 时同步移除已挂载横幅；
 ///      - 激励视频 / 插屏 / 开屏 / 横幅：load + show 全套，结果经 ad.onEvent 异步下发；
 ///      - rect 说明：JS 以 CSS px 上报，WKWebView 中 CSS px 与 pt 1:1，无需 dpr 换算
 ///        （Android 侧需乘 dpr，见 shell-android AdBridge.showBanner）。
@@ -30,8 +32,12 @@ final class AdBridge: NSObject {
     private weak var host: WebViewController?
     private let channel: JsChannel
 
-    /// 当前用户类型：'vip' | 'normal'（Taku 自定义流量分组 user_type）
+    /// 当前用户类型：'vip' | 'normal'（【VIP 免广告-代码级拦截】依据：vip 时不发起任何广告请求）
     private var userType: String
+
+    /// 【VIP 免广告】代码级拦截判定：横幅/插屏/激励视频的 load/show 入口据此短路，不依赖 Taku 后台流量分组。
+    /// 注：开屏广告不在拦截范围（VIP 仅免 App 界面内广告，启动封面广告照常展示）
+    private var isVipBlocked: Bool { userType == "vip" }
 
     /// 用户 ID 原始值（仅内存保存；applyCustomData 时哈希后以 user_id 上报，供后台按用户对账，不传原始 ID）
     private var userId: String = ""
@@ -86,8 +92,8 @@ final class AdBridge: NSObject {
     private func initAd(params: [String: Any], callbackId: String?) {
         let appId = params["appId"] as? String ?? ""
         let appKey = params["appKey"] as? String ?? ""
-        // 【VIP 免广告-流量分组】初始化前先落地用户类型：
-        // 保证「开屏」等冷启动首个广告请求即命中 VIP 流量分组（官方要求 init 前设置）。
+        // 【VIP 免广告】初始化前先落地用户类型（代码级拦截依据，load/show 入口据此短路）；
+        // 同时经 applyCustomData 下发给 Taku 仅作后台统计对账，不依赖后台流量分组。
         if let ut = params["userType"] as? String, !ut.isEmpty {
             userType = (ut == "vip") ? "vip" : "normal"
             UserDefaults.standard.set(userType, forKey: AdBridge.userTypeDefaultsKey)
@@ -169,7 +175,18 @@ final class AdBridge: NSObject {
             userId = params["userId"] as? String ?? ""
         }
 #if canImport(AnyThinkSDK)
-        // 运行时更新全局自定义参数，对后续广告请求生效（已加载未展示的广告由 H5 adControl 兜底）
+        if t == "vip" {
+            // 【VIP 免广告】立即移除已挂载横幅；后续 load/show 入口全部被 isVipBlocked 拒绝
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                for (_, view) in self.bannerViews {
+                    view.removeFromSuperview()
+                }
+                self.bannerViews.removeAll()
+                self.pendingBanners.removeAll()
+            }
+        }
+        // 同步更新全局自定义参数（仅后台统计对账用；拦截由 isVipBlocked 代码级完成）
         applyCustomData()
 #endif
         channel.resolveOk(callbackId)
@@ -179,9 +196,10 @@ final class AdBridge: NSObject {
 
     // ==================== 真实实现（Taku iOS SDK） ====================
 
-    /// Taku 全局自定义参数（自定义流量分组）：
-    /// 后台「流量分组 → 自定义规则」配置 user_type = vip 命中「VIP 免广告」分组（空广告源）。
-    /// user_id 为 SHA-256 哈希前缀（假名标识，仅用于后台对账，不影响分组匹配）。
+    /// Taku 全局自定义参数：user_type + user_id哈希。
+    /// 【说明】免广告不依赖后台流量分组（由 isVipBlocked 在 load/show 入口代码级拦截），
+    /// 此处下发仅供 Taku 后台按用户类型/用户对账统计。
+    /// user_id 为 SHA-256 哈希前缀（假名标识，不影响任何匹配）。
     private func applyCustomData() {
         var data: [AnyHashable: Any] = [:]
         data["user_type"] = userType
@@ -229,6 +247,11 @@ final class AdBridge: NSObject {
             fail(params: params, callbackId: callbackId, msg: "empty placementId")
             return
         }
+        // 【VIP 免广告-代码级拦截】不向 Taku 发起任何请求（不依赖后台流量分组）
+        guard !isVipBlocked else {
+            fail(params: params, callbackId: callbackId, msg: "vip_no_ad")
+            return
+        }
         let extra: [AnyHashable: Any] = [:]
         ATAdManager.shared().loadAD(withPlacementID: placementId, extra: extra, delegate: self)
         // 加载结果经 ad.onEvent 异步下发；立即释放调用（与 Android 行为一致）
@@ -239,6 +262,11 @@ final class AdBridge: NSObject {
         let placementId = params["placementId"] as? String ?? ""
         guard !placementId.isEmpty else {
             fail(params: params, callbackId: callbackId, msg: "empty placementId")
+            return
+        }
+        // 【VIP 免广告】防止运行中开通后「已加载未展示」广告被展示
+        guard !isVipBlocked else {
+            fail(params: params, callbackId: callbackId, msg: "vip_no_ad")
             return
         }
         guard let vc = host?.topViewController() else {
@@ -267,6 +295,11 @@ final class AdBridge: NSObject {
             fail(params: params, callbackId: callbackId, msg: "empty placementId")
             return
         }
+        // 【VIP 免广告-代码级拦截】
+        guard !isVipBlocked else {
+            fail(params: params, callbackId: callbackId, msg: "vip_no_ad")
+            return
+        }
         let extra: [AnyHashable: Any] = [:]
         ATAdManager.shared().loadAD(withPlacementID: placementId, extra: extra, delegate: self)
         channel.resolveOk(callbackId)
@@ -276,6 +309,11 @@ final class AdBridge: NSObject {
         let placementId = params["placementId"] as? String ?? ""
         guard !placementId.isEmpty else {
             fail(params: params, callbackId: callbackId, msg: "empty placementId")
+            return
+        }
+        // 【VIP 免广告】
+        guard !isVipBlocked else {
+            fail(params: params, callbackId: callbackId, msg: "vip_no_ad")
             return
         }
         guard let vc = host?.topViewController() else {
@@ -303,6 +341,7 @@ final class AdBridge: NSObject {
             fail(params: params, callbackId: callbackId, msg: "empty placementId")
             return
         }
+        // 【开屏不免广告】VIP 拦截不适用于开屏：启动封面广告对所有用户照常展示（H5 侧 App.vue 已同步去掉 isVip 跳过）
         var extra: [AnyHashable: Any] = [:]
         // 开屏请求容忍超时（秒）：超时后 didTimeoutLoadingSplashAD 回调下发失败事件
         extra[kATSplashExtraTolerateTimeoutKey] = NSNumber(value: 8)
@@ -319,6 +358,7 @@ final class AdBridge: NSObject {
             fail(params: params, callbackId: callbackId, msg: "empty placementId")
             return
         }
+        // 【开屏不免广告】不做 VIP 拦截（与 loadSplash 一致）
         guard let host = host, let window = host.view.window else {
             fail(params: params, callbackId: callbackId, msg: "window not available")
             return
@@ -344,6 +384,11 @@ final class AdBridge: NSObject {
         let placementId = params["placementId"] as? String ?? ""
         guard !placementId.isEmpty else {
             fail(params: params, callbackId: callbackId, msg: "empty placementId")
+            return
+        }
+        // 【VIP 免广告-代码级拦截】含「仅预加载」（rect 缺省）分支：VIP 不发起任何横幅请求
+        guard !isVipBlocked else {
+            fail(params: params, callbackId: callbackId, msg: "vip_no_ad")
             return
         }
         let positionKey = (params["positionKey"] as? String).flatMap { $0.isEmpty ? nil : $0 } ?? "default"

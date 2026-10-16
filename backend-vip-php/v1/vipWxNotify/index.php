@@ -43,8 +43,10 @@ if (!vip_wechat_verify_sign($data, $config['api_key'])) {
     vip_wx_notify_reply(false, 'sign error');
 }
 
-// 校验 appid / mch_id 与本商户一致
-if ((string)$data['appid'] !== (string)$config['app_id'] || (string)$data['mch_id'] !== (string)$config['mch_id']) {
+// 校验 appid / mch_id 与本商户一致（App 支付用开放平台 app_id；小程序 JSAPI 单回调带的是 mini_app_id）
+$allowAppids = array((string)$config['app_id']);
+if (!empty($config['mini_app_id'])) $allowAppids[] = (string)$config['mini_app_id'];
+if (!in_array((string)$data['appid'], $allowAppids, true) || (string)$data['mch_id'] !== (string)$config['mch_id']) {
     log_r('vipWxNotify appid/mchid mismatch order=' . $data['out_trade_no']);
     vip_wx_notify_reply(false, 'config mismatch');
 }

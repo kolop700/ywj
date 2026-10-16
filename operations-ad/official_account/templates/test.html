@@ -1,0 +1,65 @@
+{% extends "wx_base.html" %}
+
+{% block title %}充电测试{% endblock %}
+
+{% block body %}
+    <div>
+        <a href="javascript:;" id="btn">分享</a>
+    </div>
+    <div>
+        <a href="javascript:;" id="btn1">打开小程序</a>
+    </div>
+    <script>
+        $.ajax({
+            url: '/wx/get_wx_config',
+            type: 'GET',
+            data: {page_url: location.href.split('#')[0].split('?')[0]},
+            dataType: 'json',
+            success: function (data, status, xhr) {
+                if (data.is_success){
+                    wx.config({
+                      debug: false,
+                      appId: data.result.appId,
+                      timestamp: data.result.timestamp, // 必填，生成签名的时间戳
+                      nonceStr: data.result.nonceStr, // 必填，生成签名的随机串
+                      signature: data.result.signature,// 必填，签名
+                      jsApiList: ['showOptionMenu', 'updateAppMessageShareData'] // 必填，需要使用的JS接口列表
+                    });
+                } else {
+                    alert(data.message);
+                }
+            }
+        });
+
+
+        wx.ready(function(){
+
+        });
+
+        wx.error(function(res){
+            console.log(res);
+            alert('wx.config错误!');
+        });
+
+        $('#btn').on('click', function(){
+              // updateAppMessageShareData没法像小程序一样调出分享框。。。只能点右上角分享按扭，把当前页分享
+              wx.updateAppMessageShareData({
+                title: '测试分享', // 分享标题
+                desc: '测试分享abc', // 分享描述
+                link: 'http://er.guodian.com.cn/wx/test', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+                imgUrl: '', // 分享图标
+                success: function () {
+                  // 设置成功
+                   console.log('成功');
+                },
+                fail: function(e){
+                    console.log('失败:', e);
+                }
+              })
+        });
+
+        $('#btn1').on('click', function(){
+            location.href = 'weixin://dl/business/?appid=wxaaf4c972cf3af9e4&path=pages%2Fqropen%2Fqropen&env_version=release';
+        });
+    </script>
+{% endblock body %}

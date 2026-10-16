@@ -2,8 +2,9 @@
 import TakuAds, { TAKU_CONFIG } from '@/common/taku-sdk'
 import { useAgreementStore } from '@/store/modules/agreement'
 import { useAdStore } from '@/store/modules/ad'
-import { isVip } from '@/utils/vipUtils' // 【VIP 免广告】开屏跳过（VIP 状态由登录流程 syncVipStatus 同步）
-import { AD_CONTROL_TYPES, AD_CONTROL_STORAGE_KEY } from '@/store/modules/adControl' // 【广告类型】开屏跳过判断（'0' 都不显示）
+// 【VIP 免广告范围】开屏（启动封面）广告不免：此处不再按 isVip 跳过；
+// 界面内广告（横幅/插屏/激励）由原生壳 load/show 入口代码级拦截（见 shell AdManager/AdBridge）
+import { AD_CONTROL_TYPES, AD_CONTROL_STORAGE_KEY } from '@/store/modules/adControl' // 【广告开关】开屏跳过判断（缓存对象 splash=0 或旧枚举 '0' 时跳过）
 
 import { getCurrentInstance } from 'vue'
 
@@ -11,25 +12,26 @@ import { getCurrentInstance } from 'vue'
 const launchAt = Date.now()
 const SPLASH_SHOW_WINDOW_MS = 10000
 
-// 开屏广告：广告 SDK 初始化成功后调用（冷启动单次；跳过条件：VIP 用户、广告类型缓存为 '0'（都不显示）；
+// 开屏广告：广告 SDK 初始化成功后调用（冷启动单次；跳过条件仅余广告类型缓存 '0'（都不显示）；
 // 原生壳侧为纯响应式（仅响应 ad.splash.load 调用），故此处 H5 判断即完整控制点，详见 store/modules/ad.js）
 const loadSplashAd = () => {
-	// 【VIP 免广告】VIP 用户直接跳过开屏（H5 侧兜底：adType=NONE 管不到开屏；
-	// 原生侧由 Taku 后台流量分组 user_type=vip 拦截，见 utils/vipUtils.js）
-	if (isVip()) {
-		console.log('[TakuAds] VIP 用户跳过开屏广告')
-		return
-	}
+	// 【开屏不免广告】VIP 用户也展示开屏（产品约定：免广告仅覆盖 App 界面内广告）
 	// 【广告类型 '0'（都不显示）】上次登录算出的房间广告类型缓存为 '0' → 连开屏一起跳过；
 	// '04'（只显示开屏）与其他类型保留开屏展示（缓存由 store/modules/user.js 登录后写入）
-	let cachedAdType = ''
+	let cachedAd = null
 	try {
-		cachedAdType = uni.getStorageSync(AD_CONTROL_STORAGE_KEY) || ''
+		cachedAd = uni.getStorageSync(AD_CONTROL_STORAGE_KEY) || ''
 	} catch (e) {
 		// 读取失败按无缓存处理（默认展示开屏）
 	}
-	if (cachedAdType === AD_CONTROL_TYPES.NONE) {
-		console.log('[TakuAds] 广告类型缓存为 0（都不显示），跳过开屏广告')
+	// 新格式：登录后写入的开关对象 {splash,banner,rewarded,interstitial}，splash 非 1 则跳过；
+	// 旧格式（升级前的枚举字符串）：仅 '0'（都不显示）跳过开屏，保持旧行为不误伤
+	const splashOff =
+		cachedAd && typeof cachedAd === 'object'
+			? Number(cachedAd.splash) !== 1
+			: String(cachedAd) === AD_CONTROL_TYPES.NONE
+	if (splashOff) {
+		console.log('[TakuAds] 广告开关缓存：开屏已关，跳过开屏广告')
 		return
 	}
 	const splashId = useAdStore().getSplashAdId()

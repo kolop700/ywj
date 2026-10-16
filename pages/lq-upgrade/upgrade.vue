@@ -1,4 +1,5 @@
 <template>
+	<view class="upgrade-mask">
 	<view class="upgrade-popup">
 		<image class="header-bg" src="./upgrade_bg.png" mode="widthFix"></image>
 		<view class="main">
@@ -30,6 +31,7 @@
 				<view class="btn upgrade" @click="handleUpgrade">立即更新</view>
 			</view>
 		</view>
+	</view>
 	</view>
 </template>
 
@@ -78,6 +80,17 @@
 		},
 		created() {
 			uni.$on('upgrade-app',this.bindEmit)
+		},
+		onLoad(options) {
+			// H5 下 navigateTo 的 success+emit 时序不可靠，兼收 URL 参数（checkVersion.js 两处都传）
+			if (options && (options.name || options.url)) {
+				this.bindEmit({
+					name: decodeURIComponent(options.name || ''),
+					content: decodeURIComponent(options.content || ''),
+					url: decodeURIComponent(options.url || ''),
+					forceUpdate: options.forceUpdate === '1'
+				})
+			}
 		},
 		beforeDestroy() {
 			uni.$off('upgrade-app',this.bindEmit)
@@ -143,6 +156,17 @@
 	}
 </style>
 <style lang="scss" scoped>
+	/* 全屏半透明遮罩：H5 下 page 背景会被白底 body 穿透，改由固定层实现 */
+	.upgrade-mask {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: rgba(18, 26, 51, 0.55);
+		z-index: 9998;
+	}
+
 	.upgrade-popup {
 		width: 580rpx;
 		height: auto;
@@ -160,7 +184,9 @@
 
 	.header-bg {
 		width: 100%;
-		margin-top: -112rpx;
+		display: block;
+		/* H5 下去掉云打包时代的负边距溢出效果：与 overflow:hidden 叠加会把头图裁没，改为完整显示 */
+		margin-top: 0;
 	}
 
 	.main {

@@ -19,6 +19,13 @@ import { isNativeShell, NativeApp, NativePay } from '@/utils/h5-native-bridge'
 import { syncVipStatus } from '@/utils/vipUtils'
 import vipApi from '@/api/vip/vip'
 
+/**
+ * 【IAP 总开关】iOS 会员改走微信小程序开通（createVipMiniOrder，无苹果抽成）：
+ *   false = iOS 不再下发内购渠道，VIP 页走「跳小程序开通」（当前策略）
+ *   true  = 恢复 Apple 内购链路（代码/后端 verifyIapOrder/壳 PayBridge 全部保留，被拒审可回切）
+ */
+export const ENABLE_IAP = false
+
 /** 轮询参数：间隔 2.5s，总超时 120s（覆盖用户跳出微信/支付宝再返回的耗时） */
 const QUERY_INTERVAL = 2500
 const QUERY_TIMEOUT = 120000
@@ -46,16 +53,18 @@ export async function getPayPlatform() {
 
 /**
  * 获取当前平台默认可用的支付方式列表（用于页面渲染）
+ * type='mini' 为特殊渠道：不走 purchaseVip，由页面跳 ywjxcx 小程序 appvip 页开通
  * @param {String} platform getPayPlatform() 结果
  * @returns {Array<{ type: String, label: String }>}
  */
 export function getPayChannels(platform) {
   if (platform === 'ios') {
-    return [{ type: 'iap', label: 'Apple 内购' }]
+    // IAP 停用后 iOS 唯一渠道：跳小程序开通（页面据此隐藏价格，规避 3.1.1 支付引导）
+    return ENABLE_IAP ? [{ type: 'iap', label: 'Apple 内购' }] : [{ type: 'mini', label: '微信小程序开通' }]
   }
-  // 当前仅开放微信支付；支付宝入口暂不展示（后端 createVipOrder 已内置未配置降级，
-  // 后续开通：填 vip_pay_config.php 支付宝配置 + 在此加回 alipay 项即可）
-  return [{ type: 'wechat', label: '微信支付' }]
+  // Android：微信 APP 支付为主，小程序开通为备（支付宝入口暂不展示，
+  // 后端 createVipOrder 已内置未配置降级，后续开通填 vip_pay_config.php + 在此加回 alipay 项）
+  return [{ type: 'wechat', label: '微信支付' }, { type: 'mini', label: '微信小程序开通' }]
 }
 
 /**
@@ -83,9 +92,14 @@ export async function purchaseVip(productId, options = {}) {
     throw new Error('设备平台识别失败，请升级 App 后重试')
   }
   let payType = options.payType
-  if (!payType) payType = platform === 'ios' ? 'iap' : 'wechat'
+  if (!payType) payType = platform === 'ios' ? (ENABLE_IAP ? 'iap' : 'mini') : 'wechat'
+  if (payType === 'mini') {
+    // 小程序渠道不在此建单：由 VIP 页跳 ywjxcx，小程序内调 createVipMiniOrder 下单
+    throw new Error('请前往小程序完成开通')
+  }
   if (platform === 'ios' && payType !== 'iap') {
-    throw new Error('iOS 端请使用 Apple 内购')
+    if (ENABLE_IAP) throw new Error('iOS 端请使用 Apple 内购或小程序开通')
+    throw new Error('iOS 端请前往微信小程序开通会员')
   }
   if (platform !== 'ios' && payType === 'iap') {
     throw new Error('Apple 内购仅支持 iOS 端')

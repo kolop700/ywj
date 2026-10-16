@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.yefiot.community"
-    android:versionCode="100"
-    android:versionName="1.0.0" >
+    android:versionCode="127"
+    android:versionName="1.0.27" >
 
     <uses-sdk
         android:minSdkVersion="24"
@@ -231,9 +231,13 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.CloudGuard.Scan" />
 
-        <!-- 微信回调入口（必须位于 应用包名.wxapi 下）：支付回调见 WXEntryActivity.kt -->
+        <!--
+             微信回调入口：必须位于 <applicationId>.wxapi 下（com.yefiot.community.wxapi），
+             且此处写全限定类名——用相对名会被 AGP 按 namespace(cloudguard) 解析，
+             导致微信回跳找不到页面、支付完成后不返回 App。详见 WXEntryActivity.kt 注释
+        -->
         <activity
-            android:name="com.yefiot.cloudguard.wxapi.WXEntryActivity"
+            android:name="com.yefiot.community.wxapi.WXEntryActivity"
             android:exported="true"
             android:launchMode="singleTask"
             android:taskAffinity="com.yefiot.community"

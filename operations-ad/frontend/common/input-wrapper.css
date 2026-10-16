@@ -1,0 +1,19 @@
+.uni-input-wrapper {
+	/* #ifndef APP-NVUE */
+	display: flex;
+	/* #endif */
+	width: auto;
+	padding: 8px 13px;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	background-color: #FFFFFF;
+}
+
+.uni-input {
+	height: 28px;
+	line-height: 28px;
+	font-size: 15px;
+	padding: 0px;
+	flex: 1;
+	background-color: #FFFFFF;
+}

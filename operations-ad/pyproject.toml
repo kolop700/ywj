@@ -1,0 +1,51 @@
+[tool.poetry]
+name = "park_pay_intf"
+version = "0.1.0"
+description = ""
+authors = ["wei <my.cow@163.com>"]
+package-mode = false
+
+[[tool.poetry.source]]
+name = "ali"
+url = "https://mirrors.aliyun.com/pypi/simple/"
+priority = 'primary'
+
+[tool.poetry.dependencies]
+python = ">=3.10"
+flask = "*"
+flask-login = "*"
+flask-sqlalchemy = "*"
+flask-restful = "*"
+pycryptodome = "*"
+requests = "*"
+sqlalchemy-utils = "*"
+wtforms-alchemy = "*"
+wtforms = "*"
+# psycopg2 = "*"  # 生产环境装这个，装不上可以先apt install libpq-dev
+redis = "*"
+passlib = "*"
+celery = "*"
+flask_caching = "*"
+flask_wtf = "*"
+kombu = "*"
+pytest = "*"
+Pillow = "*"
+qrcode = "*"
+#crcmod = "*"
+#aliyun-python-sdk-core-v3 = "*"
+xlwt = "*"
+sqlalchemy = "*"
+nanoid = "*"
+#anytree = "*"
+#paho-mqtt = "*"
+#websockets = "*"
+#geoalchemy2 = "*"  # sqlalchemy地理信息类型
+pymysql = "*"
+
+[tool.poetry.dev-dependencies]
+psycopg2-binary = "*"  # 官方文档说，psycopg2-binary包适合用于开发的测试，生产建议用psycopg2包
+
+[build-system]
+requires = ["poetry>=1.0"]
+build-backend = "poetry.masonry.api"
+

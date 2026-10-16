@@ -1,0 +1,172 @@
+{
+	"pages": [
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "云卫家"
+			}
+		},
+		{
+            "path" : "pages/mine/mine",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "我的",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/test/test",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "测试",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/login/login",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "用户登录",
+                "enablePullDownRefresh": false
+            }
+            
+        },
+        {
+            "path" : "pages/users/users",
+            "style" : 
+            {
+                "navigationBarTitleText" : "用户管理",
+                "enablePullDownRefresh" : true
+            }
+        },
+        {
+            "path" : "pages/users/edit",
+            "style" : 
+            {
+                "navigationBarTitleText" : "新增/编辑用户",
+                "enablePullDownRefresh" : false
+            }
+        },
+        {
+            "path" : "pages/order/order",
+            "style" : 
+            {
+                "navigationBarTitleText" : "分佣结算单",
+                "enablePullDownRefresh" : true
+            }
+        },
+        {
+            "path" : "pages/comms/comms",
+            "style" : 
+            {
+                "navigationBarTitleText" : "佣金记录",
+                "enablePullDownRefresh" : true
+            }
+        },
+        {
+            "path" : "pages/order/detail",
+            "style" : 
+            {
+                "navigationBarTitleText" : "订单结算记录",
+                "enablePullDownRefresh" : false
+            }
+        },
+        {
+            "path" : "pages/profile/profile",
+            "style" : 
+            {
+                "navigationBarTitleText" : "用户资料",
+                "enablePullDownRefresh" : false
+            }
+        },
+        {
+            "path" : "pages/uv/uv",
+            "style" : 
+            {
+                "navigationBarTitleText" : "小区日活",
+                "enablePullDownRefresh" : false
+            }
+        },
+        {
+            "path" : "pages/uv/door",
+            "style" : 
+            {
+                "navigationBarTitleText" : "设备日活",
+                "enablePullDownRefresh" : false
+            }
+        },
+        {
+            "path" : "pages/uv/daily",
+            "style" : 
+            {
+                "navigationBarTitleText" : "日活数据",
+                "enablePullDownRefresh" : false
+            }
+        },
+        {
+            "path" : "pages/order/super",
+            "style" : 
+            {
+                "navigationBarTitleText" : "上级结算单",
+                "enablePullDownRefresh" : true
+            }
+        },
+        {
+            "path" : "pages/order/new",
+            "style" : 
+            {
+                "navigationBarTitleText" : "新建结算单"
+            }
+        },
+        {
+            "path" : "pages/uv/agency",
+            "style" : 
+            {
+                "navigationBarTitleText" : "运营账号日活"
+            }
+        },
+        {
+            "path" : "pages/taku/taku",
+            "style" : 
+            {
+                "navigationBarTitleText" : "Taku广告收益",
+                "enablePullDownRefresh" : true
+            }
+        },
+        {
+            "path" : "pages/wxad/wxad",
+            "style" : 
+            {
+                "navigationBarTitleText" : "微信流量主",
+                "enablePullDownRefresh" : true
+            }
+        }
+    ],
+	"globalStyle": {
+		"navigationBarTextStyle": "white",
+		"navigationBarTitleText": "运营管理",
+		"navigationBarBackgroundColor": "#007AFF",
+		"backgroundColor": "#FFFFFF"
+	},
+	"tabBar": {
+        "color": "#C0C4CC", //未选中的菜单文字颜色
+        "selectedColor": "#fa436a", //选中时的菜单文字颜色
+        "borderStyle": "black",
+        "backgroundColor": "#ffffff", //背景
+        "list": [{
+                "pagePath": "pages/index/index", //页面地址
+                "iconPath": "static/imgs/home.png", //未选中时的图片
+                "selectedIconPath": "static/imgs/home.png", //选中时的图片
+                "text": "首页" //菜单文字
+            },
+            {
+                "pagePath": "pages/mine/mine",
+                "iconPath": "static/imgs/mine.png",
+                "selectedIconPath": "static/imgs/mine.png",
+                "text": "我的"
+            }
+        ]
+    }
+}

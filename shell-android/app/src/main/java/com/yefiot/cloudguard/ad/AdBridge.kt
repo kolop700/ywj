@@ -98,9 +98,9 @@ class AdBridge(
     private fun initAd(params: JSONObject, callbackId: String?) {
         val appId = params.optString("appId")
         val appKey = params.optString("appKey")
-        // 【VIP 免广告-流量分组】初始化前先落地用户类型：
-        // setUserType 在 SDK 未初始化时仅写本地缓存，由 manager.init() 在 ATSDK.init 之前统一生效，
-        // 保证「开屏」等冷启动首个请求就命中 VIP 流量分组（官方要求 init 前调用）。
+        // 【VIP 免广告】初始化前先落地用户类型（代码级拦截依据）：
+        // setUserType 写入本地缓存，AdManager 各 load/show 入口据此短路（VIP 不发起任何广告请求），
+        // 不依赖 Taku 后台流量分组；同时 init 前经 initCustomMap 下发仅作后台统计对账。
         val userType = params.optString("userType")
         if (userType.isNotEmpty()) {
             manager.setUserType(userType)

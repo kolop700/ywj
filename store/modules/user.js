@@ -3,7 +3,7 @@ import { ref, computed } from 'vue'
 import userApi from '@/api/user/user'
 import deviceApi from '@/api/device/device' // 引入设备API
 import { useDeviceStore } from './device'
-import { useAdControlStore, AD_CONTROL_STORAGE_KEY } from './adControl' // 引入广告控制 store（含广告类型缓存键）
+import { useAdControlStore, AD_CONTROL_STORAGE_KEY, AD_ENUM_TO_SWITCHES } from './adControl' // 引入广告控制 store（含广告开关缓存键与旧枚举映射）
 import { useAdStore } from './ad' // 引入广告 store（横幅预加载）
 import { applyVipAdControl, syncVipStatus, clearVip } from '@/utils/vipUtils' // 【VIP 免广告】VIP 状态同步与广告拦截（见 utils/vipUtils.js）
 
@@ -115,45 +115,47 @@ export const useUserStore = defineStore('user', () => {
         }, res.data[0].expire_date)
         maxExpireDate.value = maxDate
 
-        // 定义广告类型优先级
-        const adPriority = {
-          '11': 5, // banner + 激励 最高优先级
-          '13': 4, // banner + 插屏
-          '1': 3,  // 只显示 banner
-          '04': 2, // 只显示开屏（比 '0' 宽松：保留开屏）
-          '0': 1   // 不显示任何广告（含开屏） 最低优先级
-        }
+        // 【广告独立开关】按房间逐项 OR：任一房间开启某类广告 → 该类广告开启
+        // 只聚合有效房间（status=1）：过期/失效房间不应把广告“借尸还魂”（否则用户关掉所有有效小区后，
+        // 名下 2010 年就过期、旧枚举恒开的测试房间仍会让开屏永远命中 OR）
+        // 房间级取值优先 t_community 新四列（ad_splash/ad_banner/ad_rewarded/ad_interstitial），
+        // 列值为 NULL（未配置过）时回退旧枚举 ad_prod_app 映射（兼容存量数据）
+        const sws = { splash: 0, banner: 0, rewarded: 0, interstitial: 0 }
+        res.data.forEach((room) => {
+          if (String(room.status) !== '1') return // 失效房间不参与广告开关计算
+          const legacy = AD_ENUM_TO_SWITCHES[String(room.ad_prod_app)] || AD_ENUM_TO_SWITCHES['0']
+          // 列值：0/1 直接采用；NULL/空串/哨兵9（SQL 用 COALESCE(col,9) 表示未配置）回退旧枚举
+          const pick = (col, legacyVal) => {
+            const n = Number(col)
+            return col === null || col === undefined || col === '' || n === 9 ? legacyVal : n === 1 ? 1 : 0
+          }
+          sws.splash = Math.max(sws.splash, pick(room.ad_splash, legacy.splash))
+          sws.banner = Math.max(sws.banner, pick(room.ad_banner, legacy.banner))
+          sws.rewarded = Math.max(sws.rewarded, pick(room.ad_rewarded, legacy.rewarded))
+          sws.interstitial = Math.max(sws.interstitial, pick(room.ad_interstitial, legacy.interstitial))
+        })
+        console.log('广告独立开关（多房间有效房OR后）:', sws)
 
-        // 从所有房间中找出优先级最高的广告类型
-        const selectedAd = res.data.reduce((highest, room) => {
-          const currentAdType = room.ad_prod_app
-          const currentPriority = adPriority[currentAdType] || 0
-          const highestPriority = adPriority[highest] || 0
-          return currentPriority > highestPriority ? currentAdType : highest
-        }, '0') // 默认值为'0'
-
-        console.log('选择的广告类型:', selectedAd)
-        // 存储选择的广告类型
-        adType.value = selectedAd
-
-        // 缓存广告类型（供下次冷启动 App.vue 判断开屏：'0' 都不显示时跳过开屏）
+        // 缓存广告开关对象（供下次冷启动 App.vue 判断开屏；'开屏关'时跳过开屏）
         try {
-          uni.setStorageSync(AD_CONTROL_STORAGE_KEY, selectedAd)
+          uni.setStorageSync(AD_CONTROL_STORAGE_KEY, sws)
         } catch (e) {
-          console.error('[广告] 广告类型缓存写入失败', e)
+          console.error('[广告] 广告开关缓存写入失败', e)
         }
 
-        // 【VIP 免广告】VIP 用户广告全关（applyVipAdControl 内部置 NONE 并返回 true）；
-        // 非 VIP（或 VIP 开关关闭）按房间计算值正常设置并预热横幅。
+        // 【VIP 免广告】VIP 用户界面广告全关（setVipAdsOff 只关横幅/激励/插屏，不动开屏）；
+        // 非 VIP（或 VIP 开关关闭）按房间开关正常设置并预热横幅。
         if (applyVipAdControl()) {
-          console.log('[VIP] 已拦截房间广告类型设置（房间计算值为 ' + selectedAd + '，未生效）')
+          console.log('[VIP] 已拦截房间广告开关设置（房间计算值仅存缓存，未生效）')
         } else {
-          // 获取广告控制 store 并设置广告类型
+          // 获取广告控制 store 并按房间计算值设置四项开关
           const adControlStore = useAdControlStore()
-          adControlStore.setAdType(selectedAd)
+          adControlStore.setAdSwitches(sws)
 
-          // 广告类型确定后：预热横幅（提前竞价，用户进入页面时可直接复用展示）
-          useAdStore().preloadBanner()
+          // 横幅开关开启时才预热（提前竞价，用户进入页面时可直接复用展示）
+          if (adControlStore.showBanner) {
+            useAdStore().preloadBanner()
+          }
         }
       } else {
         // 无房间（无 ad_prod_app 配置依据）：清除广告类型缓存，开屏按默认展示
@@ -187,6 +189,11 @@ export const useUserStore = defineStore('user', () => {
     deviceStore.clearDeviceList()
     
     try {
+      // 【换账号防御】先把上个账号可能残留的 VIP 状态清零（不走退出直接换登、或 getVipStatus 静默失败时，
+      // vip 残留会让壳层开屏请求带 user_type=vip → 命中 Taku 后台 VIP 空分组无填充 → 非 VIP 用户开屏消失），
+      // 再从服务端同步本账号真实会员状态，同步成功时会自动覆盖回 vip
+      clearVip()
+
       // 登录成功后先同步真实会员状态（决定房间广告计算与免广告拦截），再获取房间列表
       await syncVipStatus(data.user_id)
 

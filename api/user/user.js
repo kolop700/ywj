@@ -86,13 +86,14 @@ export default {
       ...options
     })
   },
-  // 获取用户房间列表
+  // 获取用户房间列表（附带小区级独立广告开关四列，供广告开关逐项计算，见 store/modules/user.js）
   getUserRoomList(user_id, options = {}) {
     return request({
       url: BASE_API + 'openSQL/',
       method: 'post',
      data: {
-       sql: `SELECT * FROM v_room_ad_user WHERE user_id =  ''${user_id}''`
+       // 开关列为 NULL（未配置）时返回哨兵 9，前端据此回退旧枚举（接口会把 NULL 序列化成空串，无法直接区分）
+       sql: `SELECT v.*, COALESCE(c.ad_splash,9) ad_splash, COALESCE(c.ad_banner,9) ad_banner, COALESCE(c.ad_rewarded,9) ad_rewarded, COALESCE(c.ad_interstitial,9) ad_interstitial FROM v_room_ad_user v LEFT JOIN t_community c ON c.comm_id = v.comm_id WHERE v.user_id =  ''${user_id}''`
        },
       ...defaultOptions,
       ...options
@@ -141,7 +142,7 @@ export default {
       url: BASE_API + 'getAppVer/',
       method: 'post',
       data: {
-        app_no: '1'  // 固定传入 app_no: 1
+        app_no: '4'  // 云卫家专用版本桶（与星云小卫 app_no:1 分离，避免同桶互相误升）
       },
       ...defaultOptions,
       ...options

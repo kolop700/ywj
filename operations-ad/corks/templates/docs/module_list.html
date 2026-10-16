@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+    <table border="1">
+        <tr>
+            <td>模块</td>
+            <td>说明</td>
+        </tr>
+        {% for m in modules %}
+            <tr>
+                <td><a href="{{- url_for('docs',module=m) -}}">{{- m -}}</a></td>
+                <td>{{- modules[m]['doc'] -}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    <br/>
+    <span>
+        每个api返回的结果都有相同的结构：
+        <pre>
+        成功时：
+            {
+                "is_success": true,
+                "result": xxx  // 成功结果
+            }
+
+        失败时：
+            {
+                "is_success": false,
+                "message": xxx  // 错误消息
+            }
+        </pre>
+    </span>
+</body>
+
+</html>

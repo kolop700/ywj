@@ -66,9 +66,12 @@ public class AdManager {
      */
     private static final boolean AD_DEBUG = false;
 
-    /** 【VIP 免广告】用户类型（流量分组）本地缓存：冷启动时在 ATSDK.init 之前读取并设置 */
+    /** 【VIP 免广告】用户类型本地缓存：代码级拦截依据（VIP 不发起任何广告请求，不依赖 Taku 后台流量分组） */
     private static final String PREF_NAME = "taku_prefs";
     private static final String KEY_USER_TYPE = "user_type";
+
+    /** 【VIP 免广告】代码拦截失败码（load/show 被 VIP 挡下时经 onAdFailed 下发，JS 侧按普通无填充降级处理） */
+    private static final int VIP_BLOCK_CODE = -10;
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
@@ -179,8 +182,8 @@ public class AdManager {
         try {
             // 打开 Taku 网络日志：logcat 会打印每个广告位选中的广告源（平台名 / firmId / 瀑布流 / ecpm）。
             ATSDK.setNetworkLogDebug(AD_DEBUG);
-            // 【VIP 免广告-流量分组】按本地缓存的用户类型（user_type=vip/normal）设置全局自定义规则。
-            // 官方要求：ATSDK.init() 之前调用（后台按 user_type=vip 建「无广告源」分组拦截 VIP 请求）。
+            // 【VIP 免广告】把 user_type 作为全局自定义参数下发（仅用于 Taku 后台统计/对账区分，
+            // 免广告本身由 isVipUser() 在 load/show 入口代码级拦截，不依赖后台流量分组配置）。
             applyUserTypeForInit();
             ATSDK.init(appContext, appId, appKey);
             ATSDK.start();
@@ -196,19 +199,22 @@ public class AdManager {
     /**
      * 【VIP 免广告】设置用户类型（"vip"；其它值一律归一为 "normal"）。
      *
-     * 双通道保障（Taku「自定义流量分组」官方机制）：
-     *   1) 立即持久化到本地：下次冷启动由 init() 在 ATSDK.init() 之前读取并设置，
-     *      保证「开屏」等冷启动请求也命中 VIP 流量分组（开屏不受页面级广告开关约束）；
-     *   2) SDK 已初始化时直接调用 ATSDK.initCustomMap 更新，后续广告请求即携带新分组标记。
+     * 免广告主机制（代码级，不依赖 Taku 后台流量分组）：
+     *   1) isVipUser() 为 true 时，横幅/插屏/激励视频的 load/show 入口直接拒绝，不向 Taku 发起任何广告请求；
+     *   2) 【开屏广告不免】VIP 仅免 App 界面内广告，启动封面（开屏）广告照常展示；
+     *   3) 切为 vip 的此刻，清理已缓存/已展示的横幅/插屏/激励视频（防运行中开通后残留展示）；
+     *   4) user_type 仍经 initCustomMap 下发给 Taku（仅供后台按用户类型统计对账，非拦截依据）。
      *
-     * 说明：需 Taku 后台配置规则（user_type=vip → 空广告源分组 + 最高优先级）后才实际拦截；
-     *      H5 侧另有 adControl 全关兜底（见 utils/vipUtils.js）。
+     * H5 侧另有 adControl 控制（见 utils/vipUtils.js；开屏不受 VIP 影响，见 App.vue）。
      */
     public void setUserType(String type) {
         final String t = "vip".equalsIgnoreCase(type) ? "vip" : "normal";
         if (appContext != null) {
             appContext.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
                     .edit().putString(KEY_USER_TYPE, t).apply();
+        }
+        if ("vip".equals(t)) {
+            clearLoadedAds();
         }
         if (inited) {
             try {
@@ -229,6 +235,40 @@ public class AdManager {
         if (appContext == null) return "normal";
         return appContext.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
                 .getString(KEY_USER_TYPE, "normal");
+    }
+
+    /**
+     * 【VIP 免广告-代码级拦截】当前用户是否为免广告 VIP。
+     * 所有广告 load/show 入口据此短路：不创建广告对象、不向 Taku 发起请求。
+     * 生效前提：H5 侧 vipUtils.setVipMode 已经桥接把 user_type 写入本缓存（冷启动 initAd 亦会带上）。
+     */
+    private boolean isVipUser() {
+        return "vip".equalsIgnoreCase(getUserTypeCached());
+    }
+
+    /**
+     * 【VIP 免广告】清理全部已缓存的界面内广告：横幅移除悬浮视图并销毁，激励/插屏对象置空。
+     * 开屏不在清理/拦截范围（VIP 不免开屏，下次冷启动照常展示）。
+     * 运行中开通 VIP 时调用，防止「已加载未展示」的广告之后被 show 出来。
+     */
+    private void clearLoadedAds() {
+        runOnMain(new Runnable() {
+            @Override
+            public void run() {
+                for (String key : new HashMap<>(bannerMap).keySet()) {
+                    destroyBanner(key);
+                }
+                for (AdHolder h : rewardedMap.values()) {
+                    h.rewardedAd = null;
+                    h.cbs = null;
+                }
+                for (AdHolder h : interstitialMap.values()) {
+                    h.interstitialAd = null;
+                    h.cbs = null;
+                }
+                Log.i(TAG, "VIP: all cached ads cleared");
+            }
+        });
     }
 
     /** init() 内调用：在 ATSDK.init 之前把 user_type 设为全局自定义规则（流量分组） */
@@ -301,6 +341,7 @@ public class AdManager {
     // ==================== 激励视频 ====================
     public void loadRewardedVideo(String placementId, AdCallback cbs) {
         if (!checkInited(placementId, cbs)) return;
+        if (checkVipBlocked(cbs, "rewarded", placementId)) return;
         final AdHolder holder = getHolder(rewardedMap, placementId);
         holder.cbs = cbs;
 
@@ -364,6 +405,11 @@ public class AdManager {
 
     public void showRewardedVideo(String placementId, Context activityContext) {
         AdHolder holder = rewardedMap.get(placementId);
+        if (isVipUser()) {
+            Log.i(TAG, "showRewardedVideo skipped: VIP 免广告（代码拦截）, placementId=" + placementId);
+            fire(holder, "onAdFailed", VIP_BLOCK_CODE, "vip_no_ad");
+            return;
+        }
         if (holder == null || holder.rewardedAd == null) {
             Log.w(TAG, "showRewardedVideo skipped: not loaded, placementId=" + placementId);
             return;
@@ -384,6 +430,7 @@ public class AdManager {
     // ==================== 插屏 ====================
     public void loadInterstitial(String placementId, AdCallback cbs) {
         if (!checkInited(placementId, cbs)) return;
+        if (checkVipBlocked(cbs, "interstitial", placementId)) return;
         final AdHolder holder = getHolder(interstitialMap, placementId);
         holder.cbs = cbs;
 
@@ -445,6 +492,11 @@ public class AdManager {
 
     public void showInterstitial(String placementId, Context activityContext) {
         AdHolder holder = interstitialMap.get(placementId);
+        if (isVipUser()) {
+            Log.i(TAG, "showInterstitial skipped: VIP 免广告（代码拦截）, placementId=" + placementId);
+            fire(holder, "onAdFailed", VIP_BLOCK_CODE, "vip_no_ad");
+            return;
+        }
         if (holder == null || holder.interstitialAd == null) {
             Log.w(TAG, "showInterstitial skipped: not loaded, placementId=" + placementId);
             return;
@@ -481,6 +533,7 @@ public class AdManager {
      */
     public void showBanner(String positionKey, String placementId, Context activityContext, AdCallback cbs) {
         if (!checkInited(placementId, cbs)) return;
+        if (checkVipBlocked(cbs, "banner", placementId)) return;
         BannerHolder holder = bannerMap.get(positionKey);
         if (holder == null) {
             holder = new BannerHolder();
@@ -608,6 +661,7 @@ public class AdManager {
      */
     public void loadSplash(String placementId, AdCallback cbs) {
         if (!checkInited(placementId, cbs)) return;
+        // 【开屏不免广告】VIP 拦截不适用于开屏：启动封面广告对所有用户照常展示
         SplashHolder holder = splashMap.get(placementId);
         if (holder == null) {
             holder = new SplashHolder();
@@ -669,6 +723,7 @@ public class AdManager {
      */
     public void showSplash(String placementId, Context activityContext, ViewGroup container, AdCallback cbs) {
         SplashHolder holder = splashMap.get(placementId);
+        // 【开屏不免广告】不做 VIP 拦截（与 loadSplash 一致）
         if (holder == null || holder.splashAd == null) {
             Log.w(TAG, "showSplash skipped: not loaded, placementId=" + placementId);
             fire(cbs, "onAdFailed", -3, "splash not loaded");
@@ -720,6 +775,20 @@ public class AdManager {
             return false;
         }
         return true;
+    }
+
+    /**
+     * 【VIP 免广告-代码级拦截】load 入口统一检查：VIP 直接下发 onAdFailed(vip_no_ad) 并拒绝，
+     * 不创建广告对象、不向 Taku 发起任何请求（JS 侧按普通加载失败降级，页面隐藏广告位）。
+     * @return true = 已拦截（调用方应直接 return）
+     */
+    private boolean checkVipBlocked(AdCallback cbs, String kind, String placementId) {
+        if (isVipUser()) {
+            Log.i(TAG, "load skipped: VIP 免广告（代码拦截）, " + kind + " " + placementId);
+            fire(cbs, "onAdFailed", VIP_BLOCK_CODE, "vip_no_ad");
+            return true;
+        }
+        return false;
     }
 
     private AdHolder getHolder(Map<String, AdHolder> map, String placementId) {

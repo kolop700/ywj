@@ -30,8 +30,10 @@ const checkVersion = async ({
                 //当前页面不是升级页面跳转防止多次打开
 			if (getCurrentPageRoute() !== 'pages/lq-upgrade/upgrade') {
 				console.log('getCurrentPageRoute', getCurrentPageRoute())
+				// 参数随 URL 传递（H5 下 success+emit 时序不可靠，emit 仅作兼容保留）
+				const q = `?name=${encodeURIComponent(name || '')}&content=${encodeURIComponent(content || '')}&url=${encodeURIComponent(url || '')}&forceUpdate=${forceUpdate ? '1' : '0'}`
 				uni.navigateTo({
-					url: '/pages/lq-upgrade/upgrade',
+					url: '/pages/lq-upgrade/upgrade' + q,
 					success() {
 						uni.$emit('upgrade-app', {
 							name,

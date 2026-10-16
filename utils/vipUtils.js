@@ -14,7 +14,7 @@
  * 另存 taku_vip_expire（到期时间）：isVip() 过期兜底 + 展示用。
  */
 import TakuAds, { USER_TYPE_STORAGE_KEY } from '@/common/taku-sdk'
-import { useAdControlStore, AD_CONTROL_TYPES } from '@/store/modules/adControl'
+import { useAdControlStore } from '@/store/modules/adControl'
 import vipApi from '@/api/vip/vip'
 
 /** VIP 到期时间存储键（'YYYY-MM-DD HH:mm:ss'） */
@@ -118,16 +118,16 @@ export function clearVip() {
 }
 
 /**
- * 把 VIP 状态应用到 H5 广告开关：VIP → 全关（NONE）。
- * 供登录/房间广告类型计算处调用（见 store/modules/user.js updateRoomList）。
- * @returns {Boolean} true = VIP 已拦截（调用方应跳过正常广告类型设置）；false = 非 VIP（按正常流程处理）
+ * 把 VIP 状态应用到 H5 广告开关：VIP → 界面三类（横幅/激励/插屏）关，开屏不动（VIP 不免开屏）。
+ * 供登录/房间广告开关计算处调用（见 store/modules/user.js updateRoomList）。
+ * @returns {Boolean} true = VIP 已拦截（调用方应跳过正常广告开关设置）；false = 非 VIP（按正常流程处理）
  */
 export function applyVipAdControl() {
   if (!isVip()) return false
   try {
     const adControlStore = useAdControlStore()
-    adControlStore.setAdType(AD_CONTROL_TYPES.NONE)
-    console.log('[VIP] 免广告生效：广告控制类型置为 NONE')
+    adControlStore.setVipAdsOff()
+    console.log('[VIP] 免广告生效：横幅/激励/插屏已关（开屏不受影响）')
   } catch (e) {
     console.error('[VIP] applyVipAdControl 失败', e)
   }

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+    <table border="1">
+        <tr>
+            <td>api</td>
+            <td>请求方式</td>
+            <td>参数</td>
+            <td>说明</td>
+        </tr>
+        {% for api in apis.values() %}
+            <tr>
+                <td>{{- api['full_url'] -}}</td>
+                <td>{{- api['methods'] -}}</td>
+                <td>
+                    {% for p in api['args'] %}
+                        {{ p['name'] }}:{{ p['alias'] }}{% if p['required']%}(必须){% endif %}; {{ p['type'] }}
+                        {% if p['default'] is not none %}
+                            &nbsp默认值:{{ p['default'] }}
+                        {% endif %} <br/>
+                    {% endfor %}
+                </td>
+                <td><pre>{{- api['doc'] -}}</pre></td>
+            </tr>
+        {% endfor %}
+    </table>
+</body>
+
+</html>

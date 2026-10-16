@@ -39,11 +39,12 @@
         >
           <view class="plan-tag" v-if="p.recommend">推荐</view>
           <text class="plan-title">{{ p.title }}</text>
-          <view class="plan-price">
+          <!-- iOS（IAP 停用）隐藏价格：苹果 3.1.1 不允许 App 内展示外部购买价格 -->
+          <view class="plan-price" v-if="!iosHidePrice">
             <text class="price-symbol">¥</text>
             <text class="price-num">{{ fmtYuan(p.price) }}</text>
           </view>
-          <text class="plan-origin" v-if="p.original_price > p.price">¥{{ fmtYuan(p.original_price) }}</text>
+          <text class="plan-origin" v-if="!iosHidePrice && p.original_price > p.price">¥{{ fmtYuan(p.original_price) }}</text>
         </view>
       </view>
       <view class="plans-empty" v-if="!products.length">档位加载失败，下拉重试或稍后再来</view>
@@ -61,11 +62,14 @@
         <up-icon :name="c.icon" size="24" :color="c.color"></up-icon>
         <text class="channel-label">{{ c.label }}</text>
         <view class="channel-radio">
+          <!-- uview-plus 无 circle 空圆图标，未选中态用 CSS 圆圈，避免直显英文图标名 -->
           <up-icon
-            :name="selectedChannel === c.type ? 'checkmark-circle-fill' : 'circle'"
+            v-if="selectedChannel === c.type"
+            name="checkmark-circle-fill"
             size="22"
-            :color="selectedChannel === c.type ? '#4A6CF7' : '#C8CCD8'"
+            color="#4A6CF7"
           ></up-icon>
+          <view v-else class="circle-off"></view>
         </view>
       </view>
     </view>
@@ -74,10 +78,12 @@
     <view class="agree">
       <view class="agree-check" @tap="agreed = !agreed">
         <up-icon
-          :name="agreed ? 'checkmark-circle-fill' : 'circle'"
+          v-if="agreed"
+          name="checkmark-circle-fill"
           size="22"
-          :color="agreed ? '#4A6CF7' : '#C8CCD8'"
+          color="#4A6CF7"
         ></up-icon>
+        <view v-else class="circle-off"></view>
       </view>
       <text class="agree-text">已阅读并同意</text>
       <text class="agree-link" @tap="openAgreement('user')">《用户服务协议》</text>
@@ -85,11 +91,16 @@
       <text class="agree-link" @tap="openAgreement('privacy')">《隐私政策》</text>
     </view>
 
+    <!-- iOS（IAP 停用）开通说明：不出现价格/支付字样，仅引导前往官方小程序 -->
+    <view class="mini-tip" v-if="iosHidePrice">
+      <text>开通会员权益请前往官方小程序，返回后本页面自动刷新会员状态</text>
+    </view>
+
     <!-- 底部开通按钮 -->
     <view class="footer">
       <button class="buy-btn" :disabled="paying || !products.length" @tap="handlePurchase">
         <text v-if="paying">正在确认支付结果…</text>
-        <text v-else>{{ vipActive ? '续费会员' : '立即开通' }}<text class="buy-price" v-if="currentPlan"> ¥{{ fmtYuan(currentPlan.price) }}</text></text>
+        <text v-else>{{ miniPurchase ? '前往小程序开通' : (vipActive ? '续费会员' : '立即开通') }}<text class="buy-price" v-if="currentPlan && !iosHidePrice"> ¥{{ fmtYuan(currentPlan.price) }}</text></text>
       </button>
     </view>
   </view>
@@ -97,9 +108,14 @@
 
 <script setup>
 import { ref, computed, getCurrentInstance, onMounted } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import vipApi from '@/api/vip/vip'
 import { isVip, getVipExpireDate, syncVipStatus } from '@/utils/vipUtils'
-import { purchaseVip, getPayPlatform, getPayChannels } from '@/utils/payUtils'
+import { purchaseVip, getPayPlatform, getPayChannels, ENABLE_IAP } from '@/utils/payUtils'
+import { encrypt } from '@/utils/aesUtils'
+// #ifdef H5
+import { NativeApp } from '@/utils/h5-native-bridge'
+// #endif
 
 const { proxy } = getCurrentInstance()
 const userStore = proxy.$store.user.useUserStore()
@@ -120,6 +136,19 @@ const currentPlan = computed(
   () => products.value.find((p) => p.product_id === selectedProduct.value) || null
 )
 
+// iOS 且 IAP 停用 → 隐藏价格/支付字样，走跳小程序开通
+const iosHidePrice = computed(() => platform.value === 'ios' && !ENABLE_IAP)
+// 当前选中是否小程序渠道（iOS 默认即小程序；Android 可在支付方式里选）
+const miniPurchase = computed(() => selectedChannel.value === 'mini' || iosHidePrice.value)
+
+// 跳 ywjxcx 小程序 appvip 页参数（与 workbench my/index.vue 绑微信入口同源）
+const MINI_PROGRAM = {
+  appId: 'wx4c80533df6184dda', // 微信开放平台「移动应用」AppId
+  userName: 'gh_67863dc191ba', // ywjxcx 小程序原始 ID
+  // 【正式】0=正式版；联调时曾改为 2=体验版
+  type: 0
+}
+
 // ---------- 权益文案 ----------
 const benefits = [
   { icon: 'eye-off', name: '全站免广告', desc: '启动开屏、横幅、信息流广告全部关闭' },
@@ -138,7 +167,8 @@ const fmtYuan = (cents) => {
 const channelMeta = {
   wechat: { icon: 'weixin-fill', color: '#07C160' },
   alipay: { icon: 'rmb-circle-fill', color: '#1677FF' },
-  iap: { icon: 'gift-fill', color: '#1B1B1F' }
+  iap: { icon: 'gift-fill', color: '#1B1B1F' },
+  mini: { icon: 'weixin-fill', color: '#07C160' }
 }
 
 // ---------- 加载 ----------
@@ -198,6 +228,12 @@ const handlePurchase = async () => {
     return
   }
 
+  // 小程序开通：不建单不拉支付，直接跳 ywjxcx appvip 页（小程序内 createVipMiniOrder 下单）
+  if (miniPurchase.value) {
+    openMiniProgram()
+    return
+  }
+
   paying.value = true
   try {
     const result = await purchaseVip(selectedProduct.value, {
@@ -214,6 +250,40 @@ const handlePurchase = async () => {
     paying.value = false
   }
 }
+
+/** 拉起小程序 VIP 开通页：uid/pid 用与 voipbind 同款的混淆加密传递 */
+const openMiniProgram = () => {
+  // #ifdef H5
+  const uid = encrypt(String(userStore.userId))
+  const pid = encrypt(selectedProduct.value)
+  if (!uid || !pid) {
+    uni.showToast({ title: '开通参数生成失败，请重试', icon: 'none' })
+    return
+  }
+  const query = `uid=${encodeURIComponent(uid)}&pid=${encodeURIComponent(pid)}&ts=${Date.now()}`
+  NativeApp.launchMiniProgram({
+    appId: MINI_PROGRAM.appId,
+    userName: MINI_PROGRAM.userName,
+    path: `userMode/pages/appvip/appvip?${query}`,
+    type: MINI_PROGRAM.type
+  }).catch((err) => {
+    console.warn('[vip] 拉起小程序失败', err)
+    uni.showToast({
+      title: (err && (err.msg || err.errMsg)) || '打开微信小程序失败，请安装微信后重试',
+      icon: 'none',
+      duration: 2500
+    })
+  })
+  // #endif
+  // #ifndef H5
+  uni.showToast({ title: '请在云卫家 App 内开通', icon: 'none' })
+  // #endif
+}
+
+// 从小程序返回 App 时刷新会员状态（开通结果以服务端为准）
+onShow(() => {
+  refreshVipState()
+})
 </script>
 
 <style lang="scss" scoped>
@@ -424,6 +494,15 @@ page {
   }
 }
 
+/* 未选中态空心圆（替代不存在的 circle 图标；渠道行与协议勾选共用） */
+.circle-off {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid #C8CCD8;
+  box-sizing: border-box;
+}
+
 /* ===== 协议 ===== */
 .agree {
   display: flex;
@@ -446,6 +525,17 @@ page {
     font-size: 23rpx;
     color: #4A6CF7;
   }
+}
+
+/* iOS 跳小程序开通提示（无价格/支付字样） */
+.mini-tip {
+  margin: 24rpx 8rpx 0;
+  padding: 22rpx 26rpx;
+  border-radius: 20rpx;
+  background: #F2F5FF;
+  font-size: 24rpx;
+  color: #4A5068;
+  line-height: 1.6;
 }
 
 /* ===== 底部按钮 ===== */

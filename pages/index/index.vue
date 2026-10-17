@@ -182,8 +182,8 @@ const menuList = ref([
     needLogin: true
   },
   {
-    // 【免广告】直接拉起小程序 VIP 开通页（不进会员页）；iOS 提审期由下方开关隐藏
-    name: "免广告",
+    // 【高级设置（原免广告）】直接拉起小程序 VIP 开通页（不进会员页）；iOS 提审期由下方开关隐藏
+    name: "高级设置",
     icon: "star-fill",
     bg: "#FFF4DE",
     color: "#F5A623",

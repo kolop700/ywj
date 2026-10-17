@@ -22,8 +22,9 @@ unpackage/
 # Android 本地 SDK 路径（各机器不同）
 shell-android/local.properties
 
-# Android 正式包签名密码（证书本体保留在 shell-android/keystore/，密码不入库）
+# Android 签名证书（2026-10 起证书本体也不入库，仅留本机；密码文件一直不入库）
 shell-android/keystore.properties
+shell-android/keystore/
 
 # python
 *.pyc
@@ -39,5 +40,16 @@ shell-ios/Pods/
 shell-ios/CloudGuard.xcodeproj/
 shell-ios/CloudGuard.xcworkspace/
 
-# 本地临时调试脚本（下划线前缀惯例：一次性工具脚本，不入库；已入库文件不受影响）
+# 本地临时调试脚本（下划线前缀惯例：一次性工具脚本，不入库；已入库文件不再受影响）
 scripts/_*
+
+# 生产库数据备份（含真实订单/用户数据，禁止入库）
+scripts/*.sql
+
+# 调试截图与临时目录、杂项压缩包（不入库）
+/_*.png
+/_tmp_xy/
+/qf-image-cropper.zip
+
+# 测试用 pinia store（仅被 modules 自动 glob 收集，无业务引用）
+store/modules/test.js
